@@ -2,21 +2,30 @@
   "product": "m5stack-codex-pet-notifier",
   "repository": "Sunmax0731/m5stack-codex-pet-notifier",
   "githubUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier",
-  "releaseStatus": "pending",
-  "releaseUrl": null,
+  "releaseStatus": "created",
+  "releaseUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier/releases/tag/v0.1.0-alpha.1",
   "tag": "v0.1.0-alpha.1",
   "isPrereleasePlanned": true,
-  "prerelease": null,
-  "latest": null,
-  "assetCount": 0,
+  "prerelease": true,
+  "latest": false,
+  "latestCheck": {
+    "endpoint": "repos/Sunmax0731/m5stack-codex-pet-notifier/releases/latest",
+    "result": "404-no-stable-release",
+    "latestIsThisPrerelease": false
+  },
+  "assetCount": 3,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
       "docs/manual-test.md",
       "docs/strict-manual-test-addendum.md"
     ],
-    "actualNames": [],
-    "allRequiredPresent": false
+    "actualNames": [
+      "m5stack-codex-pet-notifier-docs.zip",
+      "manual-test.md",
+      "strict-manual-test-addendum.md"
+    ],
+    "allRequiredPresent": true
   },
   "qcdsEvaluation": {
     "Quality": "S-",
@@ -28,12 +37,13 @@
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
-      "result": "pending"
+      "result": "passed"
     }
   ],
   "git": {
-    "clean": false,
-    "ahead": null,
-    "behind": null
+    "clean": true,
+    "ahead": 0,
+    "behind": 0,
+    "status": ""
   }
 }

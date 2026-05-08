@@ -31,4 +31,4 @@
 - [x] docs ZIP を生成する。
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。
-- [ ] GitHub prerelease 作成後に `docs/release-evidence.json` を実 URL で更新する。
+- [x] GitHub prerelease 作成後に `docs/release-evidence.json` を実 URL で更新する。
