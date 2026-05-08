@@ -1,0 +1,24 @@
+{
+  "releaseStatus": "not-created",
+  "version": "0.1.0-alpha.1",
+  "isPrereleasePlanned": true,
+  "manualTesting": "not-run",
+  "artifactsPlanned": [
+    "dist/m5stack-codex-pet-notifier-docs.zip",
+    "host-bridge archive",
+    "firmware-core2 binary",
+    "firmware-gray binary",
+    "sample-payload archive"
+  ],
+  "currentEvidence": [
+    "requirements documented",
+    "specification documented",
+    "design documented",
+    "architecture documented",
+    "test plan documented",
+    "manual test plan documented",
+    "release checklist documented",
+    "sample payloads prepared",
+    "docs zip prepared"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "type": "device.reply_selected",
+  "eventId": "evt-reply-001",
+  "createdAt": "2026-05-09T00:00:03+09:00",
+  "deviceId": "m5stack-sample-001",
+  "requestEventId": "evt-choice-001",
+  "choiceId": "yes",
+  "input": "button-a"
+}

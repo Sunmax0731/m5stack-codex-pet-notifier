@@ -1,0 +1,12 @@
+{
+  "type": "pet.updated",
+  "eventId": "evt-pet-001",
+  "createdAt": "2026-05-09T00:00:01+09:00",
+  "pet": {
+    "id": "astral-mender-codex-pet",
+    "name": "Astral Mender",
+    "state": "waiting",
+    "spriteRef": "host://pets/astral-mender/spritesheet.webp",
+    "fallbackState": "idle"
+  }
+}

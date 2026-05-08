@@ -1,0 +1,6 @@
+dist/
+build/
+.pio/
+.env
+*.local.json
+*.log

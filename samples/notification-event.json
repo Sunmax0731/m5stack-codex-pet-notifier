@@ -1,0 +1,9 @@
+{
+  "type": "notification.created",
+  "eventId": "evt-notification-001",
+  "createdAt": "2026-05-09T00:00:00+09:00",
+  "severity": "info",
+  "title": "Codex answered",
+  "body": "レビュー結果が返ってきました。確認待ちです。",
+  "threadId": "thread-local-sample"
+}

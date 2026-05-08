@@ -1,0 +1,22 @@
+{
+  "type": "prompt.choice_requested",
+  "eventId": "evt-choice-001",
+  "createdAt": "2026-05-09T00:00:02+09:00",
+  "threadId": "thread-local-sample",
+  "prompt": "この修正を続けますか。",
+  "choices": [
+    {
+      "id": "yes",
+      "label": "Yes"
+    },
+    {
+      "id": "no",
+      "label": "No"
+    },
+    {
+      "id": "other",
+      "label": "Other"
+    }
+  ],
+  "timeoutSec": 300
+}
