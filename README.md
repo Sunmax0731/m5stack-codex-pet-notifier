@@ -8,7 +8,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - Domain: IoT
 - Idea No: 18
 - Runtime gate: simulator / mock device / sample telemetry / host adapter / device adapter / security boundary
-- Manual hardware test: Core2 / GRAY とも Codex では未実施
+- Manual hardware test: Core2 target を `COM4` へ upload 済み。M5Stack が 2.4GHz LAN に接続することを serial log で確認済み
 - Release channel: GitHub prerelease
 
 ## MVP
@@ -29,6 +29,10 @@ cmd.exe /d /s /c npm run demo
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
 
+## Local Wi-Fi Config
+
+`D:\AI\secure\ssid.txt` は Git に入れません。M5Stack/ESP32 は 2.4GHz Wi-Fi のみ対応するため、5GHz SSID が記載されている場合は device scan で見つかった対応 2.4GHz SSID を `firmware/include/wifi_config.local.h` に設定します。この local header は `.gitignore` 対象です。
+
 ## Documents
 
 - [requirements.md](docs/requirements.md)
@@ -47,4 +51,4 @@ cmd.exe /d /s /c npm run demo
 
 ## Closed Alpha Boundary
 
-この release は simulator と mock device で runtime gate を通した検証版です。Core2 / GRAY の実機 Wi-Fi、touch、button、IMU、firmware 書き込みは未実施のため、安定版ではなく prerelease として扱います。
+この release は simulator と mock device で runtime gate を通した検証版です。現在の main では Core2 target の firmware 書き込みと Wi-Fi 接続まで確認済みです。touch、button、IMU、GRAY target、実 Codex adapter は未確認のため、安定版ではなく prerelease として扱います。

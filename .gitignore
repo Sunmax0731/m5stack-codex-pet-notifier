@@ -5,3 +5,5 @@ node_modules/
 .env
 *.local.json
 *.log
+firmware/include/wifi_config.local.h
+firmware/include/host_config.local.h

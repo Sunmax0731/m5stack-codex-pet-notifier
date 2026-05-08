@@ -32,7 +32,7 @@ cmd.exe /d /s /c npm run demo
 
 ## Firmware
 
-closed alpha では firmware scaffold を同梱します。実機 build / flash は未実施です。
+closed alpha では firmware scaffold を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi 接続を確認済みです。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
@@ -41,3 +41,11 @@ pio run -e m5stack-gray
 ```
 
 PlatformIO を追加導入する場合は `C:\` ではなく `E:\DevEnv` 以下へ配置してください。
+
+この環境では PlatformIO を `E:\DevEnv\PlatformIO\venv` に配置します。
+
+```powershell
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+```
+
+Wi-Fi 設定は `firmware/include/wifi_config.local.h` を使います。`D:\AI\secure\ssid.txt` が 5GHz SSID を指している場合、M5Stack/ESP32 から見える 2.4GHz SSID に変換して local header に保存してください。

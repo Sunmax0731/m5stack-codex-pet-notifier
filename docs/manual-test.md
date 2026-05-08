@@ -1,6 +1,6 @@
 # 手動テスト
 
-手動テストはCodexでは未実施です。closed alpha では simulator / mock device の自動検証までを Codex 側の実施範囲とし、Core2 / GRAY 実機確認はユーザー側の手動項目として残します。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続は Codex で実施済みです。closed alpha では simulator / mock device の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログまで確認しました。touch、button、IMU、GRAY target、実 Codex adapter はユーザー側の手動項目として残します。
 
 ## 共通前提
 
@@ -13,8 +13,8 @@
 
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
-| C2-01 | firmware を Core2 target で build / flash する | 起動画面に `Codex Pet` と profile が出る | 未実施 |
-| C2-02 | pairing code で登録する | Idle 画面に pet と接続状態が出る | 未実施 |
+| C2-01 | firmware を Core2 target で build / flash する | 起動画面に `Codex Pet` と profile が出る | 実施済み。`COM4` upload 成功 |
+| C2-02 | 2.4GHz Wi-Fi へ接続する | serial log に `wifi_connected` と device IP が出る | 実施済み。local IP は確認済み、公開 docs では redacted |
 | C2-03 | `notification.created` を送る | 通知画面へ遷移する | 未実施 |
 | C2-04 | `answer.completed` で長文を送る | swipe でスクロールできる | 未実施 |
 | C2-05 | `prompt.choice_requested` を送る | A/B/C 相当入力で返信できる | 未実施 |
@@ -39,3 +39,10 @@
 - device model。
 - 画面写真または短い動画。
 - 失敗時の event log。
+
+## Codex実施ログ要約
+
+- Build: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
+- Upload: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
+- Serial evidence: `wifi_connected`、`wifi_status connected` を確認。
+- 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。
