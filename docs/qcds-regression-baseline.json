@@ -1,0 +1,47 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.1.0-alpha.1",
+  "suiteStatus": "passed",
+  "scenarios": [
+    {
+      "id": "happy-path",
+      "status": "passed",
+      "validEvents": 4,
+      "invalidEvents": 0,
+      "warningCount": 1,
+      "replyCount": 1,
+      "interactionCount": 1,
+      "heartbeatCount": 1
+    },
+    {
+      "id": "missing-required",
+      "status": "expected-failure-detected",
+      "validEvents": 0,
+      "invalidEvents": 1,
+      "warningCount": 0,
+      "replyCount": 0,
+      "interactionCount": 0,
+      "heartbeatCount": 0
+    },
+    {
+      "id": "warning",
+      "status": "passed",
+      "validEvents": 1,
+      "invalidEvents": 0,
+      "warningCount": 1,
+      "replyCount": 0,
+      "interactionCount": 1,
+      "heartbeatCount": 0
+    },
+    {
+      "id": "mixed-batch",
+      "status": "expected-failure-detected",
+      "validEvents": 2,
+      "invalidEvents": 1,
+      "warningCount": 1,
+      "replyCount": 0,
+      "interactionCount": 0,
+      "heartbeatCount": 0
+    }
+  ]
+}

@@ -2,34 +2,25 @@
 
 ## 自動検証
 
-| Test | 内容 |
+| Test | 内容 | Evidence |
+| --- | --- | --- |
+| schema validation | sample payload と代表シナリオが event schema に合格または期待どおり拒否される | `dist/validation-result.json` |
+| host bridge auth | token なし、token 誤り、正しい token を検証する | `happy-path.securityBoundary` |
+| event routing | pet、notification、answer、choice が device session へ届く | `happy-path.validEvents` |
+| reply routing | A/B/C 返信が requestEventId 付きで host へ戻る | `happy-path.replyCount` |
+| scroll model | 長文回答の分割、位置、末尾判定を検証する | `mixed-batch.scrollPages` |
+| device profile | Core2 / GRAY の入力割り当て差分を検証する | `profileCovered` |
+| platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
+
+## Representative Suite
+
+| Scenario | 目的 |
 | --- | --- |
-| schema validation | sample payloadがevent schemaに合格する |
-| host bridge auth | tokenなし、token誤り、正しいtokenを検証する |
-| event routing | pet、notification、answer、choiceがdevice sessionへ届く |
-| reply routing | A/B/C返信がrequestEventId付きでhostへ戻る |
-| scroll model | 長文回答の分割、位置、末尾判定を検証する |
-| device profile | Core2 / GRAYの入力割り当て差分を検証する |
-
-## Simulator検証
-
-- `pet.updated`で表示petが変わる。
-- `notification.created`で通知画面が出る。
-- `answer.completed`で長文回答がスクロールできる。
-- `prompt.choice_requested`でA/B/Cが表示される。
-- `device.reply_selected`がhost logへ出る。
-- 通信断でErrorまたはReconnecting表示へ移る。
+| `happy-path` | Core2 profile で pet、通知、回答、選択、返信、interaction、heartbeat を通す |
+| `missing-required` | `eventId` 欠落 payload を拒否する |
+| `warning` | insecure sprite 参照を warning として検出する |
+| `mixed-batch` | 有効 payload、warning、4択不正 payload を同じ batch で扱う |
 
 ## 実機検証
 
-| Device | 必須確認 |
-| --- | --- |
-| Core2 | touch、swipe、Wi-Fi再接続、pet表示、choice返信、長文表示 |
-| GRAY | A/B/C、IMU tap代替、ボタン式スクロール、Wi-Fi再接続、pet表示 |
-
-## 受け入れ基準
-
-- simulatorで主要5フローが通る。
-- Core2 / GRAYの手動テスト表に結果がある。
-- security/privacy checklistのblockerが0件。
-- release checklistで未完了項目がprerelease本文に明記されている。
+Core2 / GRAY 実機テストは Codex では未実施です。手順は `docs/manual-test.md` に残し、release notes にも未実施範囲として明記します。

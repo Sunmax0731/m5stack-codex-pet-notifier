@@ -2,20 +2,13 @@
 
 ## コンポーネント
 
-| Component | Responsibility |
-| --- | --- |
-| Host Bridge | Codex App側の状態を正規イベントへ変換し、LAN内deviceへ配信する |
-| Device Firmware | M5Stack上で表示、入力、返信、再接続を扱う |
-| Device Profile | Core2 / GRAYの入力差分、画面更新、fallback操作を吸収する |
-| Simulator | 実機なしで通知、回答、選択肢、pet更新を再生する |
-| Sample Payloads | 実装とテストで使う代表JSON |
-
-## Transport
-
-- MVPはWebSocketを第一候補にする。
-- pairingと初期設定はHTTPで行う。
-- mDNS discoveryを試み、失敗時はhost IP手動入力へfallbackする。
-- 将来のMQTT adapterはtransport差し替えで追加する。
+| Component | Responsibility | 実装 |
+| --- | --- | --- |
+| Host Bridge | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する | `src/host-adapter/localLanBridge.mjs` |
+| Device Profile | Core2 / GRAY の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
+| Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
+| Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
+| Firmware scaffold | M5Unified 前提の最小 device loop | `firmware/` |
 
 ## Event Schema
 
@@ -27,29 +20,30 @@
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
+| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen` |
 
 ## 画面状態
 
 | State | Trigger | 表示 |
 | --- | --- | --- |
-| Pairing | 初回起動、token失効 | host IP、pairing code、接続状態 |
-| Idle | 通常時 | pet、接続状態、未読件数、最終通知 |
+| Pairing | 初回起動、token 失効 | host IP、pairing code、接続状態 |
+| Idle | 通常時、`pet.updated` | pet、接続状態、未読件数、最終通知 |
 | Notification | `notification.created` | タイトル、本文、重要度 |
-| Answer | `answer.completed` | 要約、本文、スクロール位置 |
-| Choice | `prompt.choice_requested` | prompt、A/B/C選択肢、timeout |
-| Error | 通信断、認証失敗、payload不正 | 原因、再試行状態 |
+| Answer | `answer.completed` | 要約、本文、ページ位置 |
+| Choice | `prompt.choice_requested` | prompt、A/B/C 選択肢、timeout |
+| Error | 通信断、認証失敗、payload 不正 | 原因、再試行状態 |
 
 ## 入力割り当て
 
 | Operation | Core2 | GRAY |
 | --- | --- | --- |
-| 選択A/B/C | 下部touch buttonまたは画面領域 | 物理A/B/C |
-| ペット反応 | pet領域tap | B長押しまたはIMU tap |
-| 回答スクロール | swipe up/down | A/C上下、B決定 |
-| 戻る | 画面左上tapまたはB長押し | B長押し |
+| 選択 A/B/C | 下部 touch button または画面領域 | 物理 A/B/C |
+| pet 反応 | pet 領域 tap | B 長押しまたは IMU tap |
+| 回答スクロール | swipe up/down | A/C 上下、B 決定 |
+| 戻る | 画面左上 tap または B 長押し | B 長押し |
 
-## 保存
+## 保存方針
 
-- device保存: `deviceId`、host URL、pairing token、表示設定。
-- device非保存: 通知本文、回答本文、返信本文、個人ペット画像。
-- host保存: 開発中のみevent logを保存し、release前に保存設定を明示する。
+- device 保存: `deviceId`、host URL、pairing token、表示設定。
+- device 非保存: 通知本文、回答本文、返信本文、個人 pet sprite。
+- host 保存: closed alpha では mock log のみ。実 Codex adapter 追加時に保存期間と削除手順を再定義する。

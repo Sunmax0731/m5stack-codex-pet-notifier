@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "device.pet_interacted",
+  "type": "object",
+  "required": ["type", "eventId", "createdAt", "deviceId", "petId", "interaction"],
+  "properties": {
+    "type": { "const": "device.pet_interacted" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "deviceId": { "type": "string", "minLength": 1 },
+    "petId": { "type": "string", "minLength": 1 },
+    "interaction": {
+      "type": "string",
+      "enum": ["touch", "button-long-press", "imu-tap"]
+    }
+  }
+}

@@ -1,22 +1,43 @@
-# Installation Guide
+# 導入手順
 
-## 開発前提
+## 必要環境
 
-- M5Stack Core2またはM5Stack GRAY。
-- Codex Appが動作するWindows PC。
-- PCとM5Stackが同一Wi-Fiに接続されていること。
-- Arduino IDEまたはPlatformIO。
-- Host Bridge実行用のNode.jsまたはPython。
+- Windows + PowerShell
+- Node.js 24 以上
+- npm 11 以上
+- 実機確認時のみ PlatformIO または Arduino IDE と M5Unified
+- 対象 device: M5Stack Core2 / M5Stack GRAY
 
-## 初期設定案
+## 自動検証
 
-1. Host BridgeをPCで起動する。
-2. M5Stack firmwareを書き込む。
-3. M5StackのPairing画面でhostを発見する。
-4. Host Bridgeに表示されたpairing codeを端末へ登録する。
-5. Idle画面にpetと接続状態が表示されることを確認する。
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm test
+```
 
-## 注意
+期待結果:
 
-- 実装開始前の文書であり、現時点では実行コマンドは確定していない。
-- 実装後はfirmware書き込み手順、host bridge起動コマンド、トラブルシュートを追記する。
+- `platform runtime gate passed for m5stack-codex-pet-notifier`
+- `validated m5stack-codex-pet-notifier`
+- `closed alpha guard passed for m5stack-codex-pet-notifier`
+- `dist/validation-result.json` と `dist/m5stack-codex-pet-notifier-docs.zip` が生成される。
+
+## Demo
+
+```powershell
+cmd.exe /d /s /c npm run demo
+```
+
+期待結果: `happy-path` の scenario summary が JSON で表示され、`status` が `passed` になる。
+
+## Firmware
+
+closed alpha では firmware scaffold を同梱します。実機 build / flash は未実施です。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
+pio run -e m5stack-core2
+pio run -e m5stack-gray
+```
+
+PlatformIO を追加導入する場合は `C:\` ではなく `E:\DevEnv` 以下へ配置してください。

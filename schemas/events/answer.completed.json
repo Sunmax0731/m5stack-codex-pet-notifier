@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "answer.completed",
+  "type": "object",
+  "required": ["type", "eventId", "createdAt", "threadId", "summary", "body"],
+  "properties": {
+    "type": { "const": "answer.completed" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "threadId": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "body": { "type": "string", "minLength": 1, "maxLength": 4000 }
+  }
+}

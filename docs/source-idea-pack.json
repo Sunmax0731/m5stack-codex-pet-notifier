@@ -1,9 +1,22 @@
 {
-  "source": "D:\\AI\\IDEAS\\IoT\\created_idea_018_m5stack-codex-pet-notifier",
+  "source": "D:\\AI\\IoT\\created_idea_018_m5stack-codex-pet-notifier",
+  "matchingIdeaZip": "D:\\AI\\IoT\\created_idea_018_m5stack-codex-pet-notifier\\idea_018_m5stack-codex-pet-notifier.zip",
   "domain": "IoT",
   "ideaNo": 18,
+  "title": "M5Stack Codexペット通知端末",
   "repositoryName": "m5stack-codex-pet-notifier",
   "createdDate": "2026-05-09",
   "copiedInto": "D:\\AI\\IoT\\m5stack-codex-pet-notifier",
-  "status": "pre-release-documents-prepared"
+  "metadataMatchesRepository": true,
+  "sourceRead": [
+    "README.md",
+    "01_REQUIREMENTS.md",
+    "02_SPECIFICATION.md",
+    "03_DESIGN.md",
+    "04_IMPLEMENTATION_PLAN.md",
+    "05_TEST_PLAN.md",
+    "06_RELEASE_CHECKLIST.md",
+    "metadata.json"
+  ],
+  "status": "formal-repository-implemented"
 }

@@ -1,0 +1,65 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.1.0-alpha.1",
+  "definition": {
+    "Quality": "実装、代表シナリオ、runtime gate、security/privacy、traceability の品質。",
+    "Cost": "追加環境、依存、運用負荷、保守容易性。",
+    "Delivery": "release checklist、docs ZIP、GitHub prerelease、release evidence の到達度。",
+    "Satisfaction": "利用者が導入、操作、手動テスト、次の改善判断へ迷わず進める満足度。"
+  },
+  "gradingScale": [
+    "S+",
+    "S-",
+    "A+",
+    "A-",
+    "B+",
+    "B-",
+    "C+",
+    "C-",
+    "D+",
+    "D-"
+  ],
+  "manualTestStatus": "not-run-by-codex",
+  "manualTestCap": "S-",
+  "manualTestCapApplied": true,
+  "grades": {
+    "Quality": "S-",
+    "Cost": "A+",
+    "Delivery": "A+",
+    "Satisfaction": "S-"
+  },
+  "allAtLeastAMinus": true,
+  "platformRuntimeGate": {
+    "platformType": "iot-simulator-mock",
+    "requiredSignals": [
+      "simulator",
+      "mockDevice",
+      "sampleTelemetry",
+      "deviceAdapter",
+      "hostAdapter",
+      "securityPrivacy"
+    ],
+    "passExpected": true
+  },
+  "evidence": {
+    "implementation": true,
+    "developerDocumentation": true,
+    "userDocumentation": true,
+    "installationGuide": true,
+    "manualTestProcedure": true,
+    "releaseReadiness": true,
+    "securityPrivacy": true,
+    "competitiveBenchmark": true,
+    "traceability": true,
+    "representativeSuite": [
+      "happy-path",
+      "missing-required",
+      "warning",
+      "mixed-batch"
+    ]
+  },
+  "notes": [
+    "手動実機テスト未実施のためS+は付けない。",
+    "A-未満の観点はない。"
+  ]
+}

@@ -5,19 +5,24 @@
 ## Start Order
 
 1. `README.md` を読む。
-2. `docs/requirements.md` でMVPと対象外を確認する。
-3. `docs/specification.md` でイベント契約と画面仕様を確認する。
-4. `docs/design.md` と `docs/architecture.md` でHost Bridge方式とdevice profileを確認する。
-5. 実装に入る前に `samples/*.json` を使って期待payloadを確認する。
+2. `docs/requirements.md`、`docs/specification.md`、`docs/design.md`、`docs/architecture.md` で product boundary を確認する。
+3. `samples/representative-suite.json` と `schemas/events/*.json` で event contract を確認する。
+4. `src/host-adapter/localLanBridge.mjs`、`src/device-adapter/deviceProfiles.mjs`、`src/simulator/mockDevice.mjs` を確認する。
+5. `docs/manual-test.md` と `docs/release-checklist.md` で実機未実施範囲を確認する。
 
 ## Validation
 
-- 実機なし: sample payload replay、schema validation、host bridge mock、simulator確認。
-- Core2: touch、スワイプ、A/B/C相当入力、Wi-Fi再接続、画面更新。
-- GRAY: A/B/Cボタン、IMU tap代替、ボタン式スクロール、Wi-Fi再接続。
-- リリース前: `docs/manual-test.md` と `docs/release-checklist.md` を更新する。
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm test
+```
 
-## Prompt Handling
+- 実機なし: sample payload replay、schema validation、host bridge auth、simulator、sample telemetry、security/privacy boundary。
+- Core2 実機: touch、swipe、A/B/C 相当入力、Wi-Fi 再接続、画面更新。
+- GRAY 実機: A/B/C ボタン、IMU tap 代替、ボタン式スクロール、Wi-Fi 再接続。
 
-- Codex App連携の未確認部分は推測で実装せず、Host Bridgeのadapter差し替え点として隔離する。
-- 長文回答、個人情報、ペット素材の扱いはsecurity/privacy checklistで先に確認する。
+## Release
+
+- release notes は `docs/releases/v0.1.0-alpha.1.md` を本文に使う。
+- release asset は `dist/m5stack-codex-pet-notifier-docs.zip`、`docs/manual-test.md`、`docs/strict-manual-test-addendum.md` を必須にする。
+- release 作成後に `docs/release-evidence.json` を更新し、`npm test` を再実行して docs ZIP を再生成してから asset を再アップロードする。

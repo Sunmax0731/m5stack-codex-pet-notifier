@@ -1,25 +1,17 @@
 # TODO
 
-## Phase 0: Contract
+## v0.1.0-alpha.1
 
-- [ ] Host Bridgeのevent schemaをJSON Schema化する。
-- [ ] Core2 / GRAY device profileを定義する。
-- [ ] Codex App側のpet manifest取得方法を調査し、adapter境界に閉じる。
+- [x] Source idea pack を formal repo に反映する。
+- [x] Host Bridge mock と event schema を実装する。
+- [x] Core2 / GRAY device profile と simulator を実装する。
+- [x] representative suite と platform runtime gate を用意する。
+- [x] QCDS、security/privacy、traceability、release docs を整備する。
+- [ ] Core2 実機で firmware build / flash / touch / Wi-Fi を確認する。
+- [ ] GRAY 実機で firmware build / flash / button / IMU を確認する。
 
-## Phase 1: Prototype
+## Post Alpha
 
-- [ ] Host Bridge mockを作る。
-- [ ] Simulatorで通知、回答、選択肢、pet更新を再生する。
-- [ ] M5Unified firmware scaffoldを作る。
-
-## Phase 2: Device
-
-- [ ] Core2のtouch / swipe / display flowを実装する。
-- [ ] GRAYのbutton / IMU fallback flowを実装する。
-- [ ] Wi-Fi reconnectとpairingを実装する。
-
-## Phase 3: Release Prep
-
-- [ ] 実機手動テストを実施する。
-- [ ] docs ZIPとfirmware artifactの構成を決める。
-- [ ] prerelease本文に未確認範囲を明記する。
+- 実 Codex App adapter の連携方式を確定する。
+- PlatformIO CI または手動 build 証跡を追加する。
+- MQTT adapter と Home Assistant 連携を検討する。

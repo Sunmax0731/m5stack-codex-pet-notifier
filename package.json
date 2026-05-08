@@ -1,0 +1,22 @@
+{
+  "name": "m5stack-codex-pet-notifier",
+  "version": "0.1.0-alpha.1",
+  "private": false,
+  "type": "module",
+  "description": "M5Stack Codex pet notifier closed alpha prototype",
+  "scripts": {
+    "test": "node tools/platform-runtime-gate.mjs && node scripts/validate.mjs && node tools/closed-alpha-guard.mjs",
+    "validate": "node scripts/validate.mjs",
+    "platform:gate": "node tools/platform-runtime-gate.mjs",
+    "closed-alpha:guard": "node tools/closed-alpha-guard.mjs",
+    "demo": "node src/cli/index.mjs demo"
+  },
+  "keywords": [
+    "IoT",
+    "M5Stack",
+    "Codex",
+    "closed-alpha",
+    "qcds"
+  ],
+  "license": "MIT"
+}

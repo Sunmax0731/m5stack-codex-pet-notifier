@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "notification.created",
+  "type": "object",
+  "required": ["type", "eventId", "createdAt", "severity", "title", "body"],
+  "properties": {
+    "type": { "const": "notification.created" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "success", "warning", "error"]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "body": { "type": "string", "minLength": 1, "maxLength": 600 },
+    "threadId": { "type": "string" }
+  }
+}

@@ -2,36 +2,32 @@
 
 ## Phase 0: Contract
 
-- JSON Schemaを `schemas/events/*.json` として作成する。
-- `samples/*.json` をschemaに合わせて更新する。
-- device profileをCore2とGRAYで定義する。
+- [x] JSON event schema を `schemas/events/*.json` として作成する。
+- [x] sample payload を schema に合わせる。
+- [x] Core2 / GRAY device profile を定義する。
 
-## Phase 1: Host Bridge
+## Phase 1: Host Bridge MVP
 
-- Node.jsまたはPythonでHTTP/WebSocket bridgeを作る。
-- pairing code発行、token検証、device registryを実装する。
-- mock Codex adapterを実装し、実Codex adapterは後続差し替えにする。
+- [x] pairing code と token 検証を持つ local LAN bridge mock を作る。
+- [x] Host -> Device event を validation 後に simulator へ配信する。
+- [x] `device.reply_selected`、`device.pet_interacted`、`device.heartbeat` を受信する。
+- [ ] 実 Codex App adapter を追加する。
 
 ## Phase 2: Simulator
 
-- browserまたはCLI simulatorで画面状態を確認できるようにする。
-- sample replay、reply送信、pet interaction送信を実装する。
-- `dist/validation-result.json` に代表フロー結果を残す。
+- [x] sample JSON から通知、回答、選択肢、pet 変更を再生する。
+- [x] 長文回答のページングと scroll state を検証する。
+- [x] reply 送信と pet interaction を host log へ戻す。
 
 ## Phase 3: Firmware Scaffold
 
-- PlatformIOまたはArduino IDE向けのM5Unified構成を作る。
-- Core2 / GRAYのbuild targetを分ける。
-- Wi-Fi設定、host discovery、pairing、heartbeatを実装する。
+- [x] PlatformIO / M5Unified 前提の Core2 / GRAY scaffold を作る。
+- [x] touch / button の最小表示 loop を置く。
+- [ ] 実機 firmware build、flash、Wi-Fi 接続を確認する。
 
-## Phase 4: UI / Interaction
+## Phase 4: Release Prep
 
-- pet display、notification、answer scroll、choice replyを実装する。
-- Core2 touch / swipeを実装する。
-- GRAY button / IMU fallbackを実装する。
-
-## Phase 5: Release Prep
-
-- `docs/manual-test.md` に実機結果を追記する。
-- `docs/release-checklist.md` を完了状態へ更新する。
-- firmware、host bridge、docs ZIP、sample payloadをrelease assetとして分ける。
+- [x] README、導入手順、manual test、security/privacy、release checklist を更新する。
+- [x] `docs/qcds-strict-metrics.json` と release notes を作る。
+- [x] docs ZIP を `npm test` で生成する。
+- [ ] GitHub prerelease 作成後、release evidence を実 URL で更新する。

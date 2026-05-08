@@ -1,0 +1,9 @@
+{
+  "type": "device.heartbeat",
+  "eventId": "evt-heartbeat-001",
+  "createdAt": "2026-05-09T00:00:12+09:00",
+  "deviceId": "m5stack-sample-001",
+  "battery": 88,
+  "wifiRssi": -48,
+  "screen": "Choice"
+}

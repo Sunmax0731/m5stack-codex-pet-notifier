@@ -1,0 +1,113 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "scenarios": [
+    {
+      "id": "happy-path",
+      "profile": "core2",
+      "authProbe": true,
+      "events": [
+        { "sample": "pet-update-event.json" },
+        { "sample": "notification-event.json" },
+        { "sample": "answer-completed-event.json" },
+        { "sample": "choice-request-event.json" }
+      ],
+      "actions": ["scroll-down", "select-yes", "pet-interact", "heartbeat"],
+      "expected": {
+        "status": "passed",
+        "validEvents": 4,
+        "invalidEvents": 0,
+        "warningCount": 1,
+        "replyCount": 1,
+        "interactionCount": 1,
+        "heartbeatCount": 1,
+        "unauthorizedRejected": 1,
+        "finalScreen": "Choice",
+        "securityBoundary": true
+      }
+    },
+    {
+      "id": "missing-required",
+      "profile": "gray",
+      "expectInvalid": true,
+      "events": [
+        {
+          "event": {
+            "type": "notification.created",
+            "createdAt": "2026-05-09T00:01:00+09:00",
+            "severity": "info",
+            "title": "Missing id",
+            "body": "eventIdが欠落したpayloadを拒否する。"
+          }
+        }
+      ],
+      "expected": {
+        "status": "expected-failure-detected",
+        "validEvents": 0,
+        "invalidEvents": 1,
+        "warningCount": 0,
+        "replyCount": 0,
+        "profileCovered": true
+      }
+    },
+    {
+      "id": "warning",
+      "profile": "gray",
+      "events": [
+        {
+          "event": {
+            "type": "pet.updated",
+            "eventId": "evt-pet-http-warning",
+            "createdAt": "2026-05-09T00:02:00+09:00",
+            "pet": {
+              "id": "warning-pet",
+              "name": "Warning Pet",
+              "state": "review",
+              "spriteRef": "http://example.invalid/pet.png"
+            }
+          }
+        }
+      ],
+      "actions": ["pet-interact"],
+      "expected": {
+        "status": "passed",
+        "validEvents": 1,
+        "invalidEvents": 0,
+        "warningCount": 1,
+        "interactionCount": 1,
+        "finalScreen": "Idle"
+      }
+    },
+    {
+      "id": "mixed-batch",
+      "profile": "core2",
+      "expectInvalid": true,
+      "events": [
+        { "sample": "pet-update-event.json" },
+        {
+          "event": {
+            "type": "prompt.choice_requested",
+            "eventId": "evt-choice-too-many",
+            "createdAt": "2026-05-09T00:03:00+09:00",
+            "threadId": "thread-local-sample",
+            "prompt": "4択payloadを拒否する。",
+            "choices": [
+              { "id": "a", "label": "A" },
+              { "id": "b", "label": "B" },
+              { "id": "c", "label": "C" },
+              { "id": "d", "label": "D" }
+            ],
+            "timeoutSec": 300
+          }
+        },
+        { "sample": "answer-completed-event.json" }
+      ],
+      "expected": {
+        "status": "expected-failure-detected",
+        "validEvents": 2,
+        "invalidEvents": 1,
+        "warningCount": 1,
+        "scrollPages": 2
+      }
+    }
+  ]
+}

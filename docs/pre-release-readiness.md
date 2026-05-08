@@ -1,30 +1,24 @@
 # Pre-release Readiness
 
-## Current State
+## Ready
 
-| Area | Status | Note |
-| --- | --- | --- |
-| Idea intake | Ready | IoT No.18として登録済み |
-| Requirements | Ready | MVPと対象外を定義済み |
-| Specification | Ready | event契約と画面状態を定義済み |
-| Design | Ready | Host Bridge方式を採用 |
-| Architecture | Ready | bridge / firmware / simulator境界を定義 |
-| Test plan | Ready | simulatorと実機手動テストを分離 |
-| Implementation | Not started | docs-only |
-| Manual test | Not run | Core2 / GRAY実機確認待ち |
-| Release | Partially ready | docs ZIPは作成済み。firmwareとhost bridge artifactは未生成 |
+- Host Bridge mock。
+- JSON event contract。
+- Core2 / GRAY device profile。
+- Simulator と representative suite。
+- Runtime gate。
+- Security/privacy checklist。
+- QCDS metrics。
+- Release notes と docs ZIP。
 
-## Blockers
+## Not Ready for Stable
 
-- Host Bridge未実装。
-- Firmware未実装。
-- Simulator未実装。
-- Core2 / GRAY実機テスト未実施。
-- Codex Appのpet設定変更検出方法がadapter調査待ち。
+- Core2 実機 firmware build / flash。
+- GRAY 実機 firmware build / flash。
+- 実 Wi-Fi 再接続。
+- touch / swipe / button / IMU の物理 UX。
+- 実 Codex App adapter。
 
-## Next Action
+## Decision
 
-1. JSON Schemaとsample replayを実装する。
-2. Host Bridge mockを作る。
-3. Simulatorで表示状態を確認する。
-4. M5Unified firmware scaffoldを作る。
+`v0.1.0-alpha.1` は closed alpha prerelease として公開し、stable release にはしません。

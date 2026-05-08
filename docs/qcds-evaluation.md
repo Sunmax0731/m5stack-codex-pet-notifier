@@ -1,14 +1,25 @@
 # QCDS Evaluation
 
+QCDS は Quality、Cost、Delivery、Satisfaction として評価します。grade は `S+ / S- / A+ / A- / B+ / B- / C+ / C- / D+ / D-` のみ使います。
+
 ## Current Grade
 
 | Area | Grade | Reason |
 | --- | --- | --- |
-| Quality | B+ | 要件と設計は整理済みだが実装と実機検証は未実施 |
-| Cost | A- | Host Bridge方式でM5Stack firmwareの変更コストを抑えられる |
-| Delivery | B+ | 文書はreadyだがartifact未生成 |
-| Satisfaction | B+ | 体験設計は明確だが実機UX未確認 |
+| Quality | S- | schema、Host Bridge mock、simulator、representative suite、runtime gate、security/privacy が自動検証済み。実機未確認のため S+ ではない |
+| Cost | A+ | Node.js 標準ライブラリのみで検証でき、firmware は scaffold に留めて導入負荷を抑えている |
+| Delivery | A+ | docs、samples、schemas、runtime evidence、release notes、docs ZIP を prerelease へ出せる |
+| Satisfaction | S- | 導入、操作、未実施範囲、次の手動テストが明確。実機 UX 未確認のため S+ ではない |
 
-## Release Target
+## Evidence
 
-prerelease前にQualityとSatisfactionをA-以上へ上げる。条件は、simulatorで代表フローが通ること、Core2 / GRAYの手動テスト結果があること、security/privacy blockerが0件であること。
+- `cmd.exe /d /s /c npm test`
+- `dist/validation-result.json`
+- `docs/platform-runtime-gate.json`
+- `docs/qcds-strict-metrics.json`
+- `docs/manual-test.md`
+- `docs/releases/v0.1.0-alpha.1.md`
+
+## Manual Test Cap
+
+Core2 / GRAY 実機テストは Codex では未実施です。手動未実施のため `S+` は付けません。

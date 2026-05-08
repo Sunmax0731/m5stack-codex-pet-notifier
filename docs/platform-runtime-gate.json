@@ -1,0 +1,22 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.1.0-alpha.1",
+  "platformType": "iot-simulator-mock",
+  "pass": true,
+  "method": "node-simulator-runtime-gate",
+  "manualTest": "not-run-by-codex",
+  "signals": {
+    "simulator": true,
+    "mockDevice": true,
+    "sampleTelemetry": true,
+    "deviceAdapter": true,
+    "hostAdapter": true,
+    "securityPrivacy": true
+  },
+  "scenarioIds": [
+    "happy-path",
+    "missing-required",
+    "warning",
+    "mixed-batch"
+  ]
+}

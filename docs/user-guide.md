@@ -1,21 +1,28 @@
-# User Guide
+# ユーザーガイド
 
-## Idle
+## 使い方
 
-Idle画面では、現在のCodexペット、接続状態、未読数、最後の通知を確認します。
+1. Host Bridge を PC 上で起動する。
+2. M5Stack を同一 Wi-Fi に接続する。
+3. M5Stack の Pairing 画面で pairing code を登録する。
+4. Idle 画面で pet、接続状態、未読件数を確認する。
+5. 通知や回答が届いたら M5Stack 画面で内容を確認する。
+6. Choice 画面では A/B/C に対応する選択肢を押して返信する。
 
-## 通知を見る
+## Core2
 
-Codex通知を受け取るとNotification画面へ切り替わります。短い通知はそのまま読み、必要に応じてボタンで閉じます。
+- pet 領域を tap すると pet interaction が送られる。
+- Answer 画面では swipe で本文ページを移動する。
+- 下部 touch button を A/B/C として扱う。
 
-## 回答を見る
+## GRAY
 
-Codex回答を受け取るとAnswer画面へ切り替わります。Core2ではスワイプで、GRAYではボタン操作で本文をスクロールします。
+- 物理 A/B/C ボタンで返信する。
+- B 長押しまたは IMU tap を pet interaction の代替にする。
+- Answer 画面では scroll mode で A/C を上下移動に使う。
 
-## 返信する
+## 制約
 
-Choice画面ではA/B/Cに選択肢が割り当てられます。Yes/No/Otherの場合も同じ3ボタンで選択します。
-
-## ペットに反応する
-
-Core2ではpet領域をタップします。GRAYではB長押しまたはIMU tap代替を使います。
+- closed alpha では実 Codex App adapter は mock です。
+- 実機 Wi-Fi、firmware flash、touch、IMU は Codex では未実施です。
+- LAN 外公開は対象外です。

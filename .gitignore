@@ -1,6 +1,7 @@
 dist/
 build/
 .pio/
+node_modules/
 .env
 *.local.json
 *.log

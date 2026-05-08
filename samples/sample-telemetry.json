@@ -1,0 +1,19 @@
+{
+  "deviceId": "m5stack-sample-001",
+  "profile": "core2",
+  "transport": "lan-local-http-mock",
+  "samples": [
+    "pet-update-event.json",
+    "notification-event.json",
+    "answer-completed-event.json",
+    "choice-request-event.json",
+    "reply-selected-event.json",
+    "pet-interacted-event.json",
+    "device-heartbeat-event.json"
+  ],
+  "privacy": {
+    "messageBodiesPersistedOnDevice": false,
+    "releaseAssetsContainPersonalPetSprites": false,
+    "requiresPairingToken": true
+  }
+}
