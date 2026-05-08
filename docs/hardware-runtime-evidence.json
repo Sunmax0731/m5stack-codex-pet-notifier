@@ -24,7 +24,8 @@
     "m5stackSsidMappedTo2GHz": true,
     "connected": true,
     "localIp": "redacted-local-lan-ip",
-    "rssiObserved": true
+    "rssiObserved": true,
+    "pcPingReachable": true
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
