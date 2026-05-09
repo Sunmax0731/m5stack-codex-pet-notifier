@@ -165,6 +165,8 @@ assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboar
 assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and GRAY preview switching');
 assert(dashboardIndexSource.includes('petPackagePath'), 'Dashboard must expose local pet package path override');
 assert(dashboardIndexSource.includes('preview-settings-dock'), 'Dashboard preview settings must be docked below the screen preview');
+assert(dashboardIndexSource.includes('preview-asset-column'), 'Dashboard preview settings must keep asset controls in a left column');
+assert(dashboardIndexSource.includes('preview-tuning-column'), 'Dashboard preview settings must keep tuning controls in a right column');
 assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
 assert(dashboardIndexSource.includes('data-tooltip'), 'Dashboard controls must provide focusable tooltip hints');
 assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must support View/Hide collapse controls');

@@ -670,8 +670,9 @@ input[type="range"] {
 }
 
 .preview-controls {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  align-items: end;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
 }
 
 .preview-settings-dock {
@@ -684,30 +685,36 @@ input[type="range"] {
   margin-bottom: 0;
 }
 
-.preview-control-summary,
+.preview-column {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.preview-tuning-column {
+  gap: 12px;
+}
+
 .preview-asset-row,
-.preview-path-field,
 .preview-pet-row,
-.preview-sprite-field {
-  grid-column: span 3;
-}
-
 .preview-display-controls,
-.preview-color-controls,
-.preview-actions {
-  grid-column: 1 / -1;
+.preview-color-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.preview-color-controls {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.preview-asset-row {
+  align-items: end;
+}
+
+.preview-actions {
+  margin-top: 4px;
 }
 
 .preview-controls .check-field {
-  min-height: 66px;
+  min-height: 70px;
 }
 
 .display-controls {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
 

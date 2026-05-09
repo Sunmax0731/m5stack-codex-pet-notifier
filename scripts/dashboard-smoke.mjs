@@ -58,6 +58,8 @@ try {
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
   assert.match(index, /preview-settings-dock/);
+  assert.match(index, /preview-asset-column/);
+  assert.match(index, /preview-tuning-column/);
   assert.match(index, /data-tooltip/);
   assert.match(index, /section-toggle/);
   assert.match(index, /commandModal/);
@@ -92,7 +94,8 @@ try {
   assert.match(css, /\.m5-screen/);
   assert.match(css, /\.preview-stage/);
   assert.match(css, /\.preview-settings-dock/);
-  assert.match(css, /\.preview-control-summary/);
+  assert.match(css, /\.preview-column/);
+  assert.match(css, /\.preview-tuning-column/);
   assert.match(css, /\.command-tabs/);
   assert.match(css, /\.color-grid/);
 
