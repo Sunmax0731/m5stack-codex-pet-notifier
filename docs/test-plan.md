@@ -18,7 +18,7 @@
 | dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/choice`、`/codex/pet`、`/codex/display`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
-| firmware pet animation source gate | firmware が pet avatar animation と runtime animation FPS 設定を含むことを検証する | `scripts/validate.mjs` |
+| firmware pet animation source gate | firmware が pet avatar animation、runtime animation FPS 設定、`M5Canvas` Sprite buffer、pet surface だけの redraw path を含むことを検証する | `scripts/validate.mjs` |
 | hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、非空 frame 自動検出を検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
@@ -49,6 +49,7 @@
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 display settings | Dashboard から pet display area と text size を `1..8`、animation FPS を `4..20` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化、animation 速度変化を目視する | `docs/gui-tools-manual-check.md` |
 | Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/8`、`4/8`、`8/8` で低解像度 base frame のブロック拡大にならないことを目視する | `docs/gui-tools-manual-check.md` |
+| Core2 sprite-buffered pet redraw | pet animation 中に Answer / Choice / footer text が毎フレーム塗り直されず、pet surface の更新だけでちらつきが抑えられることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

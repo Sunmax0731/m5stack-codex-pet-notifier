@@ -111,6 +111,7 @@
 - `display.settings_updated.display.animationFps` は `4..20` を受け付け、既定 `12fps` で pet animation interval を決める。
 - Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積、text size、animation FPS を確認できる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
+- firmware は pet surface を `M5Canvas` の off-screen Sprite に描画し、`pushSprite()` で一括転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。
 - GRAY target は flash 余裕を優先し、同じ header が存在しても scale-specific frame は参照せず base frame 拡大へ fallback する。

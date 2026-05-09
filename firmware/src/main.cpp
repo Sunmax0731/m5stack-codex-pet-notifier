@@ -71,6 +71,7 @@ int unreadCount = 0;
 int answerPage = 0;
 String lastError = "";
 bool needsRedraw = true;
+bool needsPetRedraw = true;
 uint8_t petFrame = 0;
 uint32_t lastPoll = 0;
 uint32_t lastHeartbeat = 0;
@@ -82,6 +83,10 @@ int petDisplayScale = 2;
 int uiTextScale = 1;
 int bodyTextScale = 1;
 int petAnimationFps = DEFAULT_PET_ANIMATION_FPS;
+M5Canvas petSprite(&M5.Display);
+bool petSpriteReady = false;
+int petSpriteWidth = 0;
+int petSpriteHeight = 0;
 
 void pollHost();
 void sendPetInteraction(const char* interaction);
@@ -110,6 +115,11 @@ String queryPath(const String& path) {
 
 void markDraw() {
   needsRedraw = true;
+  needsPetRedraw = true;
+}
+
+void markPetDraw() {
+  needsPetRedraw = true;
 }
 
 int clampDisplayScale(int value) {
@@ -424,7 +434,8 @@ uint16_t petAccentColor() {
   return TFT_SKYBLUE;
 }
 
-void drawScaleSpecificLocalPetAsset(int x, int y) {
+template <typename Target>
+void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y) {
 #if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
   const int levelIndex = petScaleLevelIndex();
   const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
@@ -438,7 +449,7 @@ void drawScaleSpecificLocalPetAsset(int x, int y) {
       const uint16_t color = pgm_read_word(&PET_ASSET_SCALED_PIXELS[offset + row * width + col]);
       if (color == PET_ASSET_TRANSPARENT) {
         if (runStart >= 0) {
-          M5.Display.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+          target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
           runStart = -1;
         }
         continue;
@@ -447,13 +458,39 @@ void drawScaleSpecificLocalPetAsset(int x, int y) {
         runStart = col;
         runColor = color;
       } else if (color != runColor) {
-        M5.Display.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+        target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
         runStart = col;
         runColor = color;
       }
     }
     if (runStart >= 0) {
-      M5.Display.drawFastHLine(x + runStart, y + row, width - runStart, runColor);
+      target.drawFastHLine(x + runStart, y + row, width - runStart, runColor);
+    }
+  }
+#else
+  (void)x;
+  (void)y;
+#endif
+}
+
+void drawScaleSpecificLocalPetAsset(int x, int y) {
+  drawScaleSpecificLocalPetAssetTo(M5.Display, x, y);
+}
+
+template <typename Target>
+void drawLocalPetAssetTo(Target& target, int x, int y, int scale) {
+#if HAS_LOCAL_PET_ASSET
+  if (hasScaleSpecificPetAsset()) {
+    drawScaleSpecificLocalPetAssetTo(target, x, y);
+    return;
+  }
+  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
+  for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
+    for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
+      const uint16_t color = pgm_read_word(&PET_ASSET_FRAMES[frameIndex][row * PET_ASSET_FRAME_WIDTH + col]);
+      if (color != PET_ASSET_TRANSPARENT) {
+        target.fillRect(x + col * scale, y + row * scale, scale, scale, color);
+      }
     }
   }
 #else
@@ -463,27 +500,11 @@ void drawScaleSpecificLocalPetAsset(int x, int y) {
 }
 
 void drawLocalPetAsset(int x, int y, int scale) {
-#if HAS_LOCAL_PET_ASSET
-  if (hasScaleSpecificPetAsset()) {
-    drawScaleSpecificLocalPetAsset(x, y);
-    return;
-  }
-  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
-  for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
-    for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
-      const uint16_t color = pgm_read_word(&PET_ASSET_FRAMES[frameIndex][row * PET_ASSET_FRAME_WIDTH + col]);
-      if (color != PET_ASSET_TRANSPARENT) {
-        M5.Display.fillRect(x + col * scale, y + row * scale, scale, scale, color);
-      }
-    }
-  }
-#else
-  (void)x;
-  (void)y;
-#endif
+  drawLocalPetAssetTo(M5.Display, x, y, scale);
 }
 
-void drawVectorPetAvatar(int x, int y) {
+template <typename Target>
+void drawVectorPetAvatarTo(Target& target, int x, int y) {
   const int bounce = (petFrame % 4 == 1) ? -2 : ((petFrame % 4 == 3) ? 1 : 0);
   const bool blink = petFrame % 10 == 0;
   const String state = renderedPetState();
@@ -492,44 +513,98 @@ void drawVectorPetAvatar(int x, int y) {
   const int s = petPixelScale();
   const int bodyY = y + (10 + bounce) * s;
 
-  M5.Display.fillEllipse(x + 26 * s, y + 45 * s, 22 * s, 4 * s, shadow);
-  M5.Display.fillTriangle(x + 9 * s, bodyY + 4 * s, x + 16 * s, bodyY - 8 * s, x + 22 * s, bodyY + 7 * s, accent);
-  M5.Display.fillTriangle(x + 31 * s, bodyY + 7 * s, x + 39 * s, bodyY - 8 * s, x + 45 * s, bodyY + 6 * s, accent);
-  M5.Display.fillRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, accent);
-  M5.Display.drawRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, TFT_WHITE);
+  target.fillEllipse(x + 26 * s, y + 45 * s, 22 * s, 4 * s, shadow);
+  target.fillTriangle(x + 9 * s, bodyY + 4 * s, x + 16 * s, bodyY - 8 * s, x + 22 * s, bodyY + 7 * s, accent);
+  target.fillTriangle(x + 31 * s, bodyY + 7 * s, x + 39 * s, bodyY - 8 * s, x + 45 * s, bodyY + 6 * s, accent);
+  target.fillRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, accent);
+  target.drawRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, TFT_WHITE);
 
   const int tail = petFrame % 6 < 3 ? 0 : 3;
-  M5.Display.fillCircle(x + (50 + tail) * s, bodyY + 23 * s, 4 * s, accent);
+  target.fillCircle(x + (50 + tail) * s, bodyY + 23 * s, 4 * s, accent);
 
   if (blink) {
-    M5.Display.drawFastHLine(x + 18 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
-    M5.Display.drawFastHLine(x + 32 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
+    target.drawFastHLine(x + 18 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
+    target.drawFastHLine(x + 32 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
   } else {
-    M5.Display.fillCircle(x + 21 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
-    M5.Display.fillCircle(x + 35 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
+    target.fillCircle(x + 21 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
+    target.fillCircle(x + 35 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
   }
 
   if (state == "reacting" || state == "celebrate") {
-    M5.Display.drawArc(x + 28 * s, bodyY + 23 * s, 8 * s, 5 * s, 15, 165, TFT_BLACK);
+    target.drawArc(x + 28 * s, bodyY + 23 * s, 8 * s, 5 * s, 15, 165, TFT_BLACK);
   } else if (state == "review") {
-    M5.Display.drawFastHLine(x + 24 * s, bodyY + 26 * s, 10 * s, TFT_BLACK);
+    target.drawFastHLine(x + 24 * s, bodyY + 26 * s, 10 * s, TFT_BLACK);
   } else {
-    M5.Display.fillRect(x + 27 * s, bodyY + 26 * s, s, s, TFT_BLACK);
-    M5.Display.fillRect(x + 28 * s, bodyY + 26 * s, s, s, TFT_BLACK);
+    target.fillRect(x + 27 * s, bodyY + 26 * s, s, s, TFT_BLACK);
+    target.fillRect(x + 28 * s, bodyY + 26 * s, s, s, TFT_BLACK);
   }
 }
 
-void drawPetAvatar(int x, int y) {
+void drawVectorPetAvatar(int x, int y) {
+  drawVectorPetAvatarTo(M5.Display, x, y);
+}
+
+template <typename Target>
+void drawPetAvatarTo(Target& target, int x, int y) {
 #if HAS_LOCAL_PET_ASSET
   const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
   const int s = petAssetRenderScale();
   const int inset = (petBoxPadding() / 2) * s;
-  M5.Display.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
-  M5.Display.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);
-  drawLocalPetAsset(x + inset, y + inset + bounce * s, s);
+  target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
+  target.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);
+  drawLocalPetAssetTo(target, x + inset, y + inset + bounce * s, s);
 #else
-  drawVectorPetAvatar(x, y);
+  drawVectorPetAvatarTo(target, x, y);
 #endif
+}
+
+void drawPetAvatar(int x, int y) {
+  drawPetAvatarTo(M5.Display, x, y);
+}
+
+bool ensurePetSprite(int width, int height) {
+  if (width <= 0 || height <= 0) {
+    return false;
+  }
+  if (petSpriteReady && petSpriteWidth == width && petSpriteHeight == height) {
+    return true;
+  }
+  if (petSpriteReady) {
+    petSprite.deleteSprite();
+    petSpriteReady = false;
+  }
+  petSprite.setColorDepth(16);
+  petSprite.createSprite(width, height);
+  petSpriteReady = petSprite.width() == width && petSprite.height() == height;
+  petSpriteWidth = petSpriteReady ? width : 0;
+  petSpriteHeight = petSpriteReady ? height : 0;
+  return petSpriteReady;
+}
+
+void drawPetSurfaceSprite() {
+  const int width = M5.Display.width();
+  const int height = headerHeight();
+  if (!ensurePetSprite(width, height)) {
+    M5.Display.fillRect(0, 0, width, height, TFT_BLACK);
+    const int petX = max(0, (width - petBoxWidth()) / 2);
+    const int petY = max(0, (height - petBoxHeight()) / 2);
+    drawPetAvatar(petX, petY);
+    needsPetRedraw = false;
+    return;
+  }
+
+  petSprite.fillSprite(TFT_BLACK);
+  const int petX = max(0, (width - petBoxWidth()) / 2);
+  const int petY = max(0, (height - petBoxHeight()) / 2);
+  drawPetAvatarTo(petSprite, petX, petY);
+  petSprite.pushSprite(0, 0);
+  needsPetRedraw = false;
+}
+
+void drawPetSurfaceIfNeeded() {
+  if (!needsRedraw && needsPetRedraw) {
+    drawPetSurfaceSprite();
+  }
 }
 
 String pageText(const String& value, int page, int charsPerPage) {
@@ -546,11 +621,7 @@ int pageCount(const String& value, int charsPerPage) {
 }
 
 void drawHeader() {
-  const int h = headerHeight();
-  M5.Display.fillRect(0, 0, M5.Display.width(), h, TFT_BLACK);
-  const int petX = max(0, (M5.Display.width() - petBoxWidth()) / 2);
-  const int petY = max(0, (h - petBoxHeight()) / 2);
-  drawPetAvatar(petX, petY);
+  drawPetSurfaceSprite();
 }
 
 void drawFooter(const char* a, const char* b, const char* c) {
@@ -1009,7 +1080,7 @@ void updatePetAnimation() {
   if (now - lastPetFrame >= interval) {
     lastPetFrame = now;
     petFrame = (petFrame + 1) % 30;
-    markDraw();
+    markPetDraw();
   }
   if (petReactUntil && millis() > petReactUntil && petState == "reacting") {
     petReactUntil = 0;
@@ -1076,5 +1147,6 @@ void loop() {
   }
 
   drawScreen();
+  drawPetSurfaceIfNeeded();
   delay(LOOP_IDLE_DELAY_MS);
 }

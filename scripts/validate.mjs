@@ -71,6 +71,12 @@ assert(firmwareSource.includes('DEFAULT_PET_ANIMATION_FPS = 12'), 'firmware must
 assert(firmwareSource.includes('petAnimationFps'), 'firmware must store runtime-configurable pet animation fps');
 assert(firmwareSource.includes('display["animationFps"]'), 'firmware must accept animation fps in display settings');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
+assert(firmwareSource.includes('M5Canvas petSprite'), 'firmware must use an off-screen sprite for pet rendering');
+assert(firmwareSource.includes('drawPetSurfaceSprite'), 'firmware must push the pet surface as a sprite');
+assert(firmwareSource.includes('drawPetSurfaceIfNeeded'), 'firmware must redraw only the pet surface during animation ticks');
+assert(firmwareSource.includes('markPetDraw()'), 'firmware must separate pet animation redraw from full-screen redraw');
+assert(firmwareSource.includes('petSprite.pushSprite(0, 0)'), 'firmware must transfer the completed pet sprite to the display');
+assert(!firmwareSource.includes('M5.Display.drawFastHLine(x + runStart'), 'scale-specific pet asset drawing must target the sprite canvas instead of drawing directly to the display');
 assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 8-step display scaling');
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');

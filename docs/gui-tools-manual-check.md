@@ -41,7 +41,7 @@ http://127.0.0.1:8080/
 - `Display` tab があり、pet display area、UI text size、body text size を `1..8`、animation FPS を `4..20` で変更できる。
 - `M5Stack 表示プレビュー` があり、Pet / Answer / Choice / Notify の simulated display を送信前に確認できる。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
-- `/health` の `version` が `0.1.0-alpha.6` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
+- `/health` の `version` が `0.1.0-alpha.7` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
 ## 2. M5Stack の pairing と状態確認
 
@@ -74,6 +74,7 @@ Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして
 - Core2 の pet surface が `Mira` などの hatch-pet asset として表示される。
 - Core2 の pet surface の背景色または表示状態が変わる。
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
+- pet surface は `M5Canvas` Sprite buffer 経由で更新され、pet surface 外の本文、Choice label、footer は animation tick ごとにちらつかない。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
 - Display 設定を `1/8`、`4/8`、`8/8` に変えたとき、Core2 は scale ごとの高解像度 frame を選び、同じ低解像度 frame をブロック状に拡大した見た目にならない。
 
@@ -97,6 +98,7 @@ Dashboard の `Display` tab を開き、次を送信します。
 - `UI text size` を変更すると footer の文字サイズが変わる。
 - `body text size` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
 - `animation FPS` を `4`、`12`、`20` に変えると、pet frame / bounce の更新速度が変わる。
+- `20fps` にしても画面全体の黒塗りや footer / body text の明滅は起きず、pet surface だけが更新される。
 - Dashboard の M5Stack 表示プレビューも slider 変更と FPS 設定を即時反映する。
 
 ## 5. Codex session 自動送信

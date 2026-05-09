@@ -13,7 +13,7 @@
 | clipboard 日本語返答表示 | `readClipboard()` の Base64 UTF-8 復元 | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | 実機 event polling | `firmware/src/main.cpp` | `docs/hardware-runtime-evidence.json` |
 | pet 更新表示 | `pet.updated` schema、`MockM5StackDevice.receive()` | `happy-path.validEvents=5` |
-| pet animation | `firmware/src/main.cpp` の `drawPetAvatar`、`DEFAULT_PET_ANIMATION_FPS`、`petAnimationFps` | `scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
+| pet animation | `firmware/src/main.cpp` の `drawPetAvatar`、`DEFAULT_PET_ANIMATION_FPS`、`petAnimationFps`、`M5Canvas petSprite`、`drawPetSurfaceSprite`、`drawPetSurfaceIfNeeded` | `scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
 | pet 表示倍率 / text size / animation FPS | `display.settings_updated`、`/codex/display`、Dashboard Display tab、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` / `petAnimationFps` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
 | hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |
 | 通知表示 | `notification.created` schema | `happy-path.finalScreen=Choice` までの遷移 |

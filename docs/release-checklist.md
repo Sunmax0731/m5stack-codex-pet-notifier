@@ -31,6 +31,7 @@
 - [x] 日本語回答を UTF-8 境界で page / line 分割し、日本語フォントで表示できる。
 - [x] ボタン返信が Host Bridge へ届く。
 - [x] firmware が pet avatar animation を表示できる。
+- [x] firmware が pet surface を `M5Canvas` Sprite buffer へ描画し、animation tick では pet surface だけを更新できる。
 - [x] firmware が固定ヘッダーテキストを表示せず、pet surface を優先表示できる。
 - [x] firmware が `display.settings_updated` による pet 表示倍率、text size、animation FPS の変更を処理できる。
 - [x] `display.settings_updated` が pet 表示面積と text size を `1..8`、animation FPS を `4..20` で扱える。
@@ -55,6 +56,7 @@
 - [ ] Core2 実機で Codex hook relay を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、animation FPS 変更を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Sprite buffer により pet animation 中の画面全体、本文、footer のちらつきが抑えられていることを目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 

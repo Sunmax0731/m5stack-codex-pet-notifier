@@ -22,6 +22,7 @@
 - Core2 hatch-pet asset animation の firmware 対応と upload。
 - Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` animation、dynamic display settings の firmware 対応。
 - Core2 scale-specific pet asset frame selection。
+- Core2 Sprite buffer による pet-only animation redraw。
 - Dashboard side menu、event tabs、M5Stack 表示プレビュー。
 - Runtime gate。
 - Security/privacy checklist。
@@ -39,9 +40,10 @@
 - Codex hook relay の Core2 実機目視確認。
 - Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
 - Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、animation FPS 変更の Core2 実機目視確認。
+- Sprite buffer による pet animation ちらつき抑制の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 
 ## Decision
 
-`v0.1.0-alpha.6` は closed alpha prerelease として公開し、stable release にはしません。
+`v0.1.0-alpha.7` は closed alpha prerelease として公開し、stable release にはしません。

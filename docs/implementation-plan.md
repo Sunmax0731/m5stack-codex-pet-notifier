@@ -38,6 +38,7 @@
 - [x] Core2 touch choice、footer touch、answer swipe の firmware 分岐を実装する。
 - [x] Core2 / GRAY firmware に pet avatar の blink / bounce / tail animation を実装する。
 - [x] 固定ヘッダーテキストを削除し、pet surface を優先表示する。
+- [x] pet surface を `M5Canvas` Sprite へ描画し、animation tick では pet surface だけを更新してちらつきを抑える。
 - [x] firmware が `display.settings_updated` で pet 表示面積と text size を `1..8`、animation FPS を `4..20` で動的に反映するようにする。
 - [x] hatch-pet package から ignored local firmware asset を生成するツールを追加する。
 - [x] firmware が local hatch-pet asset を優先表示し、未生成時は fallback avatar を使うようにする。

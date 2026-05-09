@@ -31,13 +31,14 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-14 | `codex:watch --once` で UTF-8 file 内容を送る | Core2 が `Answer` 画面へ遷移し、summary と file 内容を表示する | 実施済み。ユーザー提供画像で `Answer page 1/1`、summary、file 内容、`A up / B idle / C down` footer を確認 |
 | C2-15 | `codex:sessions --once --phase any` を実行する | 最近の Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ自動表示される | 準備済み。ユーザー手動 |
 | C2-16 | `codex:hook` を実行する | Codex Hooks から呼ばれる one-shot relay と同じ経路で最新やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
+| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない。pet animation は Sprite buffer で更新され、pet surface 外の本文や footer が毎フレームちらつかない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
 | C2-20 | Dashboard の `Display` tab で pet display area を `8/8`、UI text size と body text size を任意、animation FPS を `12fps` に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8`、animation FPS は `4..20` の設定に応じて変わる | 準備済み。ユーザー手動 |
 | C2-21 | Dashboard の `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify を切り替え、Display slider を変更する | 送信前の simulated display が pet 面積、body text、footer text size、animation FPS 設定を即時反映する | `dashboard:smoke` 済み。ユーザー目視 |
 | C2-22 | `pet:asset` 生成後の firmware で Display slider を `1/8`、`4/8`、`8/8` に変えて pet を見る | Core2 の pet は scale ごとの高解像度 frame に切り替わり、低解像度 base frame をブロック状に拡大した見た目にならない | 準備済み。ユーザー手動 |
-| C2-23 | Dashboard または `codex:display` で animation FPS を `4`、`12`、`20` の順に送る | `4fps` はゆっくり、`12fps` は既定の滑らかさ、`20fps` はより高速に pet frame / bounce が更新される。loop 待機短縮によりボタン操作は遅延しない | 準備済み。ユーザー手動 |
+| C2-23 | Dashboard または `codex:display` で animation FPS を `4`、`12`、`20` の順に送る | `4fps` はゆっくり、`12fps` は既定の滑らかさ、`20fps` はより高速に pet frame / bounce が更新される。loop 待機短縮と Sprite buffer によりボタン操作は遅延せず、Answer / Choice / footer text のちらつきが増えない | 準備済み。ユーザー手動 |
+| C2-24 | Answer または Choice 画面を表示したまま pet animation を 20 秒以上見る | pet surface はアニメーションするが、画面全体の黒塗り、本文の明滅、footer の明滅は発生しない。ちらつきが見える場合は firmware version と `petSprite.pushSprite` 対応 build かを確認する | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -50,7 +51,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
 | GUI-02 | `debug JSON` を開く | `/debug/snapshot` に health、redacted events、debug commands が出る | `dashboard:smoke` 済み |
 | GUI-03 | Dashboard の Answer tab から本文を送る | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
-| GUI-04 | Dashboard の Pet tab から `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションする | ユーザー手動 |
+| GUI-04 | Dashboard の Pet tab から `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションし、Sprite buffer により pet surface 外の文字や footer がちらつかない | ユーザー手動 |
 | GUI-05 | Dashboard の Choice tab から A/B/C を送り、Core2 で A/B/C を押す | inbound に `device.reply_selected`、workflow panel に choiceId / input が出る | ユーザー手動 |
 | GUI-06 | `sample replay` を押す | sample events が outbound に追加され、Core2 が poll する | ユーザー手動 |
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |

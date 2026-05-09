@@ -5,7 +5,7 @@
 1. Host Bridge を PC 上で起動する。
 2. M5Stack を同一 Wi-Fi に接続する。
 3. M5Stack の Pairing 画面で pairing code を登録する。
-4. Idle 画面で pet、接続状態、未読件数を確認する。
+4. Idle 画面で pet surface を確認する。
 5. Codex relay で通知や回答を送り、M5Stack 画面で内容を確認する。
 6. `codex:sessions` を起動すると、最近の Codex session の最新やり取りが自動で M5Stack に表示される。
 7. Choice 画面では A/B/C に対応する選択肢を押して返信する。
@@ -71,9 +71,11 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 - pet 領域を tap すると pet interaction が送られる。
 - pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
+- pet surface は `M5Canvas` Sprite buffer へ off-screen 描画してから転送するため、animation tick 中に Answer / Choice の本文や footer text を毎フレーム塗り直さない。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。
 - pet display area は Dashboard の `Display` tab から `1..8` を切り替えられる。`8/8` は pet を画面全体に近い最大面積で表示する。
 - animation FPS は Dashboard の `Display` tab から `4..20` を切り替えられる。既定は `12fps` で、低くするとゆっくり、高くすると pet frame / bounce の更新が速くなる。
+- `20fps` でちらつきが目立つ場合は、Core2 に Sprite buffer 対応 firmware が upload されているか、Host Bridge から display settings が届いているかを確認する。
 - UI text と body text は Dashboard の `Display` tab から `1..8` を切り替えられる。body text を大きくすると1ページに入る文字量は少なくなる。
 - Answer 画面では swipe または footer touch で本文ページを移動する。
 - Answer 画面は日本語本文に対応し、Codex relay から送った日本語の summary / body を表示する。

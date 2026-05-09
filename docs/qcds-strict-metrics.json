@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "definition": {
     "Quality": "実装、代表シナリオ、runtime gate、security/privacy、traceability の品質。",
     "Cost": "追加環境、依存、運用負荷、保守容易性。",
@@ -68,6 +68,8 @@
     "core2CodexRelayAnswer": true,
     "core2JapaneseAnswerSourceGate": true,
     "firmwarePetAnimationSourceGate": true,
+    "firmwarePetSpriteBufferSourceGate": true,
+    "firmwarePetOnlyAnimationRedraw": true,
     "firmwarePetAnimationFpsControl": true,
     "firmwarePetDisplayScaleSourceGate": true,
     "firmwareScaleSpecificPetFrames": true,
@@ -96,7 +98,7 @@
     "Core2 file watch はユーザー提供画像で Answer page 1/1、summary、本文、footer 表示を確認済み。",
     "Codex session auto relay は local session JSONL の最新 user / assistant やり取りを answer.completed として送る smoke を追加済み。実機目視は手動確認対象。",
     "Dashboard の最近の Codex 回答 panel は local session JSONL の最新 assistant 回答を表示し、M5Stackへ送信できる smoke を追加済み。実機目視は手動確認対象。",
-    "Pet surface は固定ヘッダーテキストを表示せず、Dashboard Display tab から pet display area と text size を 1..8、animation FPS を 4..20 で送る smoke を追加済み。petScale=8 と FPS 変更の実機目視は手動確認対象。",
+    "Pet surface は固定ヘッダーテキストを表示せず、Dashboard Display tab から pet display area と text size を 1..8、animation FPS を 4..20 で送る smoke を追加済み。pet animation は M5Canvas Sprite buffer と pet-only redraw path で更新する source gate を追加済み。petScale=8、FPS 変更、ちらつきなしの実機目視は手動確認対象。",
     "pet:asset は idle row の非空セルから frame 数を自動検出し、scale 1..8 ごとの Core2 用高解像度 frame を生成する。firmware は scale-specific frame を選択する。GRAY は flash 制約のため base frame fallback とする。",
     "Dashboard は side menu、event tabs、M5Stack 表示プレビューを追加済み。プレビューは pet 面積、text size slider、animation FPS を即時反映する。",
     "Dashboard GUI、/codex/choice、/codex/pet、hatch-pet asset firmware upload を追加済み。実機GUI連携の最終目視は手動確認対象。",

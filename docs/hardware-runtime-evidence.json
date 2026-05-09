@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.6",
+  "version": "0.1.0-alpha.7",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
@@ -176,6 +176,11 @@
     "displayScaleRange": "1..8",
     "maxPetScale": 8,
     "fixedHeaderTextRemoved": true,
+    "spriteBufferedRendering": true,
+    "spriteBuffer": "M5Canvas petSprite",
+    "petOnlyAnimationRedraw": true,
+    "spritePush": "petSprite.pushSprite(0, 0)",
+    "flickerAvoidance": "Animation ticks set needsPetRedraw only. The pet surface is composed off-screen and pushed as one sprite so body and footer text are not redrawn every frame.",
     "dashboardPreview": "M5Stack 表示プレビュー",
     "dynamicDisplaySettingsEvent": "display.settings_updated",
     "core2BuildPassed": true,
@@ -185,7 +190,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering and pet-only animation redraw. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
@@ -211,6 +216,7 @@
       "dashboard latest Codex answer",
       "dashboard:smoke",
       "hatch-pet asset firmware upload",
+      "sprite-buffered pet redraw source gate",
       "display.settings_updated",
       "animationFps=12",
       "petScale=8 fallback event queued and consumed"
@@ -234,6 +240,6 @@
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
-    "local 8080 bridge should be kept on the current v0.1.0-alpha.6 process before final manual confirmation"
+    "local 8080 bridge should be kept on the current v0.1.0-alpha.7 process before final manual confirmation"
   ]
 }
