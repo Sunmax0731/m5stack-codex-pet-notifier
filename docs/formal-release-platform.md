@@ -2,7 +2,7 @@
 
 ## MVP Baseline
 
-`v0.1.0-alpha.9` 時点の MVP は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
+`v0.1.0-alpha.10` 時点の MVP は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
 
 ## 追加済み Platform Capability
 

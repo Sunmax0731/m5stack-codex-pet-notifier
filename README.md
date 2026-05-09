@@ -4,7 +4,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 ## Status
 
-- Version: `0.1.0-alpha.9`
+- Version: `0.1.0-alpha.10`
 - Domain: IoT
 - Idea No: 18
 - Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
@@ -116,7 +116,7 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
 - [formal-release-platform.md](docs/formal-release-platform.md)
-- [releases/v0.1.0-alpha.9.md](docs/releases/v0.1.0-alpha.9.md)
+- [releases/v0.1.0-alpha.10.md](docs/releases/v0.1.0-alpha.10.md)
 
 ## Closed Alpha Boundary
 

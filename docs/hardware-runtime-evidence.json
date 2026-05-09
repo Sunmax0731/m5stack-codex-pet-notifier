@@ -1,10 +1,10 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
-    "serialPort": "COM3",
+    "serialPort": "COM4",
     "usbDescription": "Silicon Labs CP210x USB to UART Bridge",
     "target": "m5stack-core2",
     "chip": "ESP32-D0WDQ6-V3",
@@ -214,7 +214,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded through the USB serial auto-detection helper. On the latest check the helper selected COM3 (Silicon Labs CP210x USB to UART Bridge). The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, and display setting controls. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded through the USB serial auto-detection helper. On the latest check the helper selected COM4 (Silicon Labs CP210x USB to UART Bridge) and PlatformIO upload succeeded. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, and display setting controls. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
@@ -267,7 +267,6 @@
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
-    "local 8080 bridge should be kept on the current v0.1.0-alpha.9 process before final manual confirmation",
-    "latest Core2 upload retry on 2026-05-09 detected no M5Stack USB serial port; reconnect the device and rerun npm run firmware:upload:core2 before physical visual confirmation"
+    "local 8080 bridge should be kept on the current v0.1.0-alpha.10 process before final manual confirmation, or the Dashboard should show that it auto-detected the latest Bridge API on 18081"
   ]
 }

@@ -73,6 +73,10 @@ try {
   assert.match(app, /\/codex\/session\/publish/);
   assert.match(app, /\/pet\/current\/manifest/);
   assert.match(app, /\/pet\/packages/);
+  assert.match(app, /ensureApiBase/);
+  assert.match(app, /bridgeCandidates/);
+  assert.match(app, /apiUrl/);
+  assert.match(app, /assetUrl/);
   assert.match(app, /motionStepMs/);
   assert.match(app, /petBackgroundRgba/);
   assert.match(app, /textColorRgba/);
@@ -267,6 +271,8 @@ try {
       commandModalParameterizedRun: true,
       runtimeSidebarStatus: true,
       backgroundBridgeStartCommand: true,
+      bridgeApiAutoDiscovery: true,
+      crossOriginPetAssetPreview: true,
       petEndpoint: true,
       choiceEndpoint: true,
       decisionEndpoint: true,

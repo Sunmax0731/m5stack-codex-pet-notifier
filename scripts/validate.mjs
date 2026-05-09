@@ -146,6 +146,8 @@ assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sani
 assert(bridgeSource.includes("url.pathname === '/debug/runtime'"), 'Host Bridge must expose runtime status for the GUI sidebar');
 assert(bridgeSource.includes("url.pathname === '/debug/commands/run'"), 'Host Bridge must expose allowlisted command execution for the GUI');
 assert(bridgeSource.includes('local-command-execution-only'), 'Host Bridge command execution must be restricted to local requests');
+assert(bridgeSource.includes('access-control-allow-origin'), 'Host Bridge must allow the dashboard to use a latest Bridge API on another local port');
+assert(bridgeSource.includes("request.method === 'OPTIONS'"), 'Host Bridge must answer CORS preflight requests for cross-port dashboard commands');
 assert(bridgeSource.includes('firmware:upload:core2'), 'Host Bridge debug commands must expose auto-detected Core2 upload');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
@@ -184,6 +186,9 @@ assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard 
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 assert(dashboardAppSource.includes('/debug/commands/run'), 'Dashboard must run allowlisted setup/debug commands from the modal');
 assert(dashboardAppSource.includes('renderRuntimeStatus'), 'Dashboard must render server runtime status in the sidebar');
+assert(dashboardAppSource.includes('ensureApiBase'), 'Dashboard must discover the latest Bridge API when an old process owns the current port');
+assert(dashboardAppSource.includes('bridgeCandidates'), 'Dashboard must try known local Bridge ports for pet asset preview');
+assert(dashboardAppSource.includes('assetUrl'), 'Dashboard must resolve pet spritesheet URLs against the discovered Bridge API origin');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

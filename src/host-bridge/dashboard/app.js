@@ -7,11 +7,17 @@ const state = {
   petPackages: [],
   runtime: null,
   commandDefinitions: null,
+  apiBase: '',
+  apiBaseResolved: false,
+  apiBasePromise: null,
+  apiBaseWarning: '',
   activeCommandTab: 'setup',
   previewPetFrame: 0,
   previewAnimationInterval: null,
   previewAnimationDelay: null
 };
+
+const expectedVersion = document.documentElement.dataset.version || '0.1.0-alpha.10';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -79,11 +85,13 @@ const elements = {
   commandTabs: $('#commandTabs'),
   commandList: $('#commandList'),
   commandOutput: $('#commandOutput'),
-  commandModal: $('#commandModal')
+  commandModal: $('#commandModal'),
+  debugSnapshotLink: $('#debugSnapshotLink')
 };
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
+  await ensureApiBase();
+  const response = await fetch(apiUrl(path), {
     headers: options.body ? { 'content-type': 'application/json' } : undefined,
     ...options
   });
@@ -92,6 +100,98 @@ async function api(path, options = {}) {
     throw new Error(body.reason ?? body.message ?? `HTTP ${response.status}`);
   }
   return body;
+}
+
+function apiUrl(path) {
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+  return `${state.apiBase}${path}`;
+}
+
+function sameOriginBase() {
+  return window.location.origin;
+}
+
+function bridgeCandidates() {
+  const search = new URLSearchParams(window.location.search);
+  const requested = search.get('bridge');
+  const current = sameOriginBase();
+  return [
+    requested,
+    current,
+    'http://127.0.0.1:18081',
+    'http://localhost:18081',
+    'http://127.0.0.1:8080',
+    'http://localhost:8080'
+  ].filter(Boolean).filter((value, index, values) => values.indexOf(value) === index);
+}
+
+async function fetchJson(base, path, options = {}) {
+  const response = await fetch(`${base}${path}`, {
+    headers: options.body ? { 'content-type': 'application/json' } : undefined,
+    ...options
+  });
+  const body = await response.json();
+  if (!response.ok || body.ok === false) {
+    throw new Error(body.reason ?? body.message ?? `HTTP ${response.status}`);
+  }
+  return body;
+}
+
+async function ensureApiBase() {
+  if (state.apiBaseResolved) {
+    return;
+  }
+  if (state.apiBasePromise) {
+    await state.apiBasePromise;
+    return;
+  }
+  state.apiBasePromise = discoverApiBase();
+  try {
+    await state.apiBasePromise;
+  } finally {
+    state.apiBasePromise = null;
+  }
+}
+
+async function discoverApiBase() {
+  for (const base of bridgeCandidates()) {
+    try {
+      const health = await fetchJson(base, '/health');
+      if (health.version !== expectedVersion) {
+        state.apiBaseWarning = `${base} は ${health.version} のため最新Bridgeではありません`;
+        continue;
+      }
+      const runtime = await fetchJson(base, '/debug/runtime');
+      if (runtime.version !== expectedVersion) {
+        state.apiBaseWarning = `${base} は ${runtime.version} のため最新Bridgeではありません`;
+        continue;
+      }
+      state.apiBase = base === sameOriginBase() ? '' : base;
+      state.apiBaseWarning = state.apiBase ? `API: ${base}` : '';
+      state.apiBaseResolved = true;
+      updateApiLinks();
+      return;
+    } catch {
+      // Try the next known local bridge endpoint.
+    }
+  }
+  state.apiBase = '';
+  state.apiBaseResolved = true;
+  updateApiLinks();
+}
+
+function resetApiDiscovery() {
+  state.apiBaseResolved = false;
+  state.apiBasePromise = null;
+  state.apiBase = '';
+}
+
+function updateApiLinks() {
+  if (elements.debugSnapshotLink) {
+    elements.debugSnapshotLink.href = apiUrl('/debug/snapshot');
+  }
 }
 
 function deviceId() {
@@ -117,8 +217,10 @@ async function refresh() {
     state.runtime = runtime;
     render();
   } catch (error) {
+    resetApiDiscovery();
     elements.bridgeLine.textContent = `Host Bridge error: ${error.message}`;
     elements.bridgeLine.className = 'danger';
+    renderRuntimeStatus();
   }
 }
 
@@ -177,6 +279,9 @@ function render() {
   }
 
   elements.bridgeLine.textContent = `${health.product} ${health.version} / paired ${health.pairedDevices.length}`;
+  if (state.apiBaseWarning) {
+    elements.bridgeLine.textContent += ` / ${state.apiBaseWarning}`;
+  }
   elements.bridgeLine.className = health.pairedDevices.length ? 'ok' : 'warn';
   elements.lastUpdated.textContent = `updated ${nowLabel()}`;
   elements.pairedCount.textContent = String(health.pairedDevices.length);
@@ -218,8 +323,8 @@ function renderLog(target, entries, template) {
 function renderRuntimeStatus() {
   const current = state.runtime?.currentProcess;
   if (!current) {
-    elements.runtimeState.textContent = 'Bridge未確認';
-    elements.runtimePid.textContent = 'pid -';
+    elements.runtimeState.textContent = state.apiBaseWarning || 'Bridge未確認';
+    elements.runtimePid.textContent = 'latest Bridge API を探索中';
     elements.runtimeDot.className = 'status-dot warn';
     return;
   }
@@ -312,7 +417,7 @@ function collectCommandParams(commandId) {
 
 async function runDashboardCommand(commandId) {
   elements.commandOutput.textContent = `running ${commandId}...`;
-  const response = await fetch('/debug/commands/run', {
+  const response = await fetch(apiUrl('/debug/commands/run'), {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -479,7 +584,9 @@ function renderPetManifest() {
   const manifest = state.petManifest;
   if (!manifest?.ok) {
     elements.petAssetName.textContent = 'fallback';
-    elements.petAssetDescription.textContent = 'local hatch-pet asset が見つからないため fallback preview を表示';
+    elements.petAssetDescription.textContent = manifest?.reason
+      ? `local hatch-pet asset 未読込: ${manifest.reason}`
+      : 'local hatch-pet asset が見つからないため fallback preview を表示';
     return;
   }
   elements.petAssetName.textContent = manifest.displayName ?? manifest.id ?? 'current pet';
@@ -532,7 +639,7 @@ function renderM5Preview() {
   if (manifest?.ok) {
     elements.previewPet.classList.add('sprite-pet');
     elements.previewPet.classList.remove('sprite-fallback');
-    elements.previewPet.style.backgroundImage = `url("${manifest.spritesheetUrl}")`;
+    elements.previewPet.style.backgroundImage = `url("${assetUrl(manifest.spritesheetUrl)}")`;
     elements.previewPet.style.backgroundSize = `${petWidth * manifest.columns}px ${petHeight * manifest.rows}px`;
   } else {
     elements.previewPet.classList.remove('sprite-pet');
@@ -548,6 +655,16 @@ function renderM5Preview() {
   elements.previewFooter.textContent = footerLabel(preview.footer, device);
   elements.previewBody.style.display = preview.body ? 'block' : 'none';
   elements.previewFooter.style.display = preview.footer ? 'block' : 'none';
+}
+
+function assetUrl(value) {
+  if (!value) {
+    return '';
+  }
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
+  return apiUrl(value.startsWith('/') ? value : `/${value}`);
 }
 
 function renderPreviewPetFrame() {

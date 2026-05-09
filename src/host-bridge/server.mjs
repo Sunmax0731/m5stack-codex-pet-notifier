@@ -217,6 +217,9 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
   const server = http.createServer(async (request, response) => {
     try {
       const url = new URL(request.url, `http://${request.headers.host ?? 'localhost'}`);
+      if (request.method === 'OPTIONS') {
+        return sendOptions(response);
+      }
       if (request.method === 'GET' && url.pathname === '/health') {
         return sendJson(response, 200, { ok: true, ...bridge.summary() });
       }
@@ -397,14 +400,26 @@ function sendJson(response, statusCode, payload) {
   const body = `${JSON.stringify(payload)}\n`;
   response.writeHead(statusCode, {
     'content-type': 'application/json; charset=utf-8',
-    'content-length': Buffer.byteLength(body)
+    'content-length': Buffer.byteLength(body),
+    ...corsHeaders()
   });
   response.end(body);
 }
 
+function sendOptions(response) {
+  response.writeHead(204, {
+    ...corsHeaders(),
+    'access-control-allow-methods': 'GET,POST,OPTIONS',
+    'access-control-allow-headers': 'content-type',
+    'access-control-max-age': '600'
+  });
+  response.end();
+}
+
 function sendNoContent(response) {
   response.writeHead(204, {
-    'cache-control': 'no-store'
+    'cache-control': 'no-store',
+    ...corsHeaders()
   });
   response.end();
 }
@@ -435,9 +450,17 @@ function sendStaticFile(response, filePath) {
   response.writeHead(200, {
     'content-type': contentTypes[extension] ?? 'application/octet-stream',
     'content-length': body.length,
-    'cache-control': 'no-store'
+    'cache-control': 'no-store',
+    ...corsHeaders()
   });
   response.end(body);
+}
+
+function corsHeaders() {
+  return {
+    'access-control-allow-origin': '*',
+    'access-control-allow-private-network': 'true'
+  };
 }
 
 function buildCurrentPetManifest(selection = {}) {

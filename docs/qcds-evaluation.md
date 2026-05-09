@@ -33,7 +33,7 @@ QCDS は Quality、Cost、Delivery、Satisfaction として評価します。gra
 - `docs/codex-relay-manual-check.md`
 - `docs/gui-tools-manual-check.md`
 - `docs/hardware-runtime-evidence.json`
-- `docs/releases/v0.1.0-alpha.9.md`
+- `docs/releases/v0.1.0-alpha.10.md`
 
 ## Manual Test Cap
 
