@@ -165,6 +165,10 @@
     ],
     "defaultPetScale": 2,
     "defaultDisplayAreaMultiplier": 4,
+    "displayScaleRange": "1..8",
+    "maxPetScale": 8,
+    "fixedHeaderTextRemoved": true,
+    "dashboardPreview": "M5Stack 表示プレビュー",
     "dynamicDisplaySettingsEvent": "display.settings_updated",
     "core2BuildPassed": true,
     "grayBuildPassed": true,
@@ -199,7 +203,8 @@
       "dashboard latest Codex answer",
       "dashboard:smoke",
       "hatch-pet asset firmware upload",
-      "display.settings_updated"
+      "display.settings_updated",
+      "petScale=8 fallback event queued and consumed"
     ]
   },
   "manualPhysicalInput": {
@@ -216,10 +221,10 @@
     "Codex session auto relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Codex hook relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Dashboard latest Codex answer publish visual confirmation on Core2 is prepared but still requires user manual check",
-    "Dashboard Display settings visual confirmation on Core2 is prepared but still requires user manual check",
+    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, and text size is prepared but still requires user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
-    "local 8080 bridge is still an admin-owned v0.1.0-alpha.2 process; close it and start v0.1.0-alpha.5 before final manual confirmation"
+    "local 8080 bridge should be kept on the current v0.1.0-alpha.5 process before final manual confirmation"
   ]
 }

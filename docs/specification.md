@@ -105,9 +105,10 @@
 ## Pet Animation
 
 - firmware は header に pet avatar を描画する。
-- pet avatar は既定で幅2倍・高さ2倍に拡大し、従来比4倍の表示面積を使う。
-- `display.settings_updated.display.petScale` は `1` または `2` を受け付け、Dashboard から動的に変更できる。
-- `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1` または `2` を受け付け、header / footer と本文の text size を個別に変更できる。
+- M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は描画しない。
+- `display.settings_updated.display.petScale` は `1..8` を受け付け、`8` を pet を画面全体に近い最大表示とする。
+- `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1..8` を受け付け、footer と本文の text size を個別に変更できる。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積と text size の見え方を確認できる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。

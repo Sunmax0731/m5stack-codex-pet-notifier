@@ -68,7 +68,8 @@ assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page tex
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
 assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
-assert(firmwareSource.includes('petDisplayScale = 2'), 'firmware must default to a 2x pet display scale');
+assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 8-step display scaling');
+assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
 assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
@@ -103,12 +104,16 @@ assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sani
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
 assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
-assert(dashboardIndexSource.includes('pet display scale'), 'Dashboard must expose pet display area controls');
-assert(dashboardIndexSource.includes('body text scale'), 'Dashboard must expose body text size controls');
+assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side navigation');
+assert(dashboardIndexSource.includes('M5Stack 表示プレビュー'), 'Dashboard must expose a M5Stack display preview');
+assert(dashboardIndexSource.includes('pet display area'), 'Dashboard must expose pet display area controls');
+assert(dashboardIndexSource.includes('body text size'), 'Dashboard must expose body text size controls');
+assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
+assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

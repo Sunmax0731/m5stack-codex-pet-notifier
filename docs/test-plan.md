@@ -47,7 +47,7 @@
 | Core2 Codex hook relay | Codex Hooks または `codex:hook` 手動実行で最新やり取りを送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
-| Core2 display settings | Dashboard から pet display scale と text scale を送り、Core2 の pet 表示面積と文字サイズの変化を目視する | `docs/gui-tools-manual-check.md` |
+| Core2 display settings | Dashboard から pet display area と text size を `1..8` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化を目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

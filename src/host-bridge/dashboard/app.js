@@ -32,6 +32,14 @@ const elements = {
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
+  previewMode: $('#previewMode'),
+  m5Preview: $('#m5Preview'),
+  previewPet: $('#previewPet'),
+  previewBody: $('#previewBody'),
+  previewFooter: $('#previewFooter'),
+  previewPetReadout: $('#previewPetReadout'),
+  previewUiReadout: $('#previewUiReadout'),
+  previewBodyReadout: $('#previewBodyReadout'),
   commandList: $('#commandList')
 };
 
@@ -108,6 +116,7 @@ function render() {
     : 'まだ返信はありません。';
   renderLatestSession();
   renderCommands();
+  renderM5Preview();
 }
 
 function renderLog(target, entries, template) {
@@ -145,6 +154,7 @@ function renderLatestSession() {
   elements.sessionPhase.textContent = `phase ${latest.phase ?? '-'}`;
   elements.sessionAnswer.textContent = latest.body ?? '';
   elements.sessionUser.textContent = latest.user?.text ?? '直前の user message はありません。';
+  renderM5Preview();
 }
 
 async function loadLatestSession() {
@@ -224,9 +234,64 @@ function createDisplayFallbackPetEvent(payload) {
 }
 
 function renderDisplayControls() {
-  elements.petScaleValue.textContent = `${elements.petScale.value}x`;
-  elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}x`;
-  elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}x`;
+  elements.petScaleValue.textContent = `${elements.petScale.value}/8`;
+  elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}/8`;
+  elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
+  renderM5Preview();
+}
+
+function renderM5Preview() {
+  if (!elements.m5Preview) {
+    return;
+  }
+  const petScale = Number(elements.petScale.value);
+  const uiTextScale = Number(elements.uiTextScale.value);
+  const bodyTextScale = Number(elements.bodyTextScale.value);
+  const mode = elements.previewMode.value;
+  const petSize = Math.round(42 + ((petScale - 1) / 7) * 196);
+  const bodySize = Math.min(34, 10 + bodyTextScale * 3);
+  const uiSize = Math.min(24, 9 + uiTextScale * 2);
+
+  elements.m5Preview.dataset.mode = mode;
+  elements.m5Preview.style.setProperty('--pet-size', `${petSize}px`);
+  elements.m5Preview.style.setProperty('--body-size', `${bodySize}px`);
+  elements.m5Preview.style.setProperty('--ui-size', `${uiSize}px`);
+  elements.previewPetReadout.textContent = `${petScale}/8`;
+  elements.previewUiReadout.textContent = `${uiTextScale}/8`;
+  elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
+
+  const preview = previewContent(mode, petScale);
+  elements.previewBody.textContent = preview.body;
+  elements.previewFooter.textContent = preview.footer;
+  elements.previewBody.style.display = preview.body ? 'block' : 'none';
+  elements.previewFooter.style.display = preview.footer ? 'block' : 'none';
+}
+
+function previewContent(mode, petScale) {
+  if (mode === 'answer') {
+    const sessionText = state.latestSession?.body;
+    const body = sessionText || $('#answerBody').value;
+    return {
+      body: `${$('#answerSummary').value}\n${body}`,
+      footer: 'A up    B idle    C down'
+    };
+  }
+  if (mode === 'choice') {
+    return {
+      body: `${$('#choicePrompt').value}\nA: ${$('#choiceA').value}\nB: ${$('#choiceB').value}\nC: ${$('#choiceC').value}`,
+      footer: 'A send  B send  C send'
+    };
+  }
+  if (mode === 'notification') {
+    return {
+      body: `${$('#notificationTitle').value}\n${$('#notificationBody').value}`,
+      footer: 'A ack   B pet   C idle'
+    };
+  }
+  return {
+    body: '',
+    footer: petScale >= 8 ? '' : 'A poll  B pet  C idle'
+  };
 }
 
 function escapeHtml(value) {
@@ -255,6 +320,17 @@ function wireTabs() {
       $$('.tab-panel').forEach((item) => item.classList.remove('active'));
       tab.classList.add('active');
       $(`#${tab.dataset.tab}Form`).classList.add('active');
+    });
+  });
+}
+
+function wireSideNav() {
+  $$('.side-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      $$('.side-link').forEach((item) => item.classList.remove('active'));
+      link.classList.add('active');
+      const target = $(`#${link.dataset.section}`);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
 }
@@ -313,6 +389,20 @@ function wireActions() {
   [elements.petScale, elements.uiTextScale, elements.bodyTextScale].forEach((control) => {
     control.addEventListener('input', renderDisplayControls);
   });
+  [
+    elements.previewMode,
+    $('#answerSummary'),
+    $('#answerBody'),
+    $('#choicePrompt'),
+    $('#choiceA'),
+    $('#choiceB'),
+    $('#choiceC'),
+    $('#notificationTitle'),
+    $('#notificationBody')
+  ].forEach((control) => {
+    control.addEventListener('input', renderM5Preview);
+    control.addEventListener('change', renderM5Preview);
+  });
   $('#refreshButton').addEventListener('click', refresh);
   $('#clearViewButton').addEventListener('click', render);
   $('#loadCommandsButton').addEventListener('click', refresh);
@@ -330,6 +420,7 @@ function showError(error) {
 }
 
 wireTabs();
+wireSideNav();
 wireForms();
 wireActions();
 renderDisplayControls();

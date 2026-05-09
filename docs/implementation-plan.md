@@ -37,8 +37,8 @@
 - [x] Core2 実機 firmware flash、Wi-Fi、pairing、sample event poll を確認する。
 - [x] Core2 touch choice、footer touch、answer swipe の firmware 分岐を実装する。
 - [x] Core2 / GRAY firmware に pet avatar の blink / bounce / tail animation を実装する。
-- [x] pet avatar の既定表示を幅2倍・高さ2倍の4倍面積にする。
-- [x] firmware が `display.settings_updated` で pet 表示倍率と text size を動的に反映するようにする。
+- [x] 固定ヘッダーテキストを削除し、pet surface を優先表示する。
+- [x] firmware が `display.settings_updated` で pet 表示面積と text size を `1..8` の8段階で動的に反映するようにする。
 - [x] hatch-pet package から ignored local firmware asset を生成するツールを追加する。
 - [x] firmware が local hatch-pet asset を優先表示し、未生成時は fallback avatar を使うようにする。
 

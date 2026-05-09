@@ -46,8 +46,11 @@ const deviceId = productProfile.sampleDeviceId;
 try {
   const index = await getText(`${baseUrl}/`);
   assert.match(index, /M5Stack Codex Pet Console/);
+  assert.match(index, /side-nav/);
   assert.match(index, /ABC 返信ワークフロー/);
   assert.match(index, /最近の Codex 回答/);
+  assert.match(index, /M5Stack 表示プレビュー/);
+  assert.match(index, /max="8"/);
 
   const app = await getText(`${baseUrl}/dashboard/app.js`);
   assert.match(app, /\/codex\/choice/);
@@ -57,6 +60,7 @@ try {
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
+  assert.match(css, /\.m5-screen/);
 
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
@@ -88,13 +92,15 @@ try {
 
   const display = await postJson(`${baseUrl}/codex/display`, {
     deviceId,
-    petScale: 2,
-    uiTextScale: 1,
-    bodyTextScale: 1
+    petScale: 8,
+    uiTextScale: 3,
+    bodyTextScale: 4
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
-  assert.equal(display.event.display.petScale, 2);
+  assert.equal(display.event.display.petScale, 8);
+  assert.equal(display.event.display.uiTextScale, 3);
+  assert.equal(display.event.display.bodyTextScale, 4);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -158,6 +164,9 @@ try {
       latestSessionAnswerEndpoint: true,
       latestSessionPublishEndpoint: true,
       displaySettingsEndpoint: true,
+      displaySettingsEightStepControls: true,
+      m5StackPreviewPanel: true,
+      sideNavigation: true,
       petEndpoint: true,
       choiceEndpoint: true,
       inboundReplySummary: true

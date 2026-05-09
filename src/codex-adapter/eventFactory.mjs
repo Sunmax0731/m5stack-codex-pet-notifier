@@ -78,9 +78,9 @@ export function createDisplaySettingsEvent(options = {}) {
     eventId: options.eventId ?? generatedId('evt-display'),
     createdAt: options.createdAt ?? new Date().toISOString(),
     display: {
-      petScale: clampInteger(options.petScale, 1, 2, 2),
-      uiTextScale: clampInteger(options.uiTextScale, 1, 2, 1),
-      bodyTextScale: clampInteger(options.bodyTextScale, 1, 2, 1)
+      petScale: clampInteger(options.petScale, 1, 8, 2),
+      uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
+      bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1)
     }
   };
 }

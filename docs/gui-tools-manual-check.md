@@ -37,7 +37,9 @@ http://127.0.0.1:8080/
 - 状態確認に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
-- `Display` tab があり、pet display scale、UI text scale、body text scale を変更できる。
+- side menu があり、状態、送信、プレビュー、ABC 返信、Codex 回答、ログ、デバッグへ移動できる。
+- `Display` tab があり、pet display area、UI text size、body text size を `1..8` の8段階で変更できる。
+- `M5Stack 表示プレビュー` があり、Pet / Answer / Choice / Notify の simulated display を送信前に確認できる。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
 - `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
@@ -47,7 +49,7 @@ Core2 を起動し、Wi-Fi 接続と pairing を待ちます。
 
 期待結果:
 
-- Core2 のヘッダーに pet avatar が表示され、数秒ごとに blink / bounce / tail が変化する。
+- Core2 は固定ヘッダーテキストを表示せず、pet surface が表示され、数秒ごとに blink / bounce / tail が変化する。
 - Dashboard の paired が `1` 以上になる。
 - `deviceId` が `m5stack-sample-001` のまま送信対象として使える。
 
@@ -69,27 +71,29 @@ Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして
 期待結果:
 
 - outbound に `pet.updated` が出る。
-- Core2 ヘッダーの pet avatar が `Mira` などの hatch-pet asset として表示される。
-- Core2 ヘッダーの pet avatar の背景色または表示状態が変わる。
+- Core2 の pet surface が `Mira` などの hatch-pet asset として表示される。
+- Core2 の pet surface の背景色または表示状態が変わる。
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
 
-## 4.1 Display 設定
+## 4.1 Display 設定とプレビュー
 
 Dashboard の `Display` tab を開き、次を送信します。
 
-- `pet display scale`: `2x`
-- `UI text scale`: `1x` または `2x`
-- `body text scale`: `1x` または `2x`
+- `pet display area`: `8/8`
+- `UI text size`: `2/8`
+- `body text size`: `2/8`
 
 期待結果:
 
 - Dashboard の send result が `ok=true`。
 - outbound に `display.settings_updated` が出る。
 - 古い Host Bridge process が残っている場合は fallback として `pet.updated` が出る。この場合も Core2 の display 設定が変われば合格とする。
-- Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示される。
-- `UI text scale` を変更すると header / footer の文字サイズが変わる。
-- `body text scale` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
+- Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示しない。
+- `petScale=8` では pet が画面全体に近い最大面積で表示される。
+- `UI text size` を変更すると footer の文字サイズが変わる。
+- `body text size` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
+- Dashboard の M5Stack 表示プレビューも slider 変更を即時反映する。
 
 ## 5. Codex session 自動送信
 

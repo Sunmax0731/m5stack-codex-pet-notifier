@@ -232,7 +232,7 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
-    '  display --pet-scale 2 --ui-text-scale 1 --body-text-scale 1',
+    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2',
     '  watch --file .\\dist\\codex-answer.txt',
     '',
     'Common options: --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',

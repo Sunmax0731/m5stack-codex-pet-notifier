@@ -23,7 +23,10 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換する。
 - `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。state に応じた色、frame animation、bounce を M5Stack 上で表示する。
-- ペット表示は既定で幅2倍・高さ2倍の4倍面積にし、Dashboard または `codex:display` から pet 表示倍率と UI / body text size を動的に変更する。
+- M5Stack 画面上部の `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストは描画せず、pet surface を優先表示する。
+- ペット表示面積は Dashboard または `codex:display` から `1..8` の8段階で動的に変更でき、`8` は pet を画面全体に近い面積で表示する最大設定として扱う。
+- UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビュー、設計観点 panel を持ち、送信前に pet 面積と文字サイズの見え方を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
@@ -39,7 +42,7 @@ cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 2 --ui-text-scale 1 --body-text-scale 1
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001

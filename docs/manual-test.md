@@ -15,7 +15,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
-| C2-01 | firmware を Core2 target で build / flash する | 起動画面に `Codex Pet` と profile が出る | 実施済み。`COM4` upload 成功 |
+| C2-01 | firmware を Core2 target で build / flash する | 起動画面は固定ヘッダーテキストを表示せず、pet surface と状態画面が出る | 実施済み。`COM4` upload 成功 |
 | C2-02 | 2.4GHz Wi-Fi へ接続する | serial log に `wifi_connected` と device IP が出る | 実施済み。`wifi_status connected`、local IP は redacted |
 | C2-03 | Host Bridge へ pairing する | serial log に `pair_ok` が出る | 実施済み。Host Bridge health で paired device を確認 |
 | C2-04 | `notification.created` を送る | 通知画面へ遷移し、serial log に host event が出る | 実施済み。serial で host event を確認 |
@@ -31,10 +31,11 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-14 | `codex:watch --once` で UTF-8 file 内容を送る | Core2 が `Answer` 画面へ遷移し、summary と file 内容を表示する | 実施済み。ユーザー提供画像で `Answer page 1/1`、summary、file 内容、`A up / B idle / C down` footer を確認 |
 | C2-15 | `codex:sessions --once --phase any` を実行する | 最近の Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ自動表示される | 準備済み。ユーザー手動 |
 | C2-16 | `codex:hook` を実行する | Codex Hooks から呼ばれる one-shot relay と同じ経路で最新やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 header の pet avatar が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
+| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-20 | Dashboard の `Display` tab で pet display scale を `2x`、text scale を任意に変更して送る | Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示され、UI / body text size が反映される | 準備済み。ユーザー手動 |
+| C2-20 | Dashboard の `Display` tab で pet display area を `8/8`、UI text size と body text size を任意に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8` の設定に応じて変わる | 準備済み。ユーザー手動 |
+| C2-21 | Dashboard の `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify を切り替え、Display slider を `1..8` で変更する | 送信前の simulated display が pet 面積、body text、footer text size を即時反映する | `dashboard:smoke` 済み。ユーザー目視 |
 
 ## GRAY 今回対象外
 
@@ -53,7 +54,8 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-10 | `Display` tab で pet display scale、UI text scale、body text scale を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-10 | `Display` tab で pet display area、UI text size、body text size を `1..8` で変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-11 | side menu で `状態`、`送信`、`プレビュー`、`ABC返信`、`Codex回答`、`ログ`、`デバッグ` へ移動する | 各 section に移動でき、現在選択した menu が強調表示される | `dashboard:smoke` 済み。ユーザー目視 |
 
 ## 記録項目
 
@@ -90,7 +92,7 @@ Codex relay:
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 2 --ui-text-scale 1 --body-text-scale 1
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
 cmd.exe /d /s /c npm run codex:sessions -- --phase final

@@ -47,8 +47,10 @@ constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 320;
 constexpr int ANSWER_CHARS_PER_PAGE = 90;
 constexpr int BODY_TEXT_WIDTH = 304;
 constexpr int BODY_LINE_HEIGHT = 18;
-constexpr int BASE_HEADER_HEIGHT = 58;
 constexpr int BASE_FOOTER_HEIGHT = 24;
+constexpr int DISPLAY_SCALE_MIN = 1;
+constexpr int DISPLAY_SCALE_MAX = 8;
+constexpr int MIN_PET_SURFACE_HEIGHT = 52;
 
 String authToken;
 ScreenState screenState = SCREEN_PAIRING;
@@ -79,6 +81,7 @@ int bodyTextScale = 1;
 void pollHost();
 void sendPetInteraction(const char* interaction);
 int pageCount(const String& value, int charsPerPage);
+int footerTop();
 
 String screenName() {
   switch (screenState) {
@@ -105,7 +108,7 @@ void markDraw() {
 }
 
 int clampDisplayScale(int value) {
-  return max(1, min(2, value));
+  return max(DISPLAY_SCALE_MIN, min(DISPLAY_SCALE_MAX, value));
 }
 
 void applyDisplayFont(int scale = 1) {
@@ -137,20 +140,46 @@ int petAssetHeight() {
 #endif
 }
 
+int petBoxPadding() {
+  return petDisplayScale >= DISPLAY_SCALE_MAX ? 0 : 10;
+}
+
+bool petFullscreenMode() {
+  return petDisplayScale >= DISPLAY_SCALE_MAX && screenState == SCREEN_IDLE;
+}
+
+int petSurfaceHeight() {
+  const int maxHeight = max(MIN_PET_SURFACE_HEIGHT, footerTop());
+  return MIN_PET_SURFACE_HEIGHT + ((maxHeight - MIN_PET_SURFACE_HEIGHT) * (petDisplayScale - DISPLAY_SCALE_MIN)) / (DISPLAY_SCALE_MAX - DISPLAY_SCALE_MIN);
+}
+
+int petPixelScale() {
+  const int areaWidth = M5.Display.width();
+  const int areaHeight = max(1, petSurfaceHeight() - 8);
+  const int baseWidth = petAssetWidth() + petBoxPadding();
+  const int baseHeight = petAssetHeight() + petBoxPadding();
+  const int scaleByWidth = max(1, areaWidth / max(1, baseWidth));
+  const int scaleByHeight = max(1, areaHeight / max(1, baseHeight));
+  return max(1, min(DISPLAY_SCALE_MAX, min(scaleByWidth, scaleByHeight)));
+}
+
 int petBoxWidth() {
-  return (petAssetWidth() + 10) * petDisplayScale;
+  return (petAssetWidth() + petBoxPadding()) * petPixelScale();
 }
 
 int petBoxHeight() {
-  return (petAssetHeight() + 10) * petDisplayScale;
+  return (petAssetHeight() + petBoxPadding()) * petPixelScale();
 }
 
 int headerHeight() {
-  return max(BASE_HEADER_HEIGHT, petBoxHeight() + 12);
+  return petSurfaceHeight();
 }
 
 int footerHeight() {
-  return BASE_FOOTER_HEIGHT * uiTextScale;
+  if (petFullscreenMode()) {
+    return 0;
+  }
+  return min(96, max(BASE_FOOTER_HEIGHT, 18 + uiTextScale * 10));
 }
 
 int footerTop() {
@@ -170,7 +199,7 @@ int maxBodyLinesFrom(int y) {
 }
 
 int answerCharsPerPage() {
-  return max(36, ANSWER_CHARS_PER_PAGE / bodyTextScale);
+  return max(6, ANSWER_CHARS_PER_PAGE / bodyTextScale);
 }
 
 void applyDisplaySettings(JsonVariant display) {
@@ -365,7 +394,7 @@ void drawVectorPetAvatar(int x, int y) {
   const String state = renderedPetState();
   const uint16_t accent = petAccentColor();
   const uint16_t shadow = TFT_DARKGREY;
-  const int s = petDisplayScale;
+  const int s = petPixelScale();
   const int bodyY = y + (10 + bounce) * s;
 
   M5.Display.fillEllipse(x + 26 * s, y + 45 * s, 22 * s, 4 * s, shadow);
@@ -398,10 +427,11 @@ void drawVectorPetAvatar(int x, int y) {
 void drawPetAvatar(int x, int y) {
 #if HAS_LOCAL_PET_ASSET
   const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
-  const int s = petDisplayScale;
+  const int s = petPixelScale();
+  const int inset = (petBoxPadding() / 2) * s;
   M5.Display.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
   M5.Display.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);
-  drawLocalPetAsset(x + 5 * s, y + (5 + bounce) * s, s);
+  drawLocalPetAsset(x + inset, y + inset + bounce * s, s);
 #else
   drawVectorPetAvatar(x, y);
 #endif
@@ -422,18 +452,16 @@ int pageCount(const String& value, int charsPerPage) {
 
 void drawHeader() {
   const int h = headerHeight();
-  const int petX = M5.Display.width() - petBoxWidth() - 44;
-  M5.Display.fillRect(0, 0, 320, h, TFT_DARKGREY);
-  M5.Display.setTextColor(TFT_WHITE, TFT_DARKGREY);
-  applyUiFont();
-  drawLinePx(petName, 8, 8, max(96, petX - 16));
-  drawLinePx(String("state: ") + renderedPetState() + " / " + profile.name, 8, 34 * uiTextScale, max(96, petX - 16));
-  drawPetAvatar(petX, 6);
-  drawLinePx((WiFi.status() == WL_CONNECTED ? "LAN" : "NO LAN"), 272, 8, 46);
-  drawLinePx(String("U:") + unreadCount, 272, 34 * uiTextScale, 46);
+  M5.Display.fillRect(0, 0, M5.Display.width(), h, TFT_BLACK);
+  const int petX = max(0, (M5.Display.width() - petBoxWidth()) / 2);
+  const int petY = max(0, (h - petBoxHeight()) / 2);
+  drawPetAvatar(petX, petY);
 }
 
 void drawFooter(const char* a, const char* b, const char* c) {
+  if (footerHeight() <= 0) {
+    return;
+  }
   const int y = footerTop();
   M5.Display.fillRect(0, y, 320, footerHeight(), TFT_NAVY);
   M5.Display.setTextColor(TFT_WHITE, TFT_NAVY);
@@ -464,6 +492,9 @@ void drawScreen() {
   }
 
   if (screenState == SCREEN_IDLE) {
+    if (petFullscreenMode()) {
+      return;
+    }
     drawLine("Idle", 8, y0, 36);
     drawLine(title.length() ? title : "Waiting for Codex event", 8, y0 + uiLine, 36);
     drawLine(body.length() ? body : "Use Host Bridge replay.", 8, y0 + uiLine * 2, 36);

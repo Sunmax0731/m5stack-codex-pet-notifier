@@ -11,9 +11,9 @@
       "type": "object",
       "required": ["petScale", "uiTextScale", "bodyTextScale"],
       "properties": {
-        "petScale": { "type": "integer", "minimum": 1, "maximum": 2 },
-        "uiTextScale": { "type": "integer", "minimum": 1, "maximum": 2 },
-        "bodyTextScale": { "type": "integer", "minimum": 1, "maximum": 2 }
+        "petScale": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "uiTextScale": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "bodyTextScale": { "type": "integer", "minimum": 1, "maximum": 8 }
       }
     }
   }
