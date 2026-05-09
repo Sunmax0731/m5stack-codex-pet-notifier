@@ -4,11 +4,24 @@
 
 | Component | Responsibility | 実装 |
 | --- | --- | --- |
-| Host Bridge | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する | `src/host-adapter/localLanBridge.mjs` |
+| Host Bridge model | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する contract を検証する | `src/host-adapter/localLanBridge.mjs` |
+| LAN Host Bridge | pairing、token 認証、HTTP polling、device event 受信、sample replay、event log を提供する | `src/host-bridge/server.mjs` |
 | Device Profile | Core2 / GRAY の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
 | Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
 | Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
-| Firmware scaffold | M5Unified 前提の最小 device loop | `firmware/` |
+| Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson による device loop | `firmware/` |
+
+## LAN Host Bridge API
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/pair` | `deviceId` と `pairingCode` から device token を発行する |
+| `GET` | `/device/poll?deviceId&token` | paired device が Host -> Device event を 1 件取得する |
+| `POST` | `/device/event?deviceId&token` | device から reply / interaction / heartbeat を送る |
+| `POST` | `/codex/event` | Codex adapter 相当の Host -> Device event を queue する |
+| `POST` | `/codex/replay-samples` | sample event 一式を queue する |
+| `GET` | `/events` | outbound / inbound / security log を redaction 前提で確認する |
+| `GET` | `/health` | version、paired device、event count を確認する |
 
 ## Event Schema
 
@@ -46,4 +59,4 @@
 
 - device 保存: `deviceId`、host URL、pairing token、表示設定。
 - device 非保存: 通知本文、回答本文、返信本文、個人 pet sprite。
-- host 保存: closed alpha では mock log のみ。実 Codex adapter 追加時に保存期間と削除手順を再定義する。
+- host 保存: closed alpha では event type、eventId、device event summary のみを release evidence に残す。実 Codex adapter 追加時に保存期間と削除手順を再定義する。

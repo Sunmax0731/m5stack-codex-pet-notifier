@@ -1,35 +1,44 @@
 # m5stack-codex-pet-notifier
 
-M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使うための closed alpha prototype です。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack 側は安定した JSON event contract だけを処理します。
+M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使うための closed alpha prototype です。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack firmware は安定した JSON event contract だけを処理します。
 
 ## Status
 
-- Version: `0.1.0-alpha.1`
+- Version: `0.1.0-alpha.2`
 - Domain: IoT
 - Idea No: 18
-- Runtime gate: simulator / mock device / sample telemetry / host adapter / device adapter / security boundary
-- Manual hardware test: Core2 target を `COM4` へ upload 済み。M5Stack が 2.4GHz LAN に接続することを serial log で確認済み
+- Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / device adapter / security boundary
+- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、sample event polling まで確認対象
 - Release channel: GitHub prerelease
 
-## MVP
+## 搭載機能
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
-- `src/host-adapter/localLanBridge.mjs` で pairing token、device 登録、LAN 境界、device event 受信を検証する。
+- `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
+- `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
+- Core2 touch / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
-- `firmware/` に M5Unified 前提の Core2 / GRAY firmware scaffold を置く。
 
 ## Commands
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm test
-cmd.exe /d /s /c npm run demo
+cmd.exe /d /s /c npm run bridge:smoke
+cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
 
-## Local Wi-Fi Config
+## Firmware
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+```
 
 `D:\AI\secure\ssid.txt` は Git に入れません。M5Stack/ESP32 は 2.4GHz Wi-Fi のみ対応するため、5GHz SSID が記載されている場合は device scan で見つかった対応 2.4GHz SSID を `firmware/include/wifi_config.local.h` に設定します。この local header は `.gitignore` 対象です。
 
@@ -37,18 +46,17 @@ cmd.exe /d /s /c npm run demo
 
 - [requirements.md](docs/requirements.md)
 - [specification.md](docs/specification.md)
-- [design.md](docs/design.md)
 - [architecture.md](docs/architecture.md)
-- [implementation-plan.md](docs/implementation-plan.md)
 - [test-plan.md](docs/test-plan.md)
 - [manual-test.md](docs/manual-test.md)
+- [host-bridge-manual-check.md](docs/host-bridge-manual-check.md)
 - [installation-guide.md](docs/installation-guide.md)
 - [user-guide.md](docs/user-guide.md)
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
-- [releases/v0.1.0-alpha.1.md](docs/releases/v0.1.0-alpha.1.md)
+- [releases/v0.1.0-alpha.2.md](docs/releases/v0.1.0-alpha.2.md)
 
 ## Closed Alpha Boundary
 
-この release は simulator と mock device で runtime gate を通した検証版です。現在の main では Core2 target の firmware 書き込みと Wi-Fi 接続まで確認済みです。touch、button、IMU、GRAY target、実 Codex adapter は未確認のため、安定版ではなく prerelease として扱います。
+この release は simulator、mock device、LAN Host Bridge smoke、Core2 firmware build / upload / Wi-Fi / pairing / sample polling を検証対象にした prerelease です。GRAY 実機、物理 A/B/C、touch / IMU 入力、実 Codex App adapter はユーザー側の手動確認として扱います。

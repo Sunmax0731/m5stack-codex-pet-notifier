@@ -18,6 +18,7 @@ const signals = {
   sampleTelemetry: telemetry.privacy.requiresPairingToken === true,
   deviceAdapter: fs.existsSync('src/device-adapter/deviceProfiles.mjs'),
   hostAdapter: fs.existsSync('src/host-adapter/localLanBridge.mjs'),
+  lanHostBridge: fs.existsSync('src/host-bridge/server.mjs') && fs.existsSync('scripts/bridge-smoke.mjs'),
   securityPrivacy: result.scenarios.some((scenario) => scenario.securityBoundary === true)
     && telemetry.privacy.messageBodiesPersistedOnDevice === false
 };
@@ -32,7 +33,7 @@ const gate = {
   platformType: productProfile.platformType,
   pass: true,
   method: 'node-simulator-runtime-gate',
-  manualTest: 'not-run-by-codex',
+  manualTest: 'partial-pass-core2-upload-wifi-pairing-sample-poll',
   signals,
   scenarioIds: result.scenarios.map((scenario) => scenario.id)
 };

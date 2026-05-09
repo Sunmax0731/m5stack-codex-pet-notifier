@@ -9,6 +9,8 @@
 5. 通知や回答が届いたら M5Stack 画面で内容を確認する。
 6. Choice 画面では A/B/C に対応する選択肢を押して返信する。
 
+Host Bridge の closed alpha endpoint は LAN 内限定です。公開ネットワークやポート開放した環境では起動しません。
+
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
@@ -23,6 +25,7 @@
 
 ## 制約
 
-- closed alpha では実 Codex App adapter は mock です。
-- 実機 Wi-Fi、firmware flash、touch、IMU は Codex では未実施です。
+- closed alpha では実 Codex App adapter の代わりに `/codex/event` と `/codex/replay-samples` を使います。
+- Core2 の upload、Wi-Fi、pairing、sample event poll は Codex 実行環境で確認対象です。
+- GRAY 実機、物理 A/B/C、touch、IMU はユーザー手動確認項目です。
 - LAN 外公開は対象外です。

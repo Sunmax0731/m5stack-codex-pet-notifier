@@ -11,11 +11,11 @@
 
 ## 評価基準
 
-- 実機なしでも simulator と sample telemetry で代表フローを検証できること。
+- 実機なしでも simulator と sample telemetry で代表フローを検証でき、実機ありでは LAN Host Bridge で sample event を確認できること。
 - pairing token と release asset privacy 境界があること。
 - Core2 / GRAY の入力差分が仕様と実装で追えること。
 - 実機未実施範囲を release notes に明記し、stable release と誤認させないこと。
 
 ## 結論
 
-closed alpha の競争軸は「Codex 専用の小型物理通知端末を、実機前でも検証可能な契約で切り出すこと」です。MVP は機能の多さよりも、adapter 境界、sample replay、manual test への橋渡しを優先します。
+closed alpha の競争軸は「Codex 専用の小型物理通知端末を、実機前でも検証可能で、実機接続時には LAN 内で即確認できる契約として切り出すこと」です。MVP は機能の多さよりも、adapter 境界、sample replay、manual test への橋渡しを優先します。

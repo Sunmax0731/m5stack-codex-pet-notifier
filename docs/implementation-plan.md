@@ -9,6 +9,8 @@
 ## Phase 1: Host Bridge MVP
 
 - [x] pairing code と token 検証を持つ local LAN bridge mock を作る。
+- [x] PC 上で起動する LAN Host Bridge server を作る。
+- [x] `/pair`、`/device/poll`、`/device/event`、`/codex/event`、`/codex/replay-samples`、`/health`、`/events` を実装する。
 - [x] Host -> Device event を validation 後に simulator へ配信する。
 - [x] `device.reply_selected`、`device.pet_interacted`、`device.heartbeat` を受信する。
 - [ ] 実 Codex App adapter を追加する。
@@ -19,11 +21,12 @@
 - [x] 長文回答のページングと scroll state を検証する。
 - [x] reply 送信と pet interaction を host log へ戻す。
 
-## Phase 3: Firmware Scaffold
+## Phase 3: Firmware
 
-- [x] PlatformIO / M5Unified 前提の Core2 / GRAY scaffold を作る。
-- [x] touch / button の最小表示 loop を置く。
-- [ ] 実機 firmware build、flash、Wi-Fi 接続を確認する。
+- [x] PlatformIO / M5Unified 前提の Core2 / GRAY target を作る。
+- [x] Wi-Fi、pairing、HTTP polling、screen state、reply、pet interaction、heartbeat を実装する。
+- [x] Core2 / GRAY の firmware build を確認する。
+- [x] Core2 実機 firmware flash、Wi-Fi、pairing、sample event poll を確認する。
 
 ## Phase 4: Release Prep
 

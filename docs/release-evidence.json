@@ -2,30 +2,27 @@
   "product": "m5stack-codex-pet-notifier",
   "repository": "Sunmax0731/m5stack-codex-pet-notifier",
   "githubUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier",
-  "releaseStatus": "created",
-  "releaseUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier/releases/tag/v0.1.0-alpha.1",
-  "tag": "v0.1.0-alpha.1",
+  "releaseStatus": "pending",
+  "releaseUrl": null,
+  "tag": "v0.1.0-alpha.2",
   "isPrereleasePlanned": true,
-  "prerelease": true,
-  "latest": false,
+  "prerelease": null,
+  "latest": null,
   "latestCheck": {
     "endpoint": "repos/Sunmax0731/m5stack-codex-pet-notifier/releases/latest",
-    "result": "404-no-stable-release",
-    "latestIsThisPrerelease": false
+    "result": "pending",
+    "latestIsThisPrerelease": null
   },
-  "assetCount": 3,
+  "assetCount": 0,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
       "docs/manual-test.md",
-      "docs/strict-manual-test-addendum.md"
+      "docs/strict-manual-test-addendum.md",
+      "docs/hardware-runtime-evidence.json"
     ],
-    "actualNames": [
-      "m5stack-codex-pet-notifier-docs.zip",
-      "manual-test.md",
-      "strict-manual-test-addendum.md"
-    ],
-    "allRequiredPresent": true
+    "actualNames": [],
+    "allRequiredPresent": false
   },
   "qcdsEvaluation": {
     "Quality": "S-",
@@ -33,7 +30,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "not-run-by-codex",
+  "manualTest": "partial-pass-core2-upload-wifi-pairing-sample-poll",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",

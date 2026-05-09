@@ -6,15 +6,17 @@
 - JSON schema validation
 - Host Bridge token boundary
 - Mock M5Stack simulator
+- LAN Host Bridge smoke
 - sample telemetry validation
+- Core2 / GRAY PlatformIO build
+- Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll
 - docs ZIP generation
 - QCDS grade validation
 
 ## Codexでは未実施
 
-- Core2 実機への firmware 書き込み。
 - GRAY 実機への firmware 書き込み。
-- 実 Wi-Fi 再接続。
+- 長時間 Wi-Fi 再接続。
 - touch / swipe / button / IMU の物理操作。
 - 実 Codex App adapter 連携。
 

@@ -38,8 +38,12 @@ for (const required of [
   'package.json',
   'schemas/events/pet.updated.json',
   'src/host-adapter/localLanBridge.mjs',
+  'src/host-bridge/server.mjs',
   'src/device-adapter/deviceProfiles.mjs',
   'src/simulator/mockDevice.mjs',
+  'scripts/bridge-smoke.mjs',
+  'firmware/src/main.cpp',
+  'firmware/platformio.ini',
   'samples/representative-suite.json',
   'samples/sample-telemetry.json'
 ]) {
@@ -92,7 +96,7 @@ fs.writeFileSync('dist/validation-result.json', `${JSON.stringify({
   product: productProfile.repo,
   version: productProfile.version,
   status: 'passed',
-  manualTestStatus: 'not-run-by-codex',
+  manualTestStatus: metrics.manualTestStatus,
   report: buildReport(productProfile, result),
   scenarios: result.scenarios.map((scenario) => ({
     id: scenario.id,

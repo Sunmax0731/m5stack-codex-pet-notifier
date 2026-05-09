@@ -1,6 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "hardwareCheck": "core2-target-upload-and-wifi",
+  "version": "0.1.0-alpha.2",
+  "hardwareCheck": "core2-target-upload-wifi-pairing-sample-poll",
   "status": "partial-pass",
   "device": {
     "serialPort": "COM4",
@@ -26,6 +27,38 @@
     "localIp": "redacted-local-lan-ip",
     "rssiObserved": true,
     "pcPingReachable": true
+  },
+  "hostBridge": {
+    "command": "cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080",
+    "healthOk": true,
+    "pairingObserved": true,
+    "sampleEventsObserved": [
+      "pet.updated",
+      "notification.created",
+      "answer.completed",
+      "prompt.choice_requested"
+    ],
+    "inboundHeartbeatObserved": true,
+    "outboundEvents": 4,
+    "inboundEventsAtCheck": 11,
+    "securityRejections": 0
+  },
+  "serialEvidence": {
+    "logRetention": "redacted local logs were used during verification and are not release assets",
+    "redaction": [
+      "local IP",
+      "MAC address",
+      "SSID"
+    ],
+    "observedSignals": [
+      "wifi_status connected",
+      "device_event_post type=device.heartbeat ok=1",
+      "host_event type=pet.updated",
+      "host_event type=notification.created",
+      "host_event type=answer.completed",
+      "host_event type=prompt.choice_requested",
+      "screen=Choice"
+    ]
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",

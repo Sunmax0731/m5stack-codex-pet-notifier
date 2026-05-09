@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "definition": {
     "Quality": "実装、代表シナリオ、runtime gate、security/privacy、traceability の品質。",
     "Cost": "追加環境、依存、運用負荷、保守容易性。",
@@ -19,7 +19,7 @@
     "D+",
     "D-"
   ],
-  "manualTestStatus": "not-run-by-codex",
+  "manualTestStatus": "partial-pass",
   "manualTestCap": "S-",
   "manualTestCapApplied": true,
   "grades": {
@@ -37,6 +37,7 @@
       "sampleTelemetry",
       "deviceAdapter",
       "hostAdapter",
+      "lanHostBridge",
       "securityPrivacy"
     ],
     "passExpected": true
@@ -47,10 +48,14 @@
     "userDocumentation": true,
     "installationGuide": true,
     "manualTestProcedure": true,
+    "hostBridgeManualCheck": true,
     "releaseReadiness": true,
     "securityPrivacy": true,
     "competitiveBenchmark": true,
     "traceability": true,
+    "firmwareCore2Build": true,
+    "firmwareGrayBuild": true,
+    "core2UploadWifiPairing": true,
     "representativeSuite": [
       "happy-path",
       "missing-required",

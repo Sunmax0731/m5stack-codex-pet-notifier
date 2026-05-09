@@ -10,25 +10,29 @@
 
 ## Implementation
 
-- [x] Host Bridge mock が pairing token を発行できる。
+- [x] Host Bridge model が pairing token を発行できる。
+- [x] LAN Host Bridge が HTTP pairing / polling / replay / device event 受信を提供する。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
 - [x] 長文回答を page 分割できる。
 - [x] ボタン返信が Host Bridge へ届く。
-- [x] firmware scaffold が Core2 / GRAY target を分けている。
+- [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
 
 ## Verification
 
 - [x] `npm test` で代表シナリオを検証する。
+- [x] `npm run bridge:smoke` で LAN Host Bridge を検証する。
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
-- [ ] Core2 実機で主要フローを確認した。
+- [x] Core2 実機で build / upload / Wi-Fi / pairing / sample polling を確認する。
 - [ ] GRAY 実機で主要フローを確認した。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
 ## Distribution
 
 - [x] docs ZIP を生成する。
+- [x] firmware build / upload 証跡を redacted JSON と manual docs に残す。
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。
+- [x] local Wi-Fi config を含む firmware binary は release asset にしない。
 - [x] GitHub prerelease 作成後に `docs/release-evidence.json` を実 URL で更新する。

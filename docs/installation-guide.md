@@ -5,7 +5,7 @@
 - Windows + PowerShell
 - Node.js 24 以上
 - npm 11 以上
-- 実機確認時のみ PlatformIO または Arduino IDE と M5Unified
+- 実機確認時のみ PlatformIO と M5Unified / M5Stack board packages
 - 対象 device: M5Stack Core2 / M5Stack GRAY
 
 ## 自動検証
@@ -32,12 +32,12 @@ cmd.exe /d /s /c npm run demo
 
 ## Firmware
 
-closed alpha では firmware scaffold を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi 接続を確認済みです。
+closed alpha では動作 firmware を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi、Host Bridge pairing、sample event poll を確認対象にします。
 
 ```powershell
-cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
-pio run -e m5stack-core2
-pio run -e m5stack-gray
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
 ```
 
 PlatformIO を追加導入する場合は `C:\` ではなく `E:\DevEnv` 以下へ配置してください。
@@ -49,3 +49,19 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --uploa
 ```
 
 Wi-Fi 設定は `firmware/include/wifi_config.local.h` を使います。`D:\AI\secure\ssid.txt` が 5GHz SSID を指している場合、M5Stack/ESP32 から見える 2.4GHz SSID に変換して local header に保存してください。
+
+## Host Bridge
+
+PC と M5Stack を同じ LAN に接続し、PC 側で Host Bridge を起動します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
+```
+
+別の PowerShell で sample event を送信します。
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/codex/replay-samples -ContentType application/json -Body '{"deviceId":"m5stack-sample-001"}'
+Invoke-RestMethod -Uri http://127.0.0.1:8080/events
+```
