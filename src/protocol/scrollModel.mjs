@@ -7,9 +7,10 @@ export function paginateAnswer(body, options = {}) {
     return [''];
   }
 
+  const characters = Array.from(normalized);
   const pages = [];
-  for (let cursor = 0; cursor < normalized.length; cursor += charsPerPage) {
-    pages.push(normalized.slice(cursor, cursor + charsPerPage));
+  for (let cursor = 0; cursor < characters.length; cursor += charsPerPage) {
+    pages.push(characters.slice(cursor, cursor + charsPerPage).join(''));
   }
   return pages;
 }

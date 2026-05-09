@@ -20,6 +20,8 @@ cmd.exe /d /s /c npm test
 - 実機なし: sample payload replay、schema validation、host bridge auth、simulator、sample telemetry、security/privacy boundary。
 - Core2 実機: touch、swipe、A/B/C 相当入力、Wi-Fi 再接続、画面更新。
 - GRAY 実機: A/B/C ボタン、IMU tap 代替、ボタン式スクロール、Wi-Fi 再接続。
+- repo root から PlatformIO を実行する場合は `pio.exe run -d firmware ...` の順にする。`pio.exe -d firmware run ...` はこの環境では `No such option: -d` になる。
+- 日本語表示を変更した場合は Core2 / GRAY 両方の firmware build と `scripts/validate.mjs` の日本語フォント / UTF-8 境界 gate を通す。
 
 ## Release
 

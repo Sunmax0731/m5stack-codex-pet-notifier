@@ -53,6 +53,11 @@ for (const required of [
   assert(fs.existsSync(required), `implementation file missing: ${required}`);
 }
 
+const firmwareSource = fs.readFileSync('firmware/src/main.cpp', 'utf8');
+assert(firmwareSource.includes('fonts::efontJA_12'), 'firmware must set a Japanese-capable M5GFX font');
+assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page text on UTF-8 codepoint boundaries');
+assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
+
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {
   const text = fs.readFileSync(filePath, 'utf8');

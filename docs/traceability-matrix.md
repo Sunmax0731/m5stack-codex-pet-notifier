@@ -5,6 +5,7 @@
 | Host Bridge pairing token | `src/host-adapter/localLanBridge.mjs` | `happy-path.unauthorizedRejected=1` |
 | LAN Host Bridge 起動 | `src/host-bridge/server.mjs` | `npm run bridge:smoke` |
 | Codex 返答表示 | `src/codex-adapter/relay.mjs`、`/codex/answer`、`answer.completed` | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
+| 日本語返答表示 | `firmware/src/main.cpp` の `fonts::efontJA_12`、UTF-8 code point paging | `scripts/validate.mjs`、`docs/codex-relay-manual-check.md` |
 | 実機 event polling | `firmware/src/main.cpp` | `docs/hardware-runtime-evidence.json` |
 | pet 更新表示 | `pet.updated` schema、`MockM5StackDevice.receive()` | `happy-path.validEvents=4` |
 | 通知表示 | `notification.created` schema | `happy-path.finalScreen=Choice` までの遷移 |

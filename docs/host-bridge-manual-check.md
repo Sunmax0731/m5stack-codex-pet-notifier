@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.3`。
+- `version` が `0.1.0-alpha.4`。
 
 ## 3. Firmware upload
 
@@ -43,7 +43,7 @@ repo root から実行する場合:
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 Serial で確認するログ:

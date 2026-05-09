@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer",
   "status": "partial-pass",
   "device": {
@@ -30,6 +30,9 @@
   },
   "hostBridge": {
     "command": "cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080",
+    "localPort8080ObservedVersion": "0.1.0-alpha.2",
+    "alpha4BridgeValidatedBySmokeTest": true,
+    "localPort8080RestartBlockedByAccessDenied": true,
     "healthOk": true,
     "pairingObserved": true,
     "sampleEventsObserved": [
@@ -43,6 +46,14 @@
     "inboundEventsAtCheck": 11,
     "securityRejections": 0
   },
+  "rePairing": {
+    "invalidTokenRecoveryImplemented": true,
+    "reasonCodes": [
+      "invalid-token",
+      "unpaired-device"
+    ],
+    "core2RuntimeConfirmation": "firmware-uploaded; alpha4 local bridge restart requires closing the admin-owned 8080 process first"
+  },
   "codexRelay": {
     "command": "cmd.exe /d /s /c npm run codex:answer -- --summary \"Codex返答表示\" --text \"...\"",
     "route": "/codex/event",
@@ -53,6 +64,19 @@
     "observedEventType": "answer.completed",
     "bodyPersistedInEvidence": false,
     "evidence": "User confirmed the Core2 displayed the Codex relay answer as intended after running npm run codex:answer."
+  },
+  "japaneseDisplay": {
+    "firmwareFont": "fonts::efontJA_12",
+    "utf8BoundarySafePaging": true,
+    "core2BuildPassed": true,
+    "grayBuildPassed": true,
+    "core2UploadPassed": true,
+    "core2JapaneseAnswerQueued": true,
+    "core2JapaneseAnswerPolled": true,
+    "latestJapaneseAnswerEventId": "evt-answer-1778289562901-1f219079",
+    "codexAnswerCommand": "cmd.exe /d /s /c npm run codex:answer -- --summary \"日本語表示\" --text \"これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。\"",
+    "core2VisualConfirmationByUser": false,
+    "evidence": "Firmware source and build now use a Japanese-capable font and UTF-8 codepoint paging. A Japanese answer.completed event was queued and polled by Core2. User visual confirmation is still required for glyph rendering on the physical screen."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
@@ -85,6 +109,8 @@
     "Core2 touch and swipe physical interaction not exercised",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
-    "real Codex App internal API is not used; relay uses clipboard/stdin/file input"
+    "real Codex App internal API is not used; relay uses clipboard/stdin/file input",
+    "Core2 Japanese glyph rendering requires user visual confirmation after upload",
+    "local 8080 bridge is still an admin-owned v0.1.0-alpha.2 process; close it and start v0.1.0-alpha.4 before final manual confirmation"
   ]
 }

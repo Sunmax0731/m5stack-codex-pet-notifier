@@ -10,7 +10,7 @@
 | Device Profile | Core2 / GRAY の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
 | Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
 | Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
-| Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson による device loop | `firmware/` |
+| Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson、日本語フォント表示による device loop | `firmware/` |
 
 ## LAN Host Bridge API
 
@@ -65,6 +65,12 @@
 | stdin / argument | `npm run codex:answer -- --text "..."` | Codex 返答本文を直接送る |
 | clipboard | `npm run codex:clipboard -- --summary "..."` | Codex App から copy した返答を送る |
 | file | `npm run codex:watch -- --file dist/codex-answer.txt` | 外部ツールが書いた返答ファイルを監視する |
+
+## 日本語表示
+
+- firmware は M5GFX の `fonts::efontJA_12` を使用し、日本語を含む UTF-8 文字列を表示する。
+- Answer 本文のページングと折り返しは UTF-8 code point 境界で行い、日本語の途中バイトで `substring` しない。
+- 画面幅を超える行はピクセル幅で折り返し、最終行のみ `...` で省略する。
 
 ## 保存方針
 

@@ -16,6 +16,7 @@
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
 - [x] 長文回答を page 分割できる。
+- [x] 日本語回答を UTF-8 境界で page / line 分割し、日本語フォントで表示できる。
 - [x] ボタン返信が Host Bridge へ届く。
 - [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
 
@@ -27,6 +28,7 @@
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
 - [x] Core2 実機で build / upload / Wi-Fi / pairing / Codex relay answer を確認する。
+- [ ] Core2 実機で日本語 glyph を目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 

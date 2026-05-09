@@ -4,11 +4,11 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 ## Status
 
-- Version: `0.1.0-alpha.3`
+- Version: `0.1.0-alpha.4`
 - Domain: IoT
 - Idea No: 18
 - Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
-- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer 表示まで確認対象
+- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer 表示、日本語フォント表示まで確認対象
 - Release channel: GitHub prerelease
 
 ## 搭載機能
@@ -17,6 +17,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、`answer.completed` として M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
+- `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
@@ -47,7 +48,7 @@ repo root から実行する場合は `-d firmware` を付けます。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 `D:\AI\secure\ssid.txt` は Git に入れません。M5Stack/ESP32 は 2.4GHz Wi-Fi のみ対応するため、5GHz SSID が記載されている場合は device scan で見つかった対応 2.4GHz SSID を `firmware/include/wifi_config.local.h` に設定します。この local header は `.gitignore` 対象です。
@@ -66,7 +67,7 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t up
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
-- [releases/v0.1.0-alpha.3.md](docs/releases/v0.1.0-alpha.3.md)
+- [releases/v0.1.0-alpha.4.md](docs/releases/v0.1.0-alpha.4.md)
 
 ## Closed Alpha Boundary
 

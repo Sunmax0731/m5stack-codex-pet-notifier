@@ -13,6 +13,7 @@
 - 作業前に `README.md`、`AGENTS.md`、`SKILL.md` を読む。
 - Codex App 内部 API へ直接依存せず、Host Bridge adapter の差し替え点に閉じ込める。
 - 実機がない場合でも、simulator、mock device、sample telemetry、device / host adapter、security/privacy 境界を `npm test` で確認する。
+- PlatformIO を repo root から実行する場合は `pio.exe run -d firmware ...` を使う。`pio.exe -d firmware run ...` はこの環境では失敗する。
 - `dist/validation-result.json` と `docs/platform-runtime-gate.json` には実行時刻、絶対パス、ZIP byte size などの不安定値を入れない。
 - token、host IP、個人 pet sprite、会話本文を release asset へ含めない。
 - Core2 / GRAY 実機未確認のまま公開する場合は prerelease にし、未確認範囲を release notes と `docs/manual-test.md` に明記する。

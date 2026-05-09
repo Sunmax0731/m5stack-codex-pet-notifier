@@ -35,6 +35,9 @@ constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t POLL_INTERVAL_MS = 1200;
 constexpr uint32_t HEARTBEAT_INTERVAL_MS = 10000;
 constexpr uint32_t STATUS_INTERVAL_MS = 5000;
+constexpr int ANSWER_CHARS_PER_PAGE = 90;
+constexpr int BODY_TEXT_WIDTH = 304;
+constexpr int BODY_LINE_HEIGHT = 18;
 
 String authToken;
 ScreenState screenState = SCREEN_PAIRING;
@@ -83,32 +86,167 @@ void markDraw() {
   needsRedraw = true;
 }
 
-void drawLine(const String& value, int x, int y, int maxChars = 36) {
-  String out = value;
-  if (out.length() > maxChars) {
-    out = out.substring(0, maxChars - 3) + "...";
-  }
-  M5.Display.drawString(out.c_str(), x, y);
+void applyDisplayFont() {
+  M5.Display.setFont(&fonts::efontJA_12);
+  M5.Display.setTextSize(1);
 }
 
-String pageText(const String& value, int page, int charsPerPage = 120) {
-  int start = page * charsPerPage;
-  if (start >= value.length()) {
+int utf8CharBytes(const String& value, int index) {
+  const int total = value.length();
+  if (index >= total) {
+    return 0;
+  }
+  const uint8_t lead = static_cast<uint8_t>(value[index]);
+  int size = 1;
+  if ((lead & 0x80) == 0x00) {
+    size = 1;
+  } else if ((lead & 0xE0) == 0xC0) {
+    size = 2;
+  } else if ((lead & 0xF0) == 0xE0) {
+    size = 3;
+  } else if ((lead & 0xF8) == 0xF0) {
+    size = 4;
+  }
+  return index + size <= total ? size : 1;
+}
+
+int utf8CodepointCount(const String& value) {
+  int count = 0;
+  for (int index = 0; index < value.length();) {
+    const int bytes = utf8CharBytes(value, index);
+    if (bytes <= 0) {
+      break;
+    }
+    index += bytes;
+    count += 1;
+  }
+  return count;
+}
+
+String utf8SliceByCodepoints(const String& value, int start, int count) {
+  int current = 0;
+  int startByte = -1;
+  int endByte = value.length();
+  for (int index = 0; index < value.length();) {
+    if (current == start && startByte < 0) {
+      startByte = index;
+    }
+    if (current == start + count) {
+      endByte = index;
+      break;
+    }
+    const int bytes = utf8CharBytes(value, index);
+    if (bytes <= 0) {
+      break;
+    }
+    index += bytes;
+    current += 1;
+  }
+  if (startByte < 0) {
     return "";
   }
-  return value.substring(start, min(start + charsPerPage, static_cast<int>(value.length())));
+  return value.substring(startByte, endByte);
 }
 
-int pageCount(const String& value, int charsPerPage = 120) {
-  return max(1, (static_cast<int>(value.length()) + charsPerPage - 1) / charsPerPage);
+String truncateUtf8ToWidth(const String& value, int maxWidth) {
+  if (M5.Display.textWidth(value.c_str()) <= maxWidth) {
+    return value;
+  }
+  const String ellipsis = "...";
+  String out = "";
+  for (int index = 0; index < value.length();) {
+    const int bytes = utf8CharBytes(value, index);
+    if (bytes <= 0) {
+      break;
+    }
+    const String next = out + value.substring(index, index + bytes);
+    if (M5.Display.textWidth((next + ellipsis).c_str()) > maxWidth) {
+      return out.length() ? out + ellipsis : ellipsis;
+    }
+    out = next;
+    index += bytes;
+  }
+  return out;
+}
+
+void drawLinePx(const String& value, int x, int y, int maxWidth) {
+  M5.Display.drawString(truncateUtf8ToWidth(value, maxWidth).c_str(), x, y);
+}
+
+void drawLine(const String& value, int x, int y, int maxChars = 36) {
+  const int maxWidth = min(M5.Display.width() - x - 4, maxChars * 8);
+  drawLinePx(value, x, y, maxWidth);
+}
+
+void drawWrappedBlock(const String& value, int x, int y, int maxWidth, int lineHeight, int maxLines) {
+  String line = "";
+  int lineIndex = 0;
+  int index = 0;
+  while (index < value.length() && lineIndex < maxLines) {
+    const int bytes = utf8CharBytes(value, index);
+    if (bytes <= 0) {
+      break;
+    }
+
+    if (bytes == 1 && value[index] == '\r') {
+      index += bytes;
+      continue;
+    }
+    if (bytes == 1 && value[index] == '\n') {
+      drawLinePx(line, x, y + lineIndex * lineHeight, maxWidth);
+      line = "";
+      lineIndex += 1;
+      index += bytes;
+      continue;
+    }
+
+    const String token = value.substring(index, index + bytes);
+    const String candidate = line + token;
+    if (line.length() > 0 && M5.Display.textWidth(candidate.c_str()) > maxWidth) {
+      if (lineIndex == maxLines - 1) {
+        drawLinePx(line + "...", x, y + lineIndex * lineHeight, maxWidth);
+        return;
+      }
+      drawLinePx(line, x, y + lineIndex * lineHeight, maxWidth);
+      line = "";
+      lineIndex += 1;
+      continue;
+    }
+
+    if (line.length() == 0 && M5.Display.textWidth(token.c_str()) > maxWidth) {
+      drawLinePx(token, x, y + lineIndex * lineHeight, maxWidth);
+      lineIndex += 1;
+      index += bytes;
+      continue;
+    }
+
+    line = candidate;
+    index += bytes;
+  }
+
+  if (lineIndex < maxLines && line.length()) {
+    drawLinePx(index < value.length() ? line + "..." : line, x, y + lineIndex * lineHeight, maxWidth);
+  }
+}
+
+String pageText(const String& value, int page, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
+  int start = page * charsPerPage;
+  if (start >= utf8CodepointCount(value)) {
+    return "";
+  }
+  return utf8SliceByCodepoints(value, start, charsPerPage);
+}
+
+int pageCount(const String& value, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
+  const int codepoints = utf8CodepointCount(value);
+  return max(1, (codepoints + charsPerPage - 1) / charsPerPage);
 }
 
 void drawHeader() {
   M5.Display.fillRect(0, 0, 320, 58, TFT_DARKGREY);
   M5.Display.setTextColor(TFT_WHITE, TFT_DARKGREY);
-  M5.Display.setTextSize(2);
+  applyDisplayFont();
   drawLine(petName, 8, 8, 20);
-  M5.Display.setTextSize(1);
   drawLine(String("state: ") + petState + " / " + profile.name, 8, 34, 38);
   M5.Display.drawString((WiFi.status() == WL_CONNECTED ? "LAN" : "NO LAN"), 258, 8);
   M5.Display.drawString((String("U:") + unreadCount).c_str(), 258, 34);
@@ -117,7 +255,7 @@ void drawHeader() {
 void drawFooter(const char* a, const char* b, const char* c) {
   M5.Display.fillRect(0, 216, 320, 24, TFT_NAVY);
   M5.Display.setTextColor(TFT_WHITE, TFT_NAVY);
-  M5.Display.setTextSize(1);
+  applyDisplayFont();
   M5.Display.drawString(a, 14, 224);
   M5.Display.drawString(b, 132, 224);
   M5.Display.drawString(c, 242, 224);
@@ -131,7 +269,7 @@ void drawScreen() {
   M5.Display.fillScreen(TFT_BLACK);
   drawHeader();
   M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);
-  M5.Display.setTextSize(1);
+  applyDisplayFont();
 
   if (screenState == SCREEN_PAIRING) {
     drawLine("Pairing with Host Bridge", 8, 76, 36);
@@ -151,10 +289,8 @@ void drawScreen() {
 
   if (screenState == SCREEN_NOTIFICATION) {
     drawLine("Notification", 8, 68, 36);
-    M5.Display.setTextSize(2);
-    drawLine(title, 8, 88, 22);
-    M5.Display.setTextSize(1);
-    drawLine(body, 8, 122, 42);
+    drawLine(title, 8, 90, 42);
+    drawWrappedBlock(body, 8, 114, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 5);
     drawFooter("A ack", "B pet", "C idle");
     return;
   }
@@ -162,18 +298,16 @@ void drawScreen() {
   if (screenState == SCREEN_ANSWER) {
     drawLine(String("Answer page ") + (answerPage + 1) + "/" + pageCount(body), 8, 68, 36);
     drawLine(summary, 8, 88, 42);
-    drawLine(pageText(body, answerPage), 8, 112, 42);
-    drawLine(pageText(body, answerPage).substring(42), 8, 132, 42);
-    drawLine(pageText(body, answerPage).substring(84), 8, 152, 42);
+    drawWrappedBlock(pageText(body, answerPage), 8, 112, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 5);
     drawFooter("A up", "B idle", "C down");
     return;
   }
 
   if (screenState == SCREEN_CHOICE) {
     drawLine("Choice requested", 8, 68, 36);
-    drawLine(title, 8, 88, 42);
+    drawWrappedBlock(title, 8, 88, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 2);
     for (int i = 0; i < choiceCount; ++i) {
-      drawLine(String(static_cast<char>('A' + i)) + ": " + choiceLabels[i], 8, 116 + i * 24, 42);
+      drawLine(String(static_cast<char>('A' + i)) + ": " + choiceLabels[i], 8, 128 + i * 24, 42);
     }
     drawFooter("A send", "B send", "C send");
     return;
@@ -406,7 +540,15 @@ void pollHost() {
     return;
   }
   if (!doc["ok"]) {
-    setError(String("poll failed: ") + (doc["reason"] | "unknown"));
+    const String reason = String(doc["reason"] | "unknown");
+    if (reason == "invalid-token" || reason == "unpaired-device") {
+      Serial.printf("pairing_token_reset reason=%s\n", reason.c_str());
+      authToken = "";
+      screenState = SCREEN_PAIRING;
+      markDraw();
+      return;
+    }
+    setError(String("poll failed: ") + reason);
     return;
   }
   if (!doc["event"].isNull()) {

@@ -52,7 +52,7 @@ repo root から実行する場合は `-d firmware` を付けます。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 Wi-Fi 設定は `firmware/include/wifi_config.local.h` を使います。`D:\AI\secure\ssid.txt` が 5GHz SSID を指している場合、M5Stack/ESP32 から見える 2.4GHz SSID に変換して local header に保存してください。
@@ -82,4 +82,5 @@ Codex の返答本文を Core2 に表示します。
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
+cmd.exe /d /s /c npm run codex:answer -- --summary "日本語表示" --text "これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。"
 ```

@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "definition": {
     "Quality": "実装、代表シナリオ、runtime gate、security/privacy、traceability の品質。",
     "Cost": "追加環境、依存、運用負荷、保守容易性。",
@@ -59,6 +59,7 @@
     "firmwareGrayBuild": true,
     "core2UploadWifiPairing": true,
     "core2CodexRelayAnswer": true,
+    "core2JapaneseAnswerSourceGate": true,
     "representativeSuite": [
       "happy-path",
       "missing-required",
@@ -67,7 +68,7 @@
     ]
   },
   "notes": [
-    "GRAY実機、長時間運用、実Codex App内部API連携は対象外のためS+は付けない。",
+    "GRAY実機、長時間運用、実Codex App内部API連携、日本語glyphのユーザー目視確認は対象外のためS+は付けない。",
     "A-未満の観点はない。"
   ]
 }

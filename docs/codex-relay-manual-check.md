@@ -34,7 +34,18 @@ cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 
 - clipboard の本文が Core2 の `Answer` 画面に表示される。
 
-## 3. File watch
+## 3. 日本語表示
+
+```powershell
+cmd.exe /d /s /c npm run codex:answer -- --summary "日本語表示" --text "これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。"
+```
+
+期待結果:
+
+- Core2 の `Answer` 画面で日本語の summary と body が文字化けせず表示される。
+- 長文の場合も日本語の途中で欠けた文字が出ず、A/C または touch footer でページ移動できる。
+
+## 4. File watch
 
 ```powershell
 New-Item -ItemType Directory -Force dist | Out-Null

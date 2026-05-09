@@ -25,6 +25,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-09 | pet 領域を tap する | pet 反応が表示され、`device.pet_interacted` が送られる | ユーザー手動 |
 | C2-10 | Answer 画面で swipe または footer touch を行う | 本文ページが上下に移動する | ユーザー手動 |
 | C2-11 | Choice 画面で row tap または footer touch を行う | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
+| C2-12 | `codex:answer` で日本語本文を送る | Core2 の Answer 画面で日本語が文字化けせず表示される | 準備済み。ユーザー目視 |
 
 ## GRAY 今回対象外
 
@@ -70,13 +71,14 @@ repo root から実行する場合:
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 ## Codex実施ログ要約
 
 - Build: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
 - Upload: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
+- Japanese display source gate: `scripts/validate.mjs` で `fonts::efontJA_12` と UTF-8 code point 境界のページングを確認する。
 - Serial evidence: `wifi_connected`、`pair_ok`、Host Bridge sample event を確認対象にする。
 - Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
