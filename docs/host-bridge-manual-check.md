@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.2`。
+- `version` が `0.1.0-alpha.3`。
 
 ## 3. Firmware upload
 
@@ -86,6 +86,6 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 - pet tap または B 長押し後、inbound に `device.pet_interacted` が出る。
 - 10 秒程度待つと inbound に `device.heartbeat` が出る。
 
-## 未実施扱い
+## 今回対象外
 
-GRAY 実機、物理 A/B/C、Core2 touch、GRAY IMU、実 Codex adapter の手動テストはCodexでは未実施です。結果は `docs/manual-test.md` の該当行へ追記します。
+GRAY 実機、GRAY IMU、長時間運用、実 Codex App 内部 API 連携の手動テストはCodexでは未実施です。結果は `docs/manual-test.md` の該当行へ追記します。

@@ -19,6 +19,7 @@ const signals = {
   deviceAdapter: fs.existsSync('src/device-adapter/deviceProfiles.mjs'),
   hostAdapter: fs.existsSync('src/host-adapter/localLanBridge.mjs'),
   lanHostBridge: fs.existsSync('src/host-bridge/server.mjs') && fs.existsSync('scripts/bridge-smoke.mjs'),
+  codexRelay: fs.existsSync('src/codex-adapter/relay.mjs') && fs.existsSync('scripts/codex-relay-smoke.mjs'),
   securityPrivacy: result.scenarios.some((scenario) => scenario.securityBoundary === true)
     && telemetry.privacy.messageBodiesPersistedOnDevice === false
 };
@@ -33,7 +34,7 @@ const gate = {
   platformType: productProfile.platformType,
   pass: true,
   method: 'node-simulator-runtime-gate',
-  manualTest: 'partial-pass-core2-upload-wifi-pairing-sample-poll',
+  manualTest: 'partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply',
   signals,
   scenarioIds: result.scenarios.map((scenario) => scenario.id)
 };

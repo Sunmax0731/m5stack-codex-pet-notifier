@@ -56,6 +56,9 @@ uint32_t lastHeartbeat = 0;
 uint32_t lastStatus = 0;
 uint32_t lastTouchEvent = 0;
 
+void pollHost();
+void sendPetInteraction(const char* interaction);
+
 String screenName() {
   switch (screenState) {
     case SCREEN_PAIRING: return "Pairing";
@@ -274,7 +277,7 @@ void sendHeartbeat() {
   sendDeviceEvent(doc);
 }
 
-void sendReply(int index) {
+void sendReply(int index, const char* inputOverride = nullptr) {
   if (screenState != SCREEN_CHOICE || index < 0 || index >= choiceCount) {
     return;
   }
@@ -285,12 +288,53 @@ void sendReply(int index) {
   doc["deviceId"] = DEVICE_ID;
   doc["requestEventId"] = currentRequestEventId;
   doc["choiceId"] = choiceIds[index];
-  doc["input"] = String("button-") + static_cast<char>('a' + index);
+  doc["input"] = inputOverride ? inputOverride : (String("button-") + static_cast<char>('a' + index));
   sendDeviceEvent(doc);
   title = String("Reply sent: ") + choiceLabels[index];
   body = "Waiting for next Codex event.";
   screenState = SCREEN_IDLE;
   markDraw();
+}
+
+int touchChoiceIndex(int x) {
+  if (x < 107) {
+    return 0;
+  }
+  if (x < 214) {
+    return 1;
+  }
+  return 2;
+}
+
+void handleFooterTouch(int x) {
+  const int index = touchChoiceIndex(x);
+  if (screenState == SCREEN_CHOICE) {
+    char inputName[] = "touch-a";
+    inputName[6] = static_cast<char>('a' + index);
+    Serial.printf("touch_choice index=%d\n", index);
+    sendReply(index, inputName);
+    return;
+  }
+  if (screenState == SCREEN_ANSWER) {
+    if (index == 0) {
+      answerPage = max(0, answerPage - 1);
+    } else if (index == 1) {
+      screenState = SCREEN_IDLE;
+    } else {
+      answerPage = min(pageCount(body) - 1, answerPage + 1);
+    }
+    Serial.printf("touch_answer_nav index=%d page=%d\n", index, answerPage);
+    markDraw();
+    return;
+  }
+  if (index == 0) {
+    pollHost();
+  } else if (index == 1) {
+    sendPetInteraction("touch");
+  } else {
+    screenState = SCREEN_IDLE;
+    markDraw();
+  }
 }
 
 void sendPetInteraction(const char* interaction) {
@@ -477,12 +521,19 @@ void handleTouch() {
   auto detail = M5.Touch.getDetail();
   if (detail.wasReleased() && millis() - lastTouchEvent > 600) {
     lastTouchEvent = millis();
-    if (screenState == SCREEN_ANSWER && abs(detail.deltaY()) > 20) {
+    if (detail.y >= 206) {
+      handleFooterTouch(detail.x);
+    } else if (screenState == SCREEN_CHOICE && detail.y >= 108) {
+      const int row = min(choiceCount - 1, max(0, (detail.y - 108) / 24));
+      Serial.printf("touch_choice_row index=%d\n", row);
+      sendReply(row, "touch-row");
+    } else if (screenState == SCREEN_ANSWER && abs(detail.deltaY()) > 20) {
       if (detail.deltaY() < 0) {
         answerPage = min(pageCount(body) - 1, answerPage + 1);
       } else {
         answerPage = max(0, answerPage - 1);
       }
+      Serial.printf("touch_answer_swipe page=%d\n", answerPage);
       markDraw();
     } else if (detail.y < 100) {
       sendPetInteraction("touch");

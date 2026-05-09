@@ -11,9 +11,11 @@
 - [x] pairing code と token 検証を持つ local LAN bridge mock を作る。
 - [x] PC 上で起動する LAN Host Bridge server を作る。
 - [x] `/pair`、`/device/poll`、`/device/event`、`/codex/event`、`/codex/replay-samples`、`/health`、`/events` を実装する。
+- [x] `/codex/answer` と `/codex/notification` を実装する。
 - [x] Host -> Device event を validation 後に simulator へ配信する。
 - [x] `device.reply_selected`、`device.pet_interacted`、`device.heartbeat` を受信する。
-- [ ] 実 Codex App adapter を追加する。
+- [x] clipboard / stdin / file から返答本文を送る Codex relay を追加する。
+- [ ] 公開 Codex App adapter API が提供された場合に relay source として追加する。
 
 ## Phase 2: Simulator
 
@@ -27,6 +29,7 @@
 - [x] Wi-Fi、pairing、HTTP polling、screen state、reply、pet interaction、heartbeat を実装する。
 - [x] Core2 / GRAY の firmware build を確認する。
 - [x] Core2 実機 firmware flash、Wi-Fi、pairing、sample event poll を確認する。
+- [x] Core2 touch choice、footer touch、answer swipe の firmware 分岐を実装する。
 
 ## Phase 4: Release Prep
 

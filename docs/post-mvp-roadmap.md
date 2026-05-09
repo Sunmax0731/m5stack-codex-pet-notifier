@@ -2,7 +2,7 @@
 
 ## Alpha 2
 
-- 実 Codex App adapter の取得方式を確定する。
+- 公開 Codex App adapter API が提供された場合の取得方式を確定する。
 - Host Bridge を HTTP / WebSocket server として起動できるようにする。
 - Core2 / GRAY 実機 build / flash の証跡を追加する。
 

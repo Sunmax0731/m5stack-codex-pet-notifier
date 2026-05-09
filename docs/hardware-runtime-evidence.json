@@ -1,7 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.2",
-  "hardwareCheck": "core2-target-upload-wifi-pairing-sample-poll",
+  "version": "0.1.0-alpha.3",
+  "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer",
   "status": "partial-pass",
   "device": {
     "serialPort": "COM4",
@@ -43,6 +43,15 @@
     "inboundEventsAtCheck": 11,
     "securityRejections": 0
   },
+  "codexRelay": {
+    "command": "cmd.exe /d /s /c npm run codex:answer -- --summary \"Codex返答表示\" --text \"...\"",
+    "route": "/codex/event",
+    "answerCompletedObserved": true,
+    "core2AnswerScreenObserved": true,
+    "outboundEventObserved": true,
+    "observedEventType": "answer.completed",
+    "bodyPersistedInEvidence": false
+  },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
     "redaction": [
@@ -58,7 +67,9 @@
       "host_event type=answer.completed",
       "host_event type=prompt.choice_requested",
       "screen=Choice",
-      "device.reply_selected"
+      "device.reply_selected",
+      "screen=Answer",
+      "answer.completed"
     ]
   },
   "manualPhysicalInput": {
@@ -71,7 +82,7 @@
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
     "GRAY target not uploaded to physical hardware",
-    "IMU tap fallback not exercised",
-    "real Codex App adapter not connected"
+    "GRAY IMU tap fallback not exercised",
+    "real Codex App internal API is not used; relay uses clipboard/stdin/file input"
   ]
 }

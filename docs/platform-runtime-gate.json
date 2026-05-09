@@ -1,10 +1,10 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "platformType": "iot-simulator-mock",
   "pass": true,
   "method": "node-simulator-runtime-gate",
-  "manualTest": "partial-pass-core2-upload-wifi-pairing-sample-poll",
+  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply",
   "signals": {
     "simulator": true,
     "mockDevice": true,
@@ -12,6 +12,7 @@
     "deviceAdapter": true,
     "hostAdapter": true,
     "lanHostBridge": true,
+    "codexRelay": true,
     "securityPrivacy": true
   },
   "scenarioIds": [

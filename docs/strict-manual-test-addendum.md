@@ -7,9 +7,10 @@
 - Host Bridge token boundary
 - Mock M5Stack simulator
 - LAN Host Bridge smoke
+- Codex relay smoke
 - sample telemetry validation
 - Core2 / GRAY PlatformIO build
-- Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll
+- Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll、A button reply
 - docs ZIP generation
 - QCDS grade validation
 
@@ -17,8 +18,9 @@
 
 - GRAY 実機への firmware 書き込み。
 - 長時間 Wi-Fi 再接続。
-- touch / swipe / button / IMU の物理操作。
-- 実 Codex App adapter 連携。
+- Core2 touch / swipe の物理操作。
+- GRAY button / IMU の物理操作。
+- 実 Codex App 内部 API 連携。
 
 ## Release判定
 

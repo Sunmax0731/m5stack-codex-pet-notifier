@@ -4,19 +4,20 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 ## Status
 
-- Version: `0.1.0-alpha.2`
+- Version: `0.1.0-alpha.3`
 - Domain: IoT
 - Idea No: 18
-- Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / device adapter / security boundary
-- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、sample event polling まで確認対象
+- Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
+- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer 表示まで確認対象
 - Release channel: GitHub prerelease
 
 ## 搭載機能
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
+- `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、`answer.completed` として M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
-- Core2 touch / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
+- Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
 
@@ -27,6 +28,8 @@ cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm test
 cmd.exe /d /s /c npm run bridge:smoke
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
+cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
+cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
@@ -57,13 +60,14 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t up
 - [test-plan.md](docs/test-plan.md)
 - [manual-test.md](docs/manual-test.md)
 - [host-bridge-manual-check.md](docs/host-bridge-manual-check.md)
+- [codex-relay-manual-check.md](docs/codex-relay-manual-check.md)
 - [installation-guide.md](docs/installation-guide.md)
 - [user-guide.md](docs/user-guide.md)
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
-- [releases/v0.1.0-alpha.2.md](docs/releases/v0.1.0-alpha.2.md)
+- [releases/v0.1.0-alpha.3.md](docs/releases/v0.1.0-alpha.3.md)
 
 ## Closed Alpha Boundary
 
-この release は simulator、mock device、LAN Host Bridge smoke、Core2 firmware build / upload / Wi-Fi / pairing / sample polling を検証対象にした prerelease です。GRAY 実機、物理 A/B/C、touch / IMU 入力、実 Codex App adapter はユーザー側の手動確認として扱います。
+この release は simulator、mock device、LAN Host Bridge smoke、Codex relay smoke、Core2 firmware build / upload / Wi-Fi / pairing / Codex 返答表示を検証対象にした prerelease です。GRAY 実機、長時間運用、実 Codex App 内部 API 連携は対象外です。

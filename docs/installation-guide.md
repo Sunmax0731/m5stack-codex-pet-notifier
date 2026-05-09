@@ -32,7 +32,7 @@ cmd.exe /d /s /c npm run demo
 
 ## Firmware
 
-closed alpha では動作 firmware を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi、Host Bridge pairing、sample event poll を確認対象にします。
+closed alpha では動作 firmware を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi、Host Bridge pairing、Codex relay answer 表示を確認対象にします。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
@@ -72,4 +72,14 @@ cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/codex/replay-samples -ContentType application/json -Body '{"deviceId":"m5stack-sample-001"}'
 Invoke-RestMethod -Uri http://127.0.0.1:8080/events
+```
+
+## Codex Relay
+
+Codex の返答本文を Core2 に表示します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Codexの返答本文"
+cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 ```

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createAnswerEvent, createNotificationEvent } from '../codex-adapter/eventFactory.mjs';
 import { productProfile } from '../core/product-profile.mjs';
 import { loadSchemas, validateEvent } from '../protocol/validator.mjs';
 
@@ -207,6 +208,18 @@ export function createBridgeHttpServer(bridge = new LanHostBridge()) {
       if (request.method === 'POST' && url.pathname === '/codex/event') {
         const body = await readJsonBody(request);
         return sendJson(response, 200, bridge.publish(body.event ?? body, { deviceId: body.deviceId }));
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/answer') {
+        const body = await readJsonBody(request);
+        const event = createAnswerEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/notification') {
+        const body = await readJsonBody(request);
+        const event = createNotificationEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
       }
       if (request.method === 'POST' && url.pathname === '/codex/replay-samples') {
         const body = await readJsonBody(request);

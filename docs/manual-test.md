@@ -1,6 +1,6 @@
 # 手動テスト
 
-Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、sample event polling は Codex で確認対象にします。closed alpha では simulator / mock device / LAN Host Bridge smoke の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。物理 touch、button、IMU、GRAY 実機、実 Codex adapter はユーザー側の手動項目として残します。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。closed alpha では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機、GRAY IMU、長時間運用、Codex App 非公開内部 API 連携は今回対象外です。
 
 ## 共通前提
 
@@ -21,19 +21,14 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、sa
 | C2-05 | `answer.completed` で長文を送る | Answer 画面へ遷移する | 実施済み。serial で host event を確認 |
 | C2-06 | `prompt.choice_requested` を送る | Choice 画面へ遷移する | 実施済み。serial で `screen=Choice` を確認 |
 | C2-07 | A/B/C 相当入力を押す | `device.reply_selected` が Host Bridge inbound に出る | 実施済み。A 押下後に `device.reply_selected` を確認 |
-| C2-08 | pet 領域を tap する | pet 反応が表示され、`device.pet_interacted` が送られる | ユーザー手動 |
-| C2-09 | Answer 画面で swipe する | 本文ページが上下に移動する | ユーザー手動 |
+| C2-08 | Codex relay で返答本文を送る | Core2 が Answer 画面に遷移し本文を表示する | Codex確認対象 |
+| C2-09 | pet 領域を tap する | pet 反応が表示され、`device.pet_interacted` が送られる | ユーザー手動 |
+| C2-10 | Answer 画面で swipe または footer touch を行う | 本文ページが上下に移動する | ユーザー手動 |
+| C2-11 | Choice 画面で row tap または footer touch を行う | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
 
-## GRAY
+## GRAY 今回対象外
 
-| No | 手順 | 期待結果 | 結果 |
-| --- | --- | --- | --- |
-| GY-01 | firmware を GRAY target で build / flash する | 起動画面に `Codex Pet` と profile が出る | 未実施 |
-| GY-02 | pairing code で登録する | Idle 画面に pet と接続状態が出る | 未実施 |
-| GY-03 | `notification.created` を送る | 通知画面へ遷移する | 未実施 |
-| GY-04 | `answer.completed` で長文を送る | A/C または scroll mode で上下移動できる | 未実施 |
-| GY-05 | `prompt.choice_requested` を送る | 物理 A/B/C で返信できる | 未実施 |
-| GY-06 | B 長押しまたは IMU tap を行う | pet 反応が表示される | 未実施 |
+今回の手動テスト対象は Core2 です。GRAY firmware build は自動確認しますが、GRAY 実機 flash / button / IMU は今回対象外です。
 
 ## 記録項目
 
@@ -58,6 +53,12 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/codex/replay-samples -
 Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 ```
 
+Codex relay:
+
+```powershell
+cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
+```
+
 firmware:
 
 ```powershell
@@ -77,5 +78,6 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t up
 - Build: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
 - Upload: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
 - Serial evidence: `wifi_connected`、`pair_ok`、Host Bridge sample event を確認対象にする。
+- Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認対象にする。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
 - 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。

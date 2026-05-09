@@ -12,6 +12,7 @@
 
 - [x] Host Bridge model が pairing token を発行できる。
 - [x] LAN Host Bridge が HTTP pairing / polling / replay / device event 受信を提供する。
+- [x] Codex relay が clipboard / stdin / file から `answer.completed` を送信できる。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
 - [x] 長文回答を page 分割できる。
@@ -22,10 +23,11 @@
 
 - [x] `npm test` で代表シナリオを検証する。
 - [x] `npm run bridge:smoke` で LAN Host Bridge を検証する。
+- [x] `scripts/codex-relay-smoke.mjs` で Codex relay を検証する。
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
-- [x] Core2 実機で build / upload / Wi-Fi / pairing / sample polling を確認する。
-- [ ] GRAY 実機で主要フローを確認した。
+- [x] Core2 実機で build / upload / Wi-Fi / pairing / Codex relay answer を確認する。
+- [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
 ## Distribution

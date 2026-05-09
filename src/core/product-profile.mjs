@@ -1,7 +1,7 @@
 export const productProfile = {
   repo: 'm5stack-codex-pet-notifier',
-  version: '0.1.0-alpha.2',
-  tag: 'v0.1.0-alpha.2',
+  version: '0.1.0-alpha.3',
+  tag: 'v0.1.0-alpha.3',
   domain: 'IoT',
   ideaNo: 18,
   platformType: 'iot-simulator-mock',
@@ -14,6 +14,7 @@ export const productProfile = {
     'deviceAdapter',
     'hostAdapter',
     'lanHostBridge',
+    'codexRelay',
     'securityPrivacy'
   ],
   requiredDocs: [
@@ -44,6 +45,7 @@ export const productProfile = {
     'docs/strict-manual-test-addendum.md',
     'docs/hardware-runtime-evidence.json',
     'docs/host-bridge-manual-check.md',
-    'docs/releases/v0.1.0-alpha.2.md'
+    'docs/codex-relay-manual-check.md',
+    'docs/releases/v0.1.0-alpha.3.md'
   ]
 };

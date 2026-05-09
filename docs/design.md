@@ -18,7 +18,7 @@
 
 ## 採用設計
 
-MVP は Host Bridge 方式です。M5Stack firmware は Codex App の詳細を知らず、`pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` などの正規イベントだけを処理します。closed alpha では実 Codex adapter を mock として分離し、contract と device UX を先に固定します。
+MVP は Host Bridge 方式です。M5Stack firmware は Codex App の詳細を知らず、`pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` などの正規イベントだけを処理します。closed alpha では Codex relay を使い、clipboard / stdin / file から実際の返答本文を送れるようにします。
 
 ## 画面デザイン
 
