@@ -35,7 +35,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-japanese-source-gate-clipboard-utf8-relay",
+  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-japanese-source-gate-clipboard-utf8-relay-file-watch-answer",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",

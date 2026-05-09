@@ -81,10 +81,13 @@
     "fileBody": "Codex file watch answer",
     "answerCompletedObserved": true,
     "core2BodyVisibleByUser": true,
-    "core2AnswerScreenConfirmationByUser": false,
+    "core2AnswerScreenConfirmationByUser": true,
+    "core2ObservedScreen": "Answer page 1/1",
+    "core2ObservedSummary": "Codex watched answer",
+    "core2ObservedFooter": "A up / B idle / C down",
     "latestFileWatchAnswerEventId": "evt-answer-1778290810438-8f72ae9c",
     "bodyPersistedInEvidence": true,
-    "evidence": "User ran the file watch command and provided a Core2 photo showing the file body text on the device screen, but the photo shows the Idle screen rather than the expected Answer screen."
+    "evidence": "User ran the file watch command and provided a Core2 photo showing Answer page 1/1 with the summary, file body text, and A up / B idle / C down footer."
   },
   "japaneseDisplay": {
     "firmwareFont": "fonts::efontJA_12",
@@ -128,7 +131,6 @@
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
-    "Core2 file watch visual confirmation does not yet match the expected Answer screen state",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file input",
