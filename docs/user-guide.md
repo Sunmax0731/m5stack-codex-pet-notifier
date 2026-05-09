@@ -78,12 +78,12 @@ Dashboard preview だけを切り替える場合は、Host Bridge 起動後に `
 - pet 領域を tap すると pet interaction が送られる。
 - pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。local hatch-pet asset の透明ピクセルは固定アクセント背景ではなく、pet background RGBA の合成色を見せます。
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
-- pet surface は `M5Canvas` Sprite buffer へ off-screen 描画してから転送するため、animation tick 中に画面全体の黒塗りや Answer / Choice の本文、footer text の明滅を抑える。
+- pet avatar は `M5Canvas` Sprite buffer へ off-screen 描画してから pet box だけを転送するため、animation tick 中に画面全体の黒塗りや Answer / Choice の本文、footer text の明滅を抑える。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。
 - pet display area は Dashboard の `M5Stack 表示プレビュー` から `1..8` を切り替えられる。`8/8` は pet を画面全体に近い最大面積で表示する。
 - render FPS は Dashboard の `M5Stack 表示プレビュー` から `4..20` を切り替えられる。既定は `12fps` で、描画更新の上限として扱う。
 - motion step は Dashboard の `M5Stack 表示プレビュー` から `120..800ms` を切り替えられる。既定は `280ms` で、キャラ frame / bounce の切替頻度として扱うため、高FPS時の小刻みな震えを抑える。
-- `20fps` でちらつきが目立つ場合は、Core2 に Sprite buffer 対応 firmware が upload されているか、Host Bridge から display settings が届いているかを確認する。
+- `20fps` でちらつきが目立つ場合は、Core2 に pet box only Sprite 対応 firmware が upload されているか、Host Bridge から display settings が届いているかを確認する。
 - UI text と body text は Dashboard の `M5Stack 表示プレビュー` から `1..8` を切り替えられる。body text を大きくすると1ページに入る文字量は少なくなる。
 - 画面全体の背景、pet 背景、文字色、文字背景、文字枠は RGBA 設定を受け取り、LCD では最終RGB565色として合成表示する。透明度は Dashboard preview と完全一致ではなく近似です。
 - pet X/Y offset は画面外にはみ出す値も許容するため、構図調整で pet の一部だけを見せることができます。

@@ -91,8 +91,10 @@ assert(firmwareSource.includes('M5Canvas petSprite'), 'firmware must use an off-
 assert(firmwareSource.includes('drawPetSurfaceSprite'), 'firmware must push the pet surface as a sprite');
 assert(firmwareSource.includes('drawPetSurfaceIfNeeded'), 'firmware must redraw only the pet surface during animation ticks');
 assert(firmwareSource.includes('markPetDraw()'), 'firmware must separate pet animation redraw from full-screen redraw');
-assert(firmwareSource.includes('petSprite.pushSprite(0, 0)'), 'firmware must transfer the completed pet sprite to the display');
+assert(firmwareSource.includes('petSprite.pushSprite(petX, petY)'), 'firmware must transfer only the completed pet sprite box to the display');
+assert(firmwareSource.includes('drawPetAvatarTo(petSprite, 0, 0)'), 'firmware pet sprite must use local sprite coordinates to avoid redrawing the full header area');
 assert(firmwareSource.includes('screenBackgroundColor()'), 'firmware must separate full-screen background color from pet background color');
+assert(firmwareSource.includes('blendRgbaOver(textBackgroundRgba, TFT_BLACK)'), 'firmware text background must not implicitly inherit the screen background color');
 assert(firmwareSource.includes('petDrawX') && firmwareSource.includes('petOffsetX'), 'firmware must allow horizontal pet offset beyond the screen edge');
 assert(firmwareSource.includes('petDrawY') && firmwareSource.includes('petOffsetY'), 'firmware must allow vertical pet offset beyond the screen edge');
 assert(firmwareSource.includes('drawTextPanel'), 'firmware must apply text background and border consistently to text panels');

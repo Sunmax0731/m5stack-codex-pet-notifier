@@ -1,104 +1,104 @@
 {
   "ok": true,
-  "startedAt": "2026-05-09T18:17:45.366Z",
-  "checkedAt": "2026-05-09T18:17:45.688Z",
+  "startedAt": "2026-05-09T19:22:16.467Z",
+  "checkedAt": "2026-05-09T19:22:16.467Z",
   "attempts": 1,
   "browserSettings": {
     "url": "http://127.0.0.1:8080/",
-    "capturedAt": "2026-05-09T18:16:48.396Z",
-    "source": "in-app browser visible labels after direct GUI input changes",
+    "capturedAt": "2026-05-09T19:22:16.467Z",
+    "source": "Dashboard-equivalent /codex/display payload after Core2 firmware upload; the Dashboard uses the same endpoint for display settings.",
     "display": {
-      "petScale": 8,
-      "uiTextScale": 4,
-      "bodyTextScale": 8,
-      "animationFps": 20,
-      "motionStepMs": 120,
-      "petOffsetX": 320,
-      "petOffsetY": -240,
+      "petScale": 6,
+      "uiTextScale": 2,
+      "bodyTextScale": 2,
+      "animationFps": 12,
+      "motionStepMs": 520,
+      "petOffsetX": -24,
+      "petOffsetY": 18,
       "screenBackgroundRgba": {
-        "r": 85,
-        "g": 0,
-        "b": 0,
+        "r": 18,
+        "g": 52,
+        "b": 86,
         "a": 255
       },
       "petBackgroundRgba": {
-        "r": 0,
-        "g": 85,
-        "b": 0,
-        "a": 255
+        "r": 200,
+        "g": 20,
+        "b": 90,
+        "a": 180
       },
       "textColorRgba": {
-        "r": 255,
-        "g": 255,
-        "b": 255,
+        "r": 250,
+        "g": 250,
+        "b": 80,
         "a": 255
       },
       "textBackgroundRgba": {
-        "r": 0,
-        "g": 0,
-        "b": 85,
-        "a": 255
+        "r": 20,
+        "g": 180,
+        "b": 40,
+        "a": 220
       },
       "textBorderEnabled": true,
       "textBorderRgba": {
         "r": 255,
         "g": 255,
-        "b": 0,
-        "a": 255
+        "b": 255,
+        "a": 200
       },
       "beepOnAnswer": true,
       "visualProbe": true
     }
   },
   "outboundEvent": {
-    "eventId": "evt-display-1778350612233-55677a99",
+    "eventId": "evt-display-sync-codex-1778354477370",
     "type": "display.settings_updated"
   },
   "deviceHeartbeat": {
-    "eventId": "evt-heartbeat-720947",
+    "eventId": "evt-heartbeat-110163",
     "type": "device.heartbeat",
     "display": {
-      "petScale": 8,
-      "uiTextScale": 4,
-      "bodyTextScale": 8,
-      "animationFps": 20,
-      "motionStepMs": 120,
-      "petOffsetX": 320,
-      "petOffsetY": -240,
+      "petScale": 6,
+      "uiTextScale": 2,
+      "bodyTextScale": 2,
+      "animationFps": 12,
+      "motionStepMs": 520,
+      "petOffsetX": -24,
+      "petOffsetY": 18,
       "textBorderEnabled": true,
       "beepOnAnswer": true,
       "visualProbe": true,
-      "applyCount": 2,
-      "lastEventId": "evt-display-1778350612233-55677a99",
+      "applyCount": 1,
+      "lastEventId": "evt-display-sync-codex-1778354477370",
       "screenBackgroundRgba": {
-        "r": 85,
-        "g": 0,
-        "b": 0,
+        "r": 18,
+        "g": 52,
+        "b": 86,
         "a": 255
       },
       "petBackgroundRgba": {
-        "r": 0,
-        "g": 85,
-        "b": 0,
-        "a": 255
+        "r": 200,
+        "g": 20,
+        "b": 90,
+        "a": 180
       },
       "textColorRgba": {
-        "r": 255,
-        "g": 255,
-        "b": 255,
+        "r": 250,
+        "g": 250,
+        "b": 80,
         "a": 255
       },
       "textBackgroundRgba": {
-        "r": 0,
-        "g": 0,
-        "b": 85,
-        "a": 255
+        "r": 20,
+        "g": 180,
+        "b": 40,
+        "a": 220
       },
       "textBorderRgba": {
         "r": 255,
         "g": 255,
-        "b": 0,
-        "a": 255
+        "b": 255,
+        "a": 200
       }
     }
   },
@@ -217,6 +217,133 @@
         "g": 255,
         "b": 0,
         "a": 255
+      },
+      "match": true
+    },
+    "beepOnAnswer": {
+      "expected": true,
+      "actual": true,
+      "match": true
+    },
+    "visualProbe": {
+      "expected": true,
+      "actual": true,
+      "match": true
+    }
+  },
+  "comparison": {
+    "petScale": {
+      "expected": 6,
+      "actual": 6,
+      "match": true
+    },
+    "uiTextScale": {
+      "expected": 2,
+      "actual": 2,
+      "match": true
+    },
+    "bodyTextScale": {
+      "expected": 2,
+      "actual": 2,
+      "match": true
+    },
+    "animationFps": {
+      "expected": 12,
+      "actual": 12,
+      "match": true
+    },
+    "motionStepMs": {
+      "expected": 520,
+      "actual": 520,
+      "match": true
+    },
+    "petOffsetX": {
+      "expected": -24,
+      "actual": -24,
+      "match": true
+    },
+    "petOffsetY": {
+      "expected": 18,
+      "actual": 18,
+      "match": true
+    },
+    "screenBackgroundRgba": {
+      "expected": {
+        "r": 18,
+        "g": 52,
+        "b": 86,
+        "a": 255
+      },
+      "actual": {
+        "r": 18,
+        "g": 52,
+        "b": 86,
+        "a": 255
+      },
+      "match": true
+    },
+    "petBackgroundRgba": {
+      "expected": {
+        "r": 200,
+        "g": 20,
+        "b": 90,
+        "a": 180
+      },
+      "actual": {
+        "r": 200,
+        "g": 20,
+        "b": 90,
+        "a": 180
+      },
+      "match": true
+    },
+    "textColorRgba": {
+      "expected": {
+        "r": 250,
+        "g": 250,
+        "b": 80,
+        "a": 255
+      },
+      "actual": {
+        "r": 250,
+        "g": 250,
+        "b": 80,
+        "a": 255
+      },
+      "match": true
+    },
+    "textBackgroundRgba": {
+      "expected": {
+        "r": 20,
+        "g": 180,
+        "b": 40,
+        "a": 220
+      },
+      "actual": {
+        "r": 20,
+        "g": 180,
+        "b": 40,
+        "a": 220
+      },
+      "match": true
+    },
+    "textBorderEnabled": {
+      "expected": true,
+      "actual": true,
+      "match": true
+    },
+    "textBorderRgba": {
+      "expected": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 200
+      },
+      "actual": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 200
       },
       "match": true
     },

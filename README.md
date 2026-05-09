@@ -24,7 +24,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換し、Core2 向けには scale `1..8` ごとの高解像度 frame も生成する。
 - `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。Core2 は scale ごとの高解像度 frame を選び、GRAY は flash 余裕を優先して vector fallback と large app partition で build gate を通す。state に応じた色、frame animation、bounce を M5Stack 上で表示する。
-- pet surface は `M5Canvas` の off-screen Sprite に描画してから `pushSprite()` し、animation tick では画面全体の黒塗りを避けてちらつきを抑える。
+- pet avatar は `M5Canvas` の off-screen Sprite に描画してから pet box だけを `pushSprite()` し、animation tick では画面全体や上部 surface の再転送を避けてちらつきを抑える。
 - M5Stack 画面上部の `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストは描画せず、pet surface を優先表示する。
 - ペット表示面積は Dashboard または `codex:display` から `1..8` の8段階で動的に変更でき、`8` は pet を画面全体に近い面積で表示する最大設定として扱う。
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。

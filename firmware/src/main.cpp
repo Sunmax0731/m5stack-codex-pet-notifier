@@ -210,7 +210,7 @@ uint16_t petBackgroundColor() {
 }
 
 uint16_t textBackgroundColor() {
-  return blendRgbaOver(textBackgroundRgba, screenBackgroundColor());
+  return blendRgbaOver(textBackgroundRgba, TFT_BLACK);
 }
 
 uint16_t textPanelFillColor() {
@@ -553,18 +553,23 @@ void rememberDisplaySettings(JsonVariant event) {
   );
 }
 
+void drawTextPanel(int x, int y, int width, int height, int radius);
+
 void drawDisplayProbe() {
   M5.Display.fillScreen(screenBackgroundColor());
   const int w = M5.Display.width();
   const int h = M5.Display.height();
-  M5.Display.fillRect(0, 0, w, max(28, h / 6), petBackgroundColor());
-  M5.Display.fillRect(0, h - max(28, h / 6), w, max(28, h / 6), textPanelFillColor());
+  const int bandHeight = max(28, h / 6);
+  M5.Display.fillRect(0, 0, w, bandHeight, petBackgroundColor());
+  drawTextPanel(0, h - bandHeight, w, bandHeight, 0);
   M5.Display.drawRect(0, 0, w, h, textBorderEnabled ? textBorderColor() : TFT_WHITE);
   applyDisplayFont(1);
-  M5.Display.setTextColor(TFT_WHITE, screenBackgroundColor());
-  M5.Display.drawString("display applied", 8, max(36, h / 2 - 28));
-  M5.Display.drawString((String("scale ") + petDisplayScale + " x " + petOffsetX + " y " + petOffsetY).c_str(), 8, max(56, h / 2 - 8));
-  M5.Display.drawString((String("#") + displayApplyCount).c_str(), 8, max(76, h / 2 + 12));
+  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
+  const int panelY = max(bandHeight + 4, h / 2 - 34);
+  drawTextPanel(6, panelY, w - 12, min(78, h - panelY - bandHeight - 4), 6);
+  M5.Display.drawString("display applied", 12, panelY + 8);
+  M5.Display.drawString((String("scale ") + petDisplayScale + " x " + petOffsetX + " y " + petOffsetY).c_str(), 12, panelY + 28);
+  M5.Display.drawString((String("#") + displayApplyCount).c_str(), 12, panelY + 48);
 }
 
 void triggerDisplayProbe() {
@@ -917,24 +922,21 @@ void drawTextPanel(int x, int y, int width, int height, int radius) {
 void drawPetSurfaceSprite() {
   const int width = M5.Display.width();
   const int height = headerHeight();
-  const uint16_t screenBackground = screenBackgroundColor();
+  const int petX = petDrawX(width);
+  const int petY = petDrawY(height);
+  const int boxWidth = petBoxWidth();
+  const int boxHeight = petBoxHeight();
   const uint16_t petBackground = petBackgroundColor();
-  if (!ensurePetSprite(width, height)) {
-    M5.Display.fillRect(0, 0, width, height, screenBackground);
-    const int petX = petDrawX(width);
-    const int petY = petDrawY(height);
-    M5.Display.fillRect(petX, petY, petBoxWidth(), petBoxHeight(), petBackground);
+  if (!ensurePetSprite(boxWidth, boxHeight)) {
+    M5.Display.fillRect(petX, petY, boxWidth, boxHeight, petBackground);
     drawPetAvatar(petX, petY);
     needsPetRedraw = false;
     return;
   }
 
-  petSprite.fillSprite(screenBackground);
-  const int petX = petDrawX(width);
-  const int petY = petDrawY(height);
-  petSprite.fillRect(petX, petY, petBoxWidth(), petBoxHeight(), petBackground);
-  drawPetAvatarTo(petSprite, petX, petY);
-  petSprite.pushSprite(0, 0);
+  petSprite.fillSprite(petBackground);
+  drawPetAvatarTo(petSprite, 0, 0);
+  petSprite.pushSprite(petX, petY);
   needsPetRedraw = false;
 }
 

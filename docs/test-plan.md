@@ -18,7 +18,7 @@
 | dashboard smoke | Dashboard asset、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、`/codex/decision`、`/codex/pet`、`/codex/display`、`/pet/current/manifest`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary、collapse、command modal tabs を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
-| firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet surface redraw path を含むことを検証する | `scripts/validate.mjs` |
+| firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet box redraw path を含むことを検証する | `scripts/validate.mjs` |
 | hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、非空 frame 自動検出を検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
