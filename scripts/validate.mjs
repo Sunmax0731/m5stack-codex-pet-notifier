@@ -199,6 +199,7 @@ assert(dashboardIndexSource.includes('data-rgba-picker'), 'Dashboard must expose
 assert(dashboardIndexSource.includes('rgba-swatch'), 'Dashboard must show the currently selected RGBA color in each color section');
 assert(dashboardIndexSource.includes('autoDisplaySync'), 'Dashboard must expose display setting auto-sync so slider changes reach the device');
 assert(dashboardIndexSource.includes('visualProbe'), 'Dashboard must expose a visible apply probe option for display sync diagnosis');
+assert(dashboardIndexSource.includes('displaySyncCard'), 'Dashboard must show whether display settings are reflected on the device');
 assert(dashboardIndexSource.includes('ペットX位置'), 'Dashboard must expose horizontal pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('ペットY位置'), 'Dashboard must expose vertical pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('文字枠'), 'Dashboard must expose text border color controls in Japanese by default');
@@ -238,6 +239,8 @@ assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish
 assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
 assert(dashboardAppSource.includes('visualProbe'), 'Dashboard must publish display apply visual probe setting');
+assert(dashboardAppSource.includes('renderDisplaySyncStatus'), 'Dashboard must compare sent display settings with device heartbeat');
+assert(dashboardAppSource.includes('compareDisplaySettings'), 'Dashboard must compute display setting sync mismatches');
 assert(dashboardAppSource.includes('scheduleAutoDisplaySync'), 'Dashboard must debounce and auto-send display setting changes');
 assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
 assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');

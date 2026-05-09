@@ -143,6 +143,14 @@
                     <div class="readout-row"><span data-i18n="readoutBodyText">本文文字</span><strong id="previewBodyReadout">1/8</strong></div>
                     <div class="readout-row"><span data-i18n="readoutRender">描画</span><strong id="previewFpsReadout">12 fps</strong></div>
                     <div class="readout-row"><span data-i18n="readoutMotion">動き</span><strong id="previewMotionReadout">280 ms</strong></div>
+                    <div id="displaySyncCard" class="display-sync-card sync-idle" role="status" aria-live="polite">
+                      <div class="display-sync-heading">
+                        <span data-i18n="displaySyncHeading">実機反映</span>
+                        <strong id="displaySyncStatus" data-i18n="displaySyncIdle">未送信</strong>
+                      </div>
+                      <p id="displaySyncDetail" class="muted">表示設定を送信すると、実機heartbeatとの一致状態を表示します。</p>
+                      <span id="displaySyncEvent" class="device-chip">event -</span>
+                    </div>
                   </div>
                 </div>
 

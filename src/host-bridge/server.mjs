@@ -72,13 +72,18 @@ export class LanHostBridge {
     }
 
     for (const target of targets) {
-      target.queue.push(event);
-      this.outboundLog.push({
+      const details = summarizeHostEvent(event);
+      const logEntry = {
         deviceId: target.deviceId,
         type: event.type,
         eventId: event.eventId,
         warnings: validation.warnings
-      });
+      };
+      if (Object.keys(details).length) {
+        logEntry.details = details;
+      }
+      target.queue.push(event);
+      this.outboundLog.push(logEntry);
       if (target.socket) {
         sendWebSocketText(target.socket, JSON.stringify(event));
       }
@@ -664,6 +669,19 @@ function summarizeDeviceEvent(event) {
       screen: event.screen ?? null,
       display: event.display ?? null
     };
+  }
+  return {};
+}
+
+function summarizeHostEvent(event) {
+  if (!event || typeof event !== 'object') {
+    return {};
+  }
+  if (event.type === 'display.settings_updated') {
+    return { display: event.display ?? null };
+  }
+  if (event.type === 'pet.updated' && event.display) {
+    return { display: event.display };
   }
   return {};
 }

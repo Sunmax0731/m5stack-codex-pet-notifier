@@ -73,6 +73,8 @@ try {
   assert.match(index, /Codex回答のビープ通知/);
   assert.match(index, /変更を自動送信/);
   assert.match(index, /反映確認を表示/);
+  assert.match(index, /displaySyncCard/);
+  assert.match(index, /実機反映/);
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
   assert.match(index, /preview-settings-dock/);
@@ -114,6 +116,8 @@ try {
   assert.match(app, /updateRgbaVisual/);
   assert.match(app, /beepOnAnswer/);
   assert.match(app, /visualProbe/);
+  assert.match(app, /renderDisplaySyncStatus/);
+  assert.match(app, /compareDisplaySettings/);
   assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
@@ -140,6 +144,8 @@ try {
   assert.match(css, /\.color-grid/);
   assert.match(css, /\.rgba-picker/);
   assert.match(css, /\.rgba-swatch/);
+  assert.match(css, /\.display-sync-card/);
+  assert.match(css, /\.sync-applied/);
   assert.match(css, /\.help-button/);
   assert.doesNotMatch(css, /\.hint::after/);
 
@@ -334,6 +340,9 @@ try {
   assert.equal(latestHeartbeat.details.display.petScale, 8);
   assert.equal(latestHeartbeat.details.display.petOffsetX, -40);
   assert.deepEqual(latestHeartbeat.details.display.screenBackgroundRgba, { r: 2, g: 4, b: 8, a: 255 });
+  const latestDisplayOutbound = events.outbound.find((entry) => entry.eventId === display.event.eventId);
+  assert.equal(latestDisplayOutbound.details.display.petScale, 8);
+  assert.deepEqual(latestDisplayOutbound.details.display.textBorderRgba, { r: 120, g: 200, b: 255, a: 255 });
 
   const runtime = await getJson(`${baseUrl}/debug/runtime`);
   assert.equal(runtime.ok, true);
@@ -383,6 +392,7 @@ try {
       displaySettingsBeepControl: true,
       displaySettingsAutoSync: true,
       displaySettingsVisualProbe: true,
+      displaySettingsSyncIndicator: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
       m5StackPreviewDeviceSwitch: true,

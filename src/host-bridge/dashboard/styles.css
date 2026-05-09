@@ -972,6 +972,63 @@ input[type="range"] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.display-sync-card {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 6px;
+  min-height: 92px;
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 10px;
+}
+
+.display-sync-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.display-sync-heading span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.display-sync-heading strong {
+  font-size: 16px;
+}
+
+.display-sync-card p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.display-sync-card .device-chip {
+  justify-self: start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.display-sync-card.sync-applied {
+  border-left-color: var(--green);
+  background: var(--surface-tint);
+}
+
+.display-sync-card.sync-pending,
+.display-sync-card.sync-no-heartbeat,
+.display-sync-card.sync-dirty {
+  border-left-color: var(--amber);
+}
+
+.display-sync-card.sync-mismatch {
+  border-left-color: var(--danger);
+}
+
 .pet-current,
 .readout-row {
   border: 1px solid var(--border);

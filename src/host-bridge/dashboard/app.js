@@ -17,12 +17,30 @@ const state = {
   previewAnimationDelay: null,
   autoDisplaySyncTimer: null,
   autoDisplaySyncInFlight: false,
+  displaySync: null,
   language: localStorage.getItem('m5pet-language') || 'ja',
   themeMode: localStorage.getItem('m5pet-theme') || 'system'
 };
 
 const expectedVersion = document.documentElement.dataset.version || '0.1.0-alpha.10';
 const compatibleCommandRunners = new Set(['cmd-wrapper-v1', 'direct-npm-v1']);
+const displaySyncFields = [
+  'petScale',
+  'uiTextScale',
+  'bodyTextScale',
+  'animationFps',
+  'motionStepMs',
+  'petOffsetX',
+  'petOffsetY',
+  'screenBackgroundRgba',
+  'petBackgroundRgba',
+  'textColorRgba',
+  'textBackgroundRgba',
+  'textBorderEnabled',
+  'textBorderRgba',
+  'beepOnAnswer',
+  'visualProbe'
+];
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -108,6 +126,10 @@ const elements = {
   previewBodyReadout: $('#previewBodyReadout'),
   previewFpsReadout: $('#previewFpsReadout'),
   previewMotionReadout: $('#previewMotionReadout'),
+  displaySyncCard: $('#displaySyncCard'),
+  displaySyncStatus: $('#displaySyncStatus'),
+  displaySyncDetail: $('#displaySyncDetail'),
+  displaySyncEvent: $('#displaySyncEvent'),
   petAssetName: $('#petAssetName'),
   petAssetDescription: $('#petAssetDescription'),
   commandTabs: $('#commandTabs'),
@@ -144,6 +166,13 @@ const labels = {
     readoutBodyText: '本文文字',
     readoutRender: '描画',
     readoutMotion: '動き',
+    displaySyncHeading: '実機反映',
+    displaySyncIdle: '未送信',
+    displaySyncDirty: '未送信の変更あり',
+    displaySyncPending: '反映待ち',
+    displaySyncApplied: '反映済み',
+    displaySyncMismatch: '差分あり',
+    displaySyncNoHeartbeat: 'heartbeat待ち',
     currentPet: '現在のペット',
     assetPathOverride: 'アセットパス指定',
     spriteRef: 'スプライト参照',
@@ -231,6 +260,13 @@ const labels = {
     readoutBodyText: 'body text',
     readoutRender: 'render',
     readoutMotion: 'motion',
+    displaySyncHeading: 'Device sync',
+    displaySyncIdle: 'Not sent',
+    displaySyncDirty: 'Unsaved changes',
+    displaySyncPending: 'Waiting apply',
+    displaySyncApplied: 'Applied',
+    displaySyncMismatch: 'Mismatch',
+    displaySyncNoHeartbeat: 'Waiting heartbeat',
     currentPet: 'current pet',
     assetPathOverride: 'asset path override',
     spriteRef: 'spriteRef',
@@ -432,6 +468,7 @@ function applyLanguage() {
   });
   updateHelpTexts();
   renderDisplayControls();
+  renderDisplaySyncStatus();
   renderLatestSession();
 }
 
@@ -718,6 +755,7 @@ function render() {
   renderRuntimeStatus();
   renderCommands();
   renderM5Preview();
+  renderDisplaySyncStatus();
 }
 
 function renderLog(target, entries, template) {
@@ -915,6 +953,128 @@ function formatDetailValue(value) {
   return escapeHtml(String(value));
 }
 
+function stableValue(value) {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return JSON.stringify(Object.keys(value).sort().reduce((acc, key) => {
+      acc[key] = value[key];
+      return acc;
+    }, {}));
+  }
+  return JSON.stringify(value);
+}
+
+function compareDisplaySettings(expected = {}, actual = {}) {
+  const checked = displaySyncFields.filter((key) => expected[key] !== undefined);
+  const mismatches = checked.filter((key) => stableValue(expected[key]) !== stableValue(actual?.[key]));
+  return {
+    checked,
+    mismatches,
+    ok: checked.length > 0 && mismatches.length === 0
+  };
+}
+
+function latestOutboundDisplayEvent() {
+  const outbound = state.events?.outbound ?? [];
+  const entry = [...outbound].reverse().find((item) => item.details?.display);
+  if (!entry) {
+    return null;
+  }
+  return {
+    eventId: entry.eventId,
+    type: entry.type,
+    display: entry.details.display,
+    source: 'events'
+  };
+}
+
+function latestHeartbeatDisplayEvent() {
+  const currentDeviceId = deviceId();
+  const inbound = state.events?.inbound ?? [];
+  return [...inbound].reverse().find((entry) => (
+    entry.type === 'device.heartbeat'
+    && entry.deviceId === currentDeviceId
+    && entry.details?.display
+  )) ?? null;
+}
+
+function latestExpectedDisplayEvent() {
+  return latestOutboundDisplayEvent() ?? state.displaySync;
+}
+
+function rememberDisplaySyncResult(result, fallbackPayload = null, fallbackEvent = null) {
+  const event = result?.event ?? fallbackEvent;
+  const display = event?.display ?? fallbackPayload;
+  if (!event?.eventId || !display) {
+    return;
+  }
+  state.displaySync = {
+    eventId: event.eventId,
+    type: event.type,
+    display,
+    sentAt: new Date().toISOString(),
+    source: 'local-submit'
+  };
+  renderDisplaySyncStatus();
+}
+
+function displaySyncDetail(status, expected, heartbeat, comparison) {
+  const expectedId = expected?.eventId ?? '-';
+  const heartbeatId = heartbeat?.eventId ?? '-';
+  const applyCount = heartbeat?.details?.display?.applyCount ?? '-';
+  if (state.language === 'en') {
+    if (status === 'idle') return 'Send display settings to compare them with device heartbeat.';
+    if (status === 'dirty') return `Current controls differ from ${expectedId}. Send display settings again.`;
+    if (status === 'no-heartbeat') return `Sent ${expectedId}. Waiting for a device heartbeat.`;
+    if (status === 'pending') return `Sent ${expectedId}. Latest heartbeat is ${heartbeatId}; device lastEventId has not caught up yet.`;
+    if (status === 'mismatch') return `EventId matched, but fields differ: ${comparison.mismatches.join(', ')}`;
+    return `Matched ${expectedId} on heartbeat ${heartbeatId}. applyCount ${applyCount}.`;
+  }
+  if (status === 'idle') return '表示設定を送信すると、実機heartbeatとの一致状態を表示します。';
+  if (status === 'dirty') return `現在のフォーム値は ${expectedId} と異なります。表示設定を再送信してください。`;
+  if (status === 'no-heartbeat') return `${expectedId} を送信済みです。実機heartbeatを待っています。`;
+  if (status === 'pending') return `${expectedId} を送信済みです。最新heartbeat ${heartbeatId} の lastEventId はまだ追いついていません。`;
+  if (status === 'mismatch') return `eventId は一致しましたが、差分があります: ${comparison.mismatches.join(', ')}`;
+  return `${expectedId} が heartbeat ${heartbeatId} で一致しました。applyCount ${applyCount}。`;
+}
+
+function renderDisplaySyncStatus() {
+  if (!elements.displaySyncCard) {
+    return;
+  }
+  const expected = latestExpectedDisplayEvent();
+  const heartbeat = latestHeartbeatDisplayEvent();
+  const currentPayload = displaySettingsPayload();
+  let status = 'idle';
+  let labelKey = 'displaySyncIdle';
+  let comparison = { mismatches: [] };
+
+  if (expected?.display) {
+    const currentComparison = compareDisplaySettings(expected.display, currentPayload);
+    if (!currentComparison.ok) {
+      status = 'dirty';
+      labelKey = 'displaySyncDirty';
+      comparison = currentComparison;
+    } else if (!heartbeat) {
+      status = 'no-heartbeat';
+      labelKey = 'displaySyncNoHeartbeat';
+    } else if (heartbeat.details.display.lastEventId !== expected.eventId) {
+      status = 'pending';
+      labelKey = 'displaySyncPending';
+    } else {
+      comparison = compareDisplaySettings(expected.display, heartbeat.details.display);
+      status = comparison.ok ? 'applied' : 'mismatch';
+      labelKey = comparison.ok ? 'displaySyncApplied' : 'displaySyncMismatch';
+    }
+  }
+
+  elements.displaySyncCard.className = `display-sync-card sync-${status}`;
+  elements.displaySyncStatus.textContent = t(labelKey);
+  elements.displaySyncDetail.textContent = displaySyncDetail(status, expected, heartbeat, comparison);
+  elements.displaySyncEvent.textContent = expected?.eventId
+    ? `${expected.type ?? 'display'} / ${expected.eventId}`
+    : 'event -';
+}
+
 function rgbaFromControls(colorInput, alphaInput) {
   const hex = colorInput.value.replace('#', '');
   return {
@@ -969,15 +1129,20 @@ function displaySettingsPayload() {
 async function publishDisplaySettings() {
   const payload = displaySettingsPayload();
   try {
-    return await submitJson('/codex/display', payload);
+    const result = await submitJson('/codex/display', payload);
+    rememberDisplaySyncResult(result, payload);
+    return result;
   } catch (error) {
     if (!String(error.message).includes('not-found')) {
       throw error;
     }
-    return submitJson('/codex/event', {
+    const fallbackEvent = createDisplayFallbackPetEvent(payload);
+    const result = await submitJson('/codex/event', {
       deviceId: payload.deviceId,
-      event: createDisplayFallbackPetEvent(payload)
+      event: fallbackEvent
     });
+    rememberDisplaySyncResult(result, payload, fallbackEvent);
+    return result;
   }
 }
 
@@ -1063,6 +1228,7 @@ function renderDisplayControls() {
   updateRgbaVisual(elements.textBgSwatch, elements.textBgPreview, elements.textBgColor, elements.textBgAlpha);
   updateRgbaVisual(elements.textBorderSwatch, elements.textBorderPreview, elements.textBorderColor, elements.textBorderAlpha);
   renderM5Preview();
+  renderDisplaySyncStatus();
 }
 
 function renderPetManifest() {
@@ -1423,7 +1589,10 @@ function wireActions() {
     submitJson('/codex/replay-samples', { deviceId: deviceId() }).catch(showError);
   });
   $('#sendPetButton').addEventListener('click', () => {
-    submitJson('/codex/pet', petPayload()).catch(showError);
+    const payload = petPayload();
+    submitJson('/codex/pet', payload)
+      .then((result) => rememberDisplaySyncResult(result, payload.display))
+      .catch(showError);
   });
   $('#sendDisplayButton').addEventListener('click', () => {
     publishDisplaySettings().catch(showError);
