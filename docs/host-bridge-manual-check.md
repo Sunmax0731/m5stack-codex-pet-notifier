@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.7`。
+- `version` が `0.1.0-alpha.8`。
 
 Dashboard を開きます。
 
@@ -43,7 +43,7 @@ http://127.0.0.1:8080/
 - `M5Stack Codex Pet Console` が表示される。
 - paired、outbound、inbound、security の状態が見える。
 - `debug JSON` から `/debug/snapshot` を確認できる。
-- `/health` の `version` が `0.1.0-alpha.7` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。
+- `/health` の `version` が `0.1.0-alpha.8` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。
 
 ## 3. Firmware upload
 
@@ -98,7 +98,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 期待結果:
 
 - inbound に `device.reply_selected` が出る。
-- Dashboard の ABC 返信ワークフロー panel に choiceId / requestEventId / input が出る。
+- Dashboard の Debug section に choiceId / requestEventId / input が出る。
 - pet tap または B 長押し後、inbound に `device.pet_interacted` が出る。
 - 10 秒程度待つと inbound に `device.heartbeat` が出る。
 

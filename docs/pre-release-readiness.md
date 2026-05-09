@@ -17,10 +17,11 @@
 - Core2 upload、Wi-Fi、pairing、sample event poll。
 - Core2 Codex answer 表示。
 - Core2 日本語 answer 表示の firmware 対応。
-- Dashboard Choice / Pet endpoint と GUI smoke。
-- Dashboard Display endpoint と pet 表示倍率 / text size / animation FPS controls。
+- Dashboard Decision / Pet endpoint と GUI smoke。
+- Dashboard Display endpoint と pet 表示倍率 / text size / render FPS / motion step controls。
+- Dashboard current pet preview、tooltip、section collapse、setup command modal。
 - Core2 hatch-pet asset animation の firmware 対応と upload。
-- Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` animation、dynamic display settings の firmware 対応。
+- Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` render、`120..800ms` motion step、dynamic display settings の firmware 対応。
 - Core2 scale-specific pet asset frame selection。
 - Core2 Sprite buffer による pet-only animation redraw。
 - Dashboard side menu、event tabs、M5Stack 表示プレビュー。
@@ -39,11 +40,12 @@
 - Codex session auto relay の Core2 実機目視確認。
 - Codex hook relay の Core2 実機目視確認。
 - Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
-- Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、animation FPS 変更の Core2 実機目視確認。
+- Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、render FPS / motion step 変更の Core2 実機目視確認。
+- Current pet preview と実機 layout の一致、文字 overlay、tooltip、section collapse、command modal のユーザー目視確認。
 - Sprite buffer による pet animation ちらつき抑制の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 
 ## Decision
 
-`v0.1.0-alpha.7` は closed alpha prerelease として公開し、stable release にはしません。
+`v0.1.0-alpha.8` は closed alpha prerelease として公開し、stable release にはしません。

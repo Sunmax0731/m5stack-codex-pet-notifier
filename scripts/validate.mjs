@@ -68,8 +68,10 @@ assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page tex
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
 assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
 assert(firmwareSource.includes('DEFAULT_PET_ANIMATION_FPS = 12'), 'firmware must default to a smoother 12 fps pet animation');
+assert(firmwareSource.includes('DEFAULT_PET_MOTION_STEP_MS = 280'), 'firmware must separate pet pose switching from render FPS');
 assert(firmwareSource.includes('petAnimationFps'), 'firmware must store runtime-configurable pet animation fps');
 assert(firmwareSource.includes('display["animationFps"]'), 'firmware must accept animation fps in display settings');
+assert(firmwareSource.includes('display["motionStepMs"]'), 'firmware must accept pet motion step timing in display settings');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 assert(firmwareSource.includes('M5Canvas petSprite'), 'firmware must use an off-screen sprite for pet rendering');
 assert(firmwareSource.includes('drawPetSurfaceSprite'), 'firmware must push the pet surface as a sprite');
@@ -98,6 +100,8 @@ assert(petAssetGeneratorSource.includes('detect_frame_count'), 'pet asset genera
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
 assert(relaySource.includes("Buffer.from(result.stdout.trim(), 'base64').toString('utf8')"), 'clipboard relay must restore UTF-8 from Base64');
+assert(relaySource.includes("command === 'decision'"), 'relay CLI must expose a Codex decision request workflow');
+assert(relaySource.includes('waitForDeviceReply'), 'relay CLI must be able to wait for M5Stack decision replies');
 
 const sessionWatcherSource = fs.readFileSync('src/codex-adapter/sessionWatcher.mjs', 'utf8');
 assert(sessionWatcherSource.includes('.codex'), 'session watcher must default to local Codex session logs');
@@ -111,10 +115,12 @@ assert(fs.existsSync('docs/codex-hooks.example.json'), 'Codex hooks example must
 
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');
+assert(bridgeSource.includes("url.pathname === '/codex/decision'"), 'Host Bridge must expose a decision endpoint for Codex-to-M5Stack choice workflows');
 assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must expose a pet update endpoint');
 assert(bridgeSource.includes("url.pathname === '/codex/display'"), 'Host Bridge must expose a display settings endpoint');
 assert(bridgeSource.includes("url.pathname === '/codex/session/latest'"), 'Host Bridge must expose a latest Codex session endpoint for the GUI');
 assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host Bridge must expose a latest Codex session publish endpoint for the GUI');
+assert(bridgeSource.includes('/pet/current/manifest'), 'Host Bridge must expose the current local pet manifest for dashboard preview');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
@@ -124,12 +130,19 @@ assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side na
 assert(dashboardIndexSource.includes('M5Stack 表示プレビュー'), 'Dashboard must expose a M5Stack display preview');
 assert(dashboardIndexSource.includes('pet display area'), 'Dashboard must expose pet display area controls');
 assert(dashboardIndexSource.includes('body text size'), 'Dashboard must expose body text size controls');
-assert(dashboardIndexSource.includes('animation FPS'), 'Dashboard must expose animation fps controls');
+assert(dashboardIndexSource.includes('render FPS'), 'Dashboard must expose render fps controls');
+assert(dashboardIndexSource.includes('motion step'), 'Dashboard must expose pet motion step controls');
 assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
+assert(dashboardIndexSource.includes('data-tooltip'), 'Dashboard controls must provide focusable tooltip hints');
+assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must support View/Hide collapse controls');
+assert(dashboardIndexSource.includes('commandModal'), 'Dashboard setup/debug commands must be shown in a modal');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
+assert(dashboardAppSource.includes('/codex/decision'), 'Dashboard must publish Codex decision requests to M5Stack');
+assert(dashboardAppSource.includes('/pet/current/manifest'), 'Dashboard must load the current local pet asset for preview');
 assert(dashboardAppSource.includes('animationFps'), 'Dashboard must publish animation fps in display settings');
+assert(dashboardAppSource.includes('motionStepMs'), 'Dashboard must publish pet motion step timing in display settings');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 

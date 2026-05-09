@@ -13,8 +13,10 @@
 - [x] `/pair`、`/device/poll`、`/device/event`、`/codex/event`、`/codex/replay-samples`、`/health`、`/events` を実装する。
 - [x] `/codex/answer` と `/codex/notification` を実装する。
 - [x] `/codex/choice` と `/codex/pet` を実装し、GUI と CLI から送れるようにする。
-- [x] Host Bridge 同梱 Dashboard で状態確認、event 送信、ABC 返信確認、debug command 参照を実装する。
-- [x] Dashboard と Host Bridge に `display.settings_updated` を追加し、pet 表示倍率、text size、animation FPS を GUI から変更できるようにする。
+- [x] Host Bridge 同梱 Dashboard で状態確認、event 送信、Decision 返信確認、debug command modal を実装する。
+- [x] Dashboard と Host Bridge に `display.settings_updated` を追加し、pet 表示倍率、text size、render FPS、motion step を GUI から変更できるようにする。
+- [x] Dashboard と CLI に `codex:decision` を追加し、Codex 側から M5Stack に三択判断を求められるようにする。
+- [x] Dashboard が現在の hatch-pet spritesheet を preview できる `/pet/current/*` endpoint を追加する。
 - [x] Host -> Device event を validation 後に simulator へ配信する。
 - [x] `device.reply_selected`、`device.pet_interacted`、`device.heartbeat` を受信する。
 - [x] clipboard / stdin / file から返答本文を送る Codex relay を追加する。
@@ -39,7 +41,8 @@
 - [x] Core2 / GRAY firmware に pet avatar の blink / bounce / tail animation を実装する。
 - [x] 固定ヘッダーテキストを削除し、pet surface を優先表示する。
 - [x] pet surface を `M5Canvas` Sprite へ描画し、animation tick では pet surface だけを更新してちらつきを抑える。
-- [x] firmware が `display.settings_updated` で pet 表示面積と text size を `1..8`、animation FPS を `4..20` で動的に反映するようにする。
+- [x] firmware が `display.settings_updated` で pet 表示面積と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で動的に反映するようにする。
+- [x] firmware が pet render FPS とキャラ frame / bounce 切替頻度を分離し、高FPS時の小刻みな震えを抑える。
 - [x] hatch-pet package から ignored local firmware asset を生成するツールを追加する。
 - [x] firmware が local hatch-pet asset を優先表示し、未生成時は fallback avatar を使うようにする。
 

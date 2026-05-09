@@ -47,17 +47,24 @@ try {
   const index = await getText(`${baseUrl}/`);
   assert.match(index, /M5Stack Codex Pet Console/);
   assert.match(index, /side-nav/);
-  assert.match(index, /ABC 返信ワークフロー/);
+  assert.match(index, /デバッグ/);
   assert.match(index, /最近の Codex 回答/);
   assert.match(index, /M5Stack 表示プレビュー/);
-  assert.match(index, /animation FPS/);
+  assert.match(index, /render FPS/);
+  assert.match(index, /motion step/);
+  assert.match(index, /data-tooltip/);
+  assert.match(index, /section-toggle/);
+  assert.match(index, /commandModal/);
+  assert.match(index, /環境構築コマンド/);
   assert.match(index, /max="8"/);
 
   const app = await getText(`${baseUrl}/dashboard/app.js`);
-  assert.match(app, /\/codex\/choice/);
+  assert.match(app, /\/codex\/decision/);
   assert.match(app, /\/codex\/pet/);
   assert.match(app, /\/codex\/session\/latest/);
   assert.match(app, /\/codex\/session\/publish/);
+  assert.match(app, /\/pet\/current\/manifest/);
+  assert.match(app, /motionStepMs/);
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
@@ -66,10 +73,17 @@ try {
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
   assert.match(snapshot.commands.codexChoice, /codex:choice/);
+  assert.match(snapshot.commands.codexDecision, /codex:decision/);
+  assert.match(snapshot.commands.codexDecisionWait, /codex:decision:wait/);
   assert.match(snapshot.commands.codexSessions, /codex:sessions/);
   assert.match(snapshot.commands.codexHook, /codex:hook/);
   assert.match(snapshot.commands.petAsset, /pet:asset/);
   assert.match(snapshot.commands.codexDisplay, /codex:display/);
+
+  const petManifest = await getJson(`${baseUrl}/pet/current/manifest`);
+  assert.equal(typeof petManifest.ok, 'boolean');
+  assert.equal(petManifest.frameWidth, 192);
+  assert.equal(petManifest.columns, 8);
 
   const pair = await postJson(`${baseUrl}/pair`, { deviceId, pairingCode: productProfile.defaultPairingCode });
   assert.equal(pair.ok, true);
@@ -96,7 +110,8 @@ try {
     petScale: 8,
     uiTextScale: 3,
     bodyTextScale: 4,
-    animationFps: 12
+    animationFps: 12,
+    motionStepMs: 280
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
@@ -104,6 +119,7 @@ try {
   assert.equal(display.event.display.uiTextScale, 3);
   assert.equal(display.event.display.bodyTextScale, 4);
   assert.equal(display.event.display.animationFps, 12);
+  assert.equal(display.event.display.motionStepMs, 280);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -127,12 +143,24 @@ try {
   assert.equal(choice.ok, true);
   assert.equal(choice.event.type, 'prompt.choice_requested');
 
+  const decision = await postJson(`${baseUrl}/codex/decision`, {
+    deviceId,
+    question: 'Dashboard decision smoke',
+    a: '進める',
+    b: '修正する',
+    c: '保留する'
+  });
+  assert.equal(decision.ok, true);
+  assert.equal(decision.event.type, 'prompt.choice_requested');
+
   const polledDisplay = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
   assert.equal(polledDisplay.event.type, 'display.settings_updated');
   const polledPet = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
   assert.equal(polledPet.event.type, 'pet.updated');
   const polledChoice = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
   assert.equal(polledChoice.event.type, 'prompt.choice_requested');
+  const polledDecision = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
+  assert.equal(polledDecision.event.type, 'prompt.choice_requested');
 
   const reply = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
     type: 'device.reply_selected',
@@ -169,10 +197,15 @@ try {
       displaySettingsEndpoint: true,
       displaySettingsEightStepControls: true,
       displaySettingsAnimationFpsControl: true,
+      displaySettingsMotionStepControl: true,
       m5StackPreviewPanel: true,
+      m5StackPreviewCurrentPet: true,
       sideNavigation: true,
+      sectionCollapseControls: true,
+      commandModal: true,
       petEndpoint: true,
       choiceEndpoint: true,
+      decisionEndpoint: true,
       inboundReplySummary: true
     }
   }, null, 2)}\n`);

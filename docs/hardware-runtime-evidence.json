@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
@@ -18,7 +18,8 @@
       "pio run -e m5stack-core2 -t upload --upload-port COM4",
       "npm run dashboard:smoke",
       "npm run codex:sessions -- --once --phase any",
-      "npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001"
+      "npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001",
+      "npm run codex:decision:wait -- --question \"次の作業を選んでください\" --a \"進める\" --b \"修正する\" --c \"保留する\" --wait-ms 300000"
     ]
   },
   "dashboardGui": {
@@ -28,17 +29,28 @@
     "dashboardSmokePassed": true,
     "browserSmokeDesktop": "dist/dashboard-smoke.png",
     "browserSmokeMobile": "dist/dashboard-mobile-smoke.png",
+    "browserSmokeAlpha8": "dist/dashboard-alpha8-browser.png",
+    "browserSmokeConsoleErrors": 0,
     "choiceEndpoint": "/codex/choice",
+    "decisionEndpoint": "/codex/decision",
     "petEndpoint": "/codex/pet",
     "displayEndpoint": "/codex/display",
+    "currentPetManifestEndpoint": "/pet/current/manifest",
+    "currentPetSpritesheetEndpoint": "/pet/current/spritesheet.webp",
     "latestSessionEndpoint": "/codex/session/latest",
     "latestSessionPublishEndpoint": "/codex/session/publish",
     "codexSessionCommand": "codex:sessions",
     "codexHookCommand": "codex:hook",
+    "codexDecisionWaitCommand": "codex:decision:wait",
     "latestSessionAnswerPanel": true,
     "displaySettingsControls": true,
+    "motionStepControl": true,
+    "currentPetPreview": true,
+    "sectionCollapseControls": true,
+    "tooltipHints": true,
+    "setupCommandModal": true,
     "abcReplySummaryInEvents": true,
-    "evidence": "Dashboard assets, debug snapshot, choice/pet/display endpoints, latest Codex session answer display/publish endpoints, and inbound reply details passed dashboard-smoke. Desktop and mobile screenshots were captured with Playwright."
+    "evidence": "Dashboard assets, debug snapshot, decision/choice/pet/display endpoints, current pet preview endpoints, latest Codex session answer display/publish endpoints, section collapse, tooltip hints, command modal, and inbound reply details passed dashboard-smoke. Desktop and mobile screenshots were captured with Playwright."
   },
   "wifi": {
     "sourceSecretFile": "D:\\AI\\secure\\ssid.txt",
@@ -164,7 +176,10 @@
     "fallbackAvatarAvailable": true,
     "defaultAnimationFps": 12,
     "animationFpsRange": "4..20",
+    "defaultMotionStepMs": 280,
+    "motionStepRangeMs": "120..800",
     "frameIntervalMs": 83,
+    "poseSwitchSeparatedFromRenderFps": true,
     "states": [
       "idle",
       "review",
@@ -180,7 +195,7 @@
     "spriteBuffer": "M5Canvas petSprite",
     "petOnlyAnimationRedraw": true,
     "spritePush": "petSprite.pushSprite(0, 0)",
-    "flickerAvoidance": "Animation ticks set needsPetRedraw only. The pet surface is composed off-screen and pushed as one sprite so body and footer text are not redrawn every frame.",
+    "flickerAvoidance": "Animation ticks set needsPetRedraw only. The pet surface is composed off-screen and pushed as one sprite, then text is overlaid to match the Dashboard preview layout. render FPS and motion step are separated so a high render rate does not make the pet frame jitter.",
     "dashboardPreview": "M5Stack 表示プレビュー",
     "dynamicDisplaySettingsEvent": "display.settings_updated",
     "core2BuildPassed": true,
@@ -209,6 +224,7 @@
       "host_event type=prompt.choice_requested",
     "screen=Choice",
     "device.reply_selected",
+    "codex:decision:wait",
     "screen=Answer",
       "answer.completed",
       "codex session auto relay",
@@ -219,6 +235,7 @@
       "sprite-buffered pet redraw source gate",
       "display.settings_updated",
       "animationFps=12",
+      "motionStepMs=280",
       "petScale=8 fallback event queued and consumed"
     ]
   },
@@ -231,15 +248,16 @@
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
-    "Dashboard Choice/Pet real-device visual confirmation is prepared but still requires user manual check",
+    "Dashboard Decision/Pet real-device visual confirmation is prepared but still requires user manual check",
     "hatch-pet asset visual confirmation on Core2 is prepared but still requires user manual check",
     "Codex session auto relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Codex hook relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Dashboard latest Codex answer publish visual confirmation on Core2 is prepared but still requires user manual check",
-    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, text size, and animation FPS is prepared but still requires user manual check",
+    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, text size, render FPS, motion step, and text-over-pet layout is prepared but still requires user manual check",
+    "Dashboard current pet preview and physical Core2 layout match are prepared but still require user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
-    "local 8080 bridge should be kept on the current v0.1.0-alpha.7 process before final manual confirmation"
+    "local 8080 bridge should be kept on the current v0.1.0-alpha.8 process before final manual confirmation"
   ]
 }

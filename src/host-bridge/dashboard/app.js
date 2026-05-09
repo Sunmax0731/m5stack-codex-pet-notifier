@@ -2,7 +2,11 @@ const state = {
   health: null,
   events: null,
   commands: null,
-  latestSession: null
+  latestSession: null,
+  petManifest: null,
+  previewPetFrame: 0,
+  previewAnimationInterval: null,
+  previewAnimationDelay: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -26,14 +30,19 @@ const elements = {
   sessionPhase: $('#sessionPhase'),
   sessionAnswer: $('#sessionAnswer'),
   sessionUser: $('#sessionUser'),
+  petName: $('#petName'),
+  petState: $('#petState'),
+  petSprite: $('#petSprite'),
   petScale: $('#petScale'),
   uiTextScale: $('#uiTextScale'),
   bodyTextScale: $('#bodyTextScale'),
   animationFps: $('#animationFps'),
+  motionStepMs: $('#motionStepMs'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
   animationFpsValue: $('#animationFpsValue'),
+  motionStepValue: $('#motionStepValue'),
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
   previewPet: $('#previewPet'),
@@ -43,7 +52,11 @@ const elements = {
   previewUiReadout: $('#previewUiReadout'),
   previewBodyReadout: $('#previewBodyReadout'),
   previewFpsReadout: $('#previewFpsReadout'),
-  commandList: $('#commandList')
+  previewMotionReadout: $('#previewMotionReadout'),
+  petAssetName: $('#petAssetName'),
+  petAssetDescription: $('#petAssetDescription'),
+  commandList: $('#commandList'),
+  commandModal: $('#commandModal')
 };
 
 async function api(path, options = {}) {
@@ -81,6 +94,16 @@ async function refresh() {
     elements.bridgeLine.textContent = `Host Bridge error: ${error.message}`;
     elements.bridgeLine.className = 'danger';
   }
+}
+
+async function loadCurrentPetManifest() {
+  try {
+    state.petManifest = await api('/pet/current/manifest');
+  } catch (error) {
+    state.petManifest = { ok: false, reason: error.message };
+  }
+  renderPetManifest();
+  renderM5Preview();
 }
 
 function render() {
@@ -199,7 +222,8 @@ function displaySettingsPayload() {
     petScale: Number(elements.petScale.value),
     uiTextScale: Number(elements.uiTextScale.value),
     bodyTextScale: Number(elements.bodyTextScale.value),
-    animationFps: Number(elements.animationFps.value)
+    animationFps: Number(elements.animationFps.value),
+    motionStepMs: Number(elements.motionStepMs.value)
   };
 }
 
@@ -225,16 +249,26 @@ function createDisplayFallbackPetEvent(payload) {
     createdAt: new Date().toISOString(),
     pet: {
       id: 'display-settings',
-      name: 'Codex Pet',
-      state: 'idle',
-      spriteRef: 'host://display/settings'
+      name: elements.petName.value || 'Codex Pet',
+      state: elements.petState.value || 'idle',
+      spriteRef: elements.petSprite.value || 'host://display/settings'
     },
     display: {
       petScale: payload.petScale,
       uiTextScale: payload.uiTextScale,
       bodyTextScale: payload.bodyTextScale,
-      animationFps: payload.animationFps
+      animationFps: payload.animationFps,
+      motionStepMs: payload.motionStepMs
     }
+  };
+}
+
+function petPayload() {
+  return {
+    deviceId: deviceId(),
+    name: elements.petName.value || state.petManifest?.displayName || 'Codex Pet',
+    state: elements.petState.value,
+    spriteRef: elements.petSprite.value || 'host://pet/current'
   };
 }
 
@@ -243,7 +277,22 @@ function renderDisplayControls() {
   elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}/8`;
   elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
   elements.animationFpsValue.textContent = `${elements.animationFps.value} fps`;
+  elements.motionStepValue.textContent = `${elements.motionStepMs.value} ms`;
   renderM5Preview();
+}
+
+function renderPetManifest() {
+  const manifest = state.petManifest;
+  if (!manifest?.ok) {
+    elements.petAssetName.textContent = 'fallback';
+    elements.petAssetDescription.textContent = 'local hatch-pet asset が見つからないため fallback preview を表示';
+    return;
+  }
+  elements.petAssetName.textContent = manifest.displayName ?? manifest.id ?? 'current pet';
+  elements.petAssetDescription.textContent = manifest.description ?? 'local hatch-pet asset';
+  if (elements.petName.value === 'Codex Pet') {
+    elements.petName.value = manifest.displayName ?? manifest.id ?? elements.petName.value;
+  }
 }
 
 function renderM5Preview() {
@@ -254,26 +303,71 @@ function renderM5Preview() {
   const uiTextScale = Number(elements.uiTextScale.value);
   const bodyTextScale = Number(elements.bodyTextScale.value);
   const animationFps = Number(elements.animationFps.value);
+  const motionStepMs = Number(elements.motionStepMs.value);
   const mode = elements.previewMode.value;
-  const petSize = Math.round(42 + ((petScale - 1) / 7) * 196);
+  const petHeight = Math.round(42 + ((petScale - 1) / 7) * 178);
+  const manifest = state.petManifest;
+  const aspect = manifest?.ok ? manifest.frameWidth / manifest.frameHeight : 1;
+  const petWidth = Math.round(petHeight * aspect);
   const bodySize = Math.min(34, 10 + bodyTextScale * 3);
   const uiSize = Math.min(24, 9 + uiTextScale * 2);
 
   elements.m5Preview.dataset.mode = mode;
-  elements.m5Preview.style.setProperty('--pet-size', `${petSize}px`);
+  elements.m5Preview.style.setProperty('--pet-width', `${petWidth}px`);
+  elements.m5Preview.style.setProperty('--pet-height', `${petHeight}px`);
   elements.m5Preview.style.setProperty('--body-size', `${bodySize}px`);
   elements.m5Preview.style.setProperty('--ui-size', `${uiSize}px`);
-  elements.previewPet.style.setProperty('--pet-animation-duration', `${Math.round(1000 / Math.max(1, animationFps))}ms`);
   elements.previewPetReadout.textContent = `${petScale}/8`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
   elements.previewFpsReadout.textContent = `${animationFps} fps`;
+  elements.previewMotionReadout.textContent = `${motionStepMs} ms`;
+
+  if (manifest?.ok) {
+    elements.previewPet.classList.add('sprite-pet');
+    elements.previewPet.classList.remove('sprite-fallback');
+    elements.previewPet.style.backgroundImage = `url("${manifest.spritesheetUrl}")`;
+    elements.previewPet.style.backgroundSize = `${petWidth * manifest.columns}px ${petHeight * manifest.rows}px`;
+  } else {
+    elements.previewPet.classList.remove('sprite-pet');
+    elements.previewPet.classList.add('sprite-fallback');
+    elements.previewPet.style.backgroundImage = '';
+    elements.previewPet.style.backgroundSize = '';
+  }
+  renderPreviewPetFrame();
+  syncPreviewAnimationTimer();
 
   const preview = previewContent(mode, petScale);
   elements.previewBody.textContent = preview.body;
   elements.previewFooter.textContent = preview.footer;
   elements.previewBody.style.display = preview.body ? 'block' : 'none';
   elements.previewFooter.style.display = preview.footer ? 'block' : 'none';
+}
+
+function renderPreviewPetFrame() {
+  const manifest = state.petManifest;
+  if (!manifest?.ok) {
+    return;
+  }
+  const petWidth = Number.parseFloat(getComputedStyle(elements.m5Preview).getPropertyValue('--pet-width')) || 100;
+  const frameCount = Math.max(1, Number(manifest.idleFrames ?? 6));
+  const frame = state.previewPetFrame % frameCount;
+  elements.previewPet.style.backgroundPosition = `${-frame * petWidth}px 0px`;
+}
+
+function syncPreviewAnimationTimer() {
+  const delay = Math.max(Number(elements.motionStepMs.value), Math.round(1000 / Math.max(1, Number(elements.animationFps.value))));
+  if (state.previewAnimationInterval && state.previewAnimationDelay === delay) {
+    return;
+  }
+  if (state.previewAnimationInterval) {
+    clearInterval(state.previewAnimationInterval);
+  }
+  state.previewAnimationDelay = delay;
+  state.previewAnimationInterval = setInterval(() => {
+    state.previewPetFrame += 1;
+    renderPreviewPetFrame();
+  }, delay);
 }
 
 function previewContent(mode, petScale) {
@@ -298,7 +392,7 @@ function previewContent(mode, petScale) {
     };
   }
   return {
-    body: '',
+    body: petScale >= 8 ? '' : `${elements.petName.value || 'Pet'}\n${elements.petState.value}`,
     footer: petScale >= 8 ? '' : 'A poll  B pet  C idle'
   };
 }
@@ -320,6 +414,7 @@ async function submitJson(path, payload) {
   });
   elements.sendResult.textContent = JSON.stringify(result, null, 2);
   await refresh();
+  return result;
 }
 
 function wireTabs() {
@@ -329,6 +424,8 @@ function wireTabs() {
       $$('.tab-panel').forEach((item) => item.classList.remove('active'));
       tab.classList.add('active');
       $(`#${tab.dataset.tab}Form`).classList.add('active');
+      elements.previewMode.value = tab.dataset.tab === 'choice' ? 'choice' : tab.dataset.tab;
+      renderM5Preview();
     });
   });
 }
@@ -356,31 +453,14 @@ function wireForms() {
 
   $('#choiceForm').addEventListener('submit', (event) => {
     event.preventDefault();
-    submitJson('/codex/choice', {
+    submitJson('/codex/decision', {
       deviceId: deviceId(),
-      prompt: $('#choicePrompt').value,
-      choices: [
-        { id: 'yes', label: $('#choiceA').value },
-        { id: 'no', label: $('#choiceB').value },
-        { id: 'other', label: $('#choiceC').value }
-      ],
+      question: $('#choicePrompt').value,
+      a: $('#choiceA').value,
+      b: $('#choiceB').value,
+      c: $('#choiceC').value,
       timeoutSec: 300
     }).catch(showError);
-  });
-
-  $('#petForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitJson('/codex/pet', {
-      deviceId: deviceId(),
-      name: $('#petName').value,
-      state: $('#petState').value,
-      spriteRef: $('#petSprite').value
-    }).catch(showError);
-  });
-
-  $('#displayForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    publishDisplaySettings().catch(showError);
   });
 
   $('#notificationForm').addEventListener('submit', (event) => {
@@ -395,11 +475,14 @@ function wireForms() {
 }
 
 function wireActions() {
-  [elements.petScale, elements.uiTextScale, elements.bodyTextScale, elements.animationFps].forEach((control) => {
+  [elements.petScale, elements.uiTextScale, elements.bodyTextScale, elements.animationFps, elements.motionStepMs].forEach((control) => {
     control.addEventListener('input', renderDisplayControls);
   });
   [
     elements.previewMode,
+    elements.petName,
+    elements.petState,
+    elements.petSprite,
     $('#answerSummary'),
     $('#answerBody'),
     $('#choicePrompt'),
@@ -415,6 +498,8 @@ function wireActions() {
   $('#refreshButton').addEventListener('click', refresh);
   $('#clearViewButton').addEventListener('click', render);
   $('#loadCommandsButton').addEventListener('click', refresh);
+  $('#openCommandsButton').addEventListener('click', () => openModal(elements.commandModal));
+  $$('[data-close-modal]').forEach((item) => item.addEventListener('click', () => closeModal(elements.commandModal)));
   $('#loadSessionButton').addEventListener('click', loadLatestSession);
   $('#publishSessionButton').addEventListener('click', () => {
     publishLatestSession().catch(showError);
@@ -422,6 +507,31 @@ function wireActions() {
   $('#replayButton').addEventListener('click', () => {
     submitJson('/codex/replay-samples', { deviceId: deviceId() }).catch(showError);
   });
+  $('#sendPetButton').addEventListener('click', () => {
+    submitJson('/codex/pet', petPayload()).catch(showError);
+  });
+  $('#sendDisplayButton').addEventListener('click', () => {
+    publishDisplaySettings().catch(showError);
+  });
+  $$('.section-toggle').forEach((button) => {
+    button.addEventListener('click', () => toggleSection(button.dataset.target, button));
+  });
+}
+
+function toggleSection(sectionId, button) {
+  const section = $(`#${sectionId}`);
+  section.classList.toggle('collapsed');
+  button.textContent = section.classList.contains('collapsed') ? 'View' : 'Hide';
+}
+
+function openModal(modal) {
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(modal) {
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
 }
 
 function showError(error) {
@@ -434,6 +544,7 @@ wireForms();
 wireActions();
 renderDisplayControls();
 refresh();
+loadCurrentPetManifest();
 loadLatestSession();
 setInterval(refresh, 2500);
 setInterval(loadLatestSession, 5000);

@@ -46,6 +46,9 @@ constexpr uint32_t STATUS_INTERVAL_MS = 5000;
 constexpr int DEFAULT_PET_ANIMATION_FPS = 12;
 constexpr int MIN_PET_ANIMATION_FPS = 4;
 constexpr int MAX_PET_ANIMATION_FPS = 20;
+constexpr int DEFAULT_PET_MOTION_STEP_MS = 280;
+constexpr int MIN_PET_MOTION_STEP_MS = 120;
+constexpr int MAX_PET_MOTION_STEP_MS = 800;
 constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 1000 / DEFAULT_PET_ANIMATION_FPS;
 constexpr uint32_t LOOP_IDLE_DELAY_MS = 5;
 constexpr int ANSWER_CHARS_PER_PAGE = 90;
@@ -78,11 +81,13 @@ uint32_t lastHeartbeat = 0;
 uint32_t lastStatus = 0;
 uint32_t lastTouchEvent = 0;
 uint32_t lastPetFrame = 0;
+uint32_t lastPetMotionStep = 0;
 uint32_t petReactUntil = 0;
 int petDisplayScale = 2;
 int uiTextScale = 1;
 int bodyTextScale = 1;
 int petAnimationFps = DEFAULT_PET_ANIMATION_FPS;
+int petMotionStepMs = DEFAULT_PET_MOTION_STEP_MS;
 M5Canvas petSprite(&M5.Display);
 bool petSpriteReady = false;
 int petSpriteWidth = 0;
@@ -92,6 +97,8 @@ void pollHost();
 void sendPetInteraction(const char* interaction);
 int pageCount(const String& value, int charsPerPage);
 int footerTop();
+int bodyLineHeight();
+void drawScreenContentOverlay(bool includeFooter);
 
 String screenName() {
   switch (screenState) {
@@ -130,9 +137,17 @@ int clampAnimationFps(int value) {
   return max(MIN_PET_ANIMATION_FPS, min(MAX_PET_ANIMATION_FPS, value));
 }
 
+int clampMotionStepMs(int value) {
+  return max(MIN_PET_MOTION_STEP_MS, min(MAX_PET_MOTION_STEP_MS, value));
+}
+
 uint32_t petAnimationIntervalMs() {
   const uint32_t computed = 1000 / max(1, petAnimationFps);
   return computed < 50 ? 50 : computed;
+}
+
+uint32_t petMotionStepIntervalMs() {
+  return static_cast<uint32_t>(clampMotionStepMs(petMotionStepMs));
 }
 
 void applyDisplayFont(int scale = 1) {
@@ -207,8 +222,7 @@ bool petFullscreenMode() {
 }
 
 int petSurfaceHeight() {
-  const int maxHeight = max(MIN_PET_SURFACE_HEIGHT, footerTop());
-  return MIN_PET_SURFACE_HEIGHT + ((maxHeight - MIN_PET_SURFACE_HEIGHT) * (petDisplayScale - DISPLAY_SCALE_MIN)) / (DISPLAY_SCALE_MAX - DISPLAY_SCALE_MIN);
+  return max(MIN_PET_SURFACE_HEIGHT, footerTop());
 }
 
 int petPixelScale() {
@@ -249,7 +263,9 @@ int footerTop() {
 }
 
 int contentTop() {
-  return headerHeight() + 10;
+  const int uiLine = BODY_LINE_HEIGHT * uiTextScale;
+  const int overlayHeight = min(150, max(92, uiLine * 2 + bodyLineHeight() * 4 + 8));
+  return max(8, footerTop() - overlayHeight);
 }
 
 int bodyLineHeight() {
@@ -272,6 +288,7 @@ void applyDisplaySettings(JsonVariant display) {
   uiTextScale = clampDisplayScale(display["uiTextScale"] | uiTextScale);
   bodyTextScale = clampDisplayScale(display["bodyTextScale"] | bodyTextScale);
   petAnimationFps = clampAnimationFps(display["animationFps"] | petAnimationFps);
+  petMotionStepMs = clampMotionStepMs(display["motionStepMs"] | petMotionStepMs);
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
 }
 
@@ -604,6 +621,7 @@ void drawPetSurfaceSprite() {
 void drawPetSurfaceIfNeeded() {
   if (!needsRedraw && needsPetRedraw) {
     drawPetSurfaceSprite();
+    drawScreenContentOverlay(false);
   }
 }
 
@@ -644,6 +662,10 @@ void drawScreen() {
   needsRedraw = false;
   M5.Display.fillScreen(TFT_BLACK);
   drawHeader();
+  drawScreenContentOverlay(true);
+}
+
+void drawScreenContentOverlay(bool includeFooter) {
   M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);
   applyUiFont();
   const int y0 = contentTop();
@@ -653,7 +675,9 @@ void drawScreen() {
     drawLine("Pairing with Host Bridge", 8, y0, 36);
     drawLine(String(HOST_BRIDGE_HOST) + ":" + HOST_BRIDGE_PORT, 8, y0 + uiLine, 36);
     drawLine(authToken.length() ? "paired" : "waiting token", 8, y0 + uiLine * 2, 36);
-    drawFooter("A poll", "B pet", "C idle");
+    if (includeFooter) {
+      drawFooter("A poll", "B pet", "C idle");
+    }
     return;
   }
 
@@ -664,7 +688,9 @@ void drawScreen() {
     drawLine("Idle", 8, y0, 36);
     drawLine(title.length() ? title : "Waiting for Codex event", 8, y0 + uiLine, 36);
     drawLine(body.length() ? body : "Use Host Bridge replay.", 8, y0 + uiLine * 2, 36);
-    drawFooter("A prev", "B pet", "C next");
+    if (includeFooter) {
+      drawFooter("A prev", "B pet", "C next");
+    }
     return;
   }
 
@@ -674,7 +700,9 @@ void drawScreen() {
     applyBodyFont();
     const int bodyY = y0 + uiLine * 2 + 6;
     drawWrappedBlock(body, 8, bodyY, BODY_TEXT_WIDTH, bodyLineHeight(), maxBodyLinesFrom(bodyY));
-    drawFooter("A ack", "B pet", "C idle");
+    if (includeFooter) {
+      drawFooter("A ack", "B pet", "C idle");
+    }
     return;
   }
 
@@ -686,7 +714,9 @@ void drawScreen() {
     applyBodyFont();
     const int bodyY = y0 + uiLine * 2 + 6;
     drawWrappedBlock(pageText(body, answerPage, charsPerPage), 8, bodyY, BODY_TEXT_WIDTH, bodyLineHeight(), maxBodyLinesFrom(bodyY));
-    drawFooter("A up", "B idle", "C down");
+    if (includeFooter) {
+      drawFooter("A up", "B idle", "C down");
+    }
     return;
   }
 
@@ -696,13 +726,17 @@ void drawScreen() {
     for (int i = 0; i < choiceCount; ++i) {
       drawLine(String(static_cast<char>('A' + i)) + ": " + choiceLabels[i], 8, y0 + uiLine * 3 + i * 24 * uiTextScale, 42);
     }
-    drawFooter("A send", "B send", "C send");
+    if (includeFooter) {
+      drawFooter("A send", "B send", "C send");
+    }
     return;
   }
 
   drawLine("Error", 8, y0, 36);
   drawLine(lastError, 8, y0 + uiLine, 42);
-  drawFooter("A retry", "B pet", "C idle");
+  if (includeFooter) {
+    drawFooter("A retry", "B pet", "C idle");
+  }
 }
 
 bool httpPostJson(const String& path, const String& payload, String& response) {
@@ -1076,8 +1110,9 @@ void handleTouch() {
 
 void updatePetAnimation() {
   const uint32_t now = millis();
-  const uint32_t interval = petAnimationIntervalMs();
-  if (now - lastPetFrame >= interval) {
+  const uint32_t interval = max(petAnimationIntervalMs(), petMotionStepIntervalMs());
+  if (now - lastPetMotionStep >= interval) {
+    lastPetMotionStep = now;
     lastPetFrame = now;
     petFrame = (petFrame + 1) % 30;
     markPetDraw();

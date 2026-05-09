@@ -27,8 +27,11 @@
 | `POST` | `/codex/answer` | 返答本文から `answer.completed` を生成して queue する |
 | `POST` | `/codex/notification` | 通知本文から `notification.created` を生成して queue する |
 | `POST` | `/codex/choice` | 確認依頼から `prompt.choice_requested` を生成して queue する |
+| `POST` | `/codex/decision` | 正式リリース向けに Codex から M5Stack へ三択判断依頼を生成して queue する |
 | `POST` | `/codex/pet` | pet name / state / spriteRef から `pet.updated` を生成して queue する |
-| `POST` | `/codex/display` | pet 表示倍率、text size、animation FPS から `display.settings_updated` を生成して queue する |
+| `POST` | `/codex/display` | pet 表示倍率、text size、render FPS、motion step から `display.settings_updated` を生成して queue する |
+| `GET` | `/pet/current/manifest` | Dashboard preview 用に現在の local hatch-pet package の公開可能 metadata を返す |
+| `GET` | `/pet/current/spritesheet.webp` | Dashboard preview 用に現在の local hatch-pet spritesheet を返す。release asset には含めない |
 | `GET` | `/codex/session/latest` | local Codex session JSONL から最新 assistant 回答を Dashboard 表示用に返す |
 | `POST` | `/codex/session/publish` | 最新 Codex session の user / assistant やり取りを `answer.completed` として queue する |
 | `POST` | `/codex/replay-samples` | sample event 一式を queue する |
@@ -45,7 +48,7 @@
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
-| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps` |
+| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
 | `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen` |
@@ -79,6 +82,7 @@
 | file | `npm run codex:watch -- --file dist/codex-answer.txt` | 外部ツールが書いた返答ファイルを監視する |
 | session JSONL | `npm run codex:sessions -- --phase any` | 最近の Codex session の最新 user / assistant やり取りを自動送信する |
 | Codex Hooks | `npm run codex:hook -- --bridge http://127.0.0.1:8080` | Codex hook 発火時に最新 session を1回だけ送る |
+| Decision | `npm run codex:decision -- --question "..." --a "..." --b "..." --c "..."` | Codex 側から M5Stack へ三択判断を求める |
 
 `codex:sessions` は opt-in のローカルファイル監視です。Codex App の非公開 API へ接続せず、ローカル session JSONL だけを読みます。`--phase any` は進行中の commentary も送信し、`--phase final` は完了応答だけを送信します。
 `codex:hook` は hook process ごとに起動されるため、`dist/codex-session-hook-state.json` に本文を含まない署名だけを保存して重複送信を防ぎます。
@@ -94,12 +98,13 @@
 
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
-- Answer / Choice / Pet / Notification はそれぞれ `/codex/answer`、`/codex/choice`、`/codex/pet`、`/codex/notification` を使う。
-- Display は `/codex/display` を使い、pet 表示倍率、UI text size、body text size、pet animation FPS を M5Stack へ送る。
+- Answer / Decision / Notification はそれぞれ `/codex/answer`、`/codex/decision`、`/codex/notification` を使う。互換用に `/codex/choice` も残す。
+- Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、UI text size、body text size、pet render FPS、motion step を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-- command panel は `codex:sessions` を表示し、Codex 最新 session 自動送信の起動コマンドを確認できる。
-- ABC 返信ワークフローでは、Choice 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
+- 環境構築と debug command は side menu の button から modal で表示する。
+- Decision 返信ワークフローと送信結果は Debug section に統合し、Decision 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
+- 各 section は View / Hide で折りたたみできる。主要 field は focus / hover で tooltip hint を表示する。
 - `/events` は reply の `choiceId`、`requestEventId`、input、heartbeat summary などの運用確認に必要な最小情報だけを返し、回答本文を永続 evidence に残さない。
 
 ## Pet Animation
@@ -108,8 +113,9 @@
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は描画しない。
 - `display.settings_updated.display.petScale` は `1..8` を受け付け、`8` を pet を画面全体に近い最大表示とする。
 - `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1..8` を受け付け、footer と本文の text size を個別に変更できる。
-- `display.settings_updated.display.animationFps` は `4..20` を受け付け、既定 `12fps` で pet animation interval を決める。
-- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積、text size、animation FPS を確認できる。
+- `display.settings_updated.display.animationFps` は `4..20` を受け付け、既定 `12fps` で pet surface redraw の上限を決める。
+- `display.settings_updated.display.motionStepMs` は `120..800` を受け付け、既定 `280ms` でキャラの pose / frame 切替間隔を決める。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step を確認できる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - firmware は pet surface を `M5Canvas` の off-screen Sprite に描画し、`pushSprite()` で一括転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
@@ -118,7 +124,7 @@
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` を受け付ける。
-- avatar は `animationFps` から算出した interval ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
+- avatar は `max(animationFps 由来 interval, motionStepMs)` ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
 - `review`、`reacting`、`celebrate` は色または表情を変え、pet interaction 時は短時間 `reacting` として表示する。
 
 ## 保存方針

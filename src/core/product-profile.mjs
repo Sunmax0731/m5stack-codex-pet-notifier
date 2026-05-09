@@ -1,7 +1,7 @@
 export const productProfile = {
   repo: 'm5stack-codex-pet-notifier',
-  version: '0.1.0-alpha.7',
-  tag: 'v0.1.0-alpha.7',
+  version: '0.1.0-alpha.8',
+  tag: 'v0.1.0-alpha.8',
   domain: 'IoT',
   ideaNo: 18,
   platformType: 'iot-simulator-mock',
@@ -36,6 +36,7 @@ export const productProfile = {
     'docs/security-privacy-checklist.md',
     'docs/competitive-benchmark.md',
     'docs/evaluation-criteria.md',
+    'docs/formal-release-platform.md',
     'docs/traceability-matrix.md',
     'docs/qcds-evaluation.md',
     'docs/qcds-strict-metrics.json',
@@ -48,6 +49,6 @@ export const productProfile = {
     'docs/hardware-runtime-evidence.json',
     'docs/host-bridge-manual-check.md',
     'docs/codex-relay-manual-check.md',
-    'docs/releases/v0.1.0-alpha.7.md'
+    'docs/releases/v0.1.0-alpha.8.md'
   ]
 };

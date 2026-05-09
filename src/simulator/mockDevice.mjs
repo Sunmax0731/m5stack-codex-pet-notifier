@@ -17,7 +17,8 @@ export class MockM5StackDevice {
       petScale: 2,
       uiTextScale: 1,
       bodyTextScale: 1,
-      animationFps: 12
+      animationFps: 12,
+      motionStepMs: 280
     };
     this.snapshots = [];
   }

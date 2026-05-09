@@ -105,17 +105,28 @@ Hook 設定例:
 docs/codex-hooks.example.json
 ```
 
-## 6. Choice relay
+## 6. Decision relay
 
 ```powershell
-cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
+cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
 ```
 
 期待結果:
 
-- Core2 が `Choice` 画面へ遷移する。
+- Core2 が `Choice` / Decision 画面へ遷移する。
 - A/B/C の label が表示される。
 - A/B/C を押すと `/events` の inbound に `device.reply_selected` が出る。
+
+Codex 側コマンドで返信まで待つ場合:
+
+```powershell
+cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
+```
+
+期待結果:
+
+- M5Stack の A/B/C 返信後に command result の `reply.choiceId` が `continue`、`revise`、`hold` のいずれかになる。
+- timeout した場合は command が失敗し、Codex 側で未回答として扱える。
 
 ## 7. Pet relay
 
@@ -132,7 +143,7 @@ cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 ## 8. Display relay
 
 ```powershell
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280
 ```
 
 期待結果:
@@ -140,8 +151,9 @@ cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body
 - `/events` の outbound に `display.settings_updated` が出る。
 - Core2 は固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。
 - text size を `2` 以上に変更した場合は footer または本文の文字サイズが大きくなる。
-- animation FPS は `12fps` になり、固定 320ms 更新より滑らかに pet frame / bounce が更新される。
-- `20fps` へ上げても body / footer text のちらつきが増えない。
+- render FPS は `12fps` になり、描画更新上限として反映される。
+- motion step は `280ms` になり、pet frame / bounce の切替頻度として反映される。
+- `20fps` へ上げても小刻みに震えず、body / footer text のちらつきが増えない。
 
 ## 確認コマンド
 

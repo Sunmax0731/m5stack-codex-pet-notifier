@@ -8,13 +8,15 @@
 | Codex 返答表示 | `src/codex-adapter/relay.mjs`、`/codex/answer`、`answer.completed` | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Codex 最近 session 自動送信 | `src/codex-adapter/sessionWatcher.mjs`、`npm run codex:sessions`、`answer.completed` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Dashboard 最新 Codex 回答表示 | `/codex/session/latest`、`/codex/session/publish`、`src/host-bridge/dashboard/` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
+| Codex decision request | `npm run codex:decision`、`/codex/decision`、Dashboard Decision tab | `scripts/codex-relay-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`docs/formal-release-platform.md` |
 | Codex Hooks 連携 | `src/codex-adapter/hookRelay.mjs`、`docs/codex-hooks.example.json` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | 日本語返答表示 | `firmware/src/main.cpp` の `fonts::efontJA_12`、UTF-8 code point paging | `scripts/validate.mjs`、`docs/codex-relay-manual-check.md` |
 | clipboard 日本語返答表示 | `readClipboard()` の Base64 UTF-8 復元 | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | 実機 event polling | `firmware/src/main.cpp` | `docs/hardware-runtime-evidence.json` |
 | pet 更新表示 | `pet.updated` schema、`MockM5StackDevice.receive()` | `happy-path.validEvents=5` |
 | pet animation | `firmware/src/main.cpp` の `drawPetAvatar`、`DEFAULT_PET_ANIMATION_FPS`、`petAnimationFps`、`M5Canvas petSprite`、`drawPetSurfaceSprite`、`drawPetSurfaceIfNeeded` | `scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
-| pet 表示倍率 / text size / animation FPS | `display.settings_updated`、`/codex/display`、Dashboard Display tab、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` / `petAnimationFps` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
+| pet 表示倍率 / text size / render FPS / motion step | `display.settings_updated`、`/codex/display`、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` / `petAnimationFps` / `petMotionStepMs` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
+| current pet preview | `/pet/current/manifest`、`/pet/current/spritesheet.webp`、Dashboard preview sprite renderer | `scripts/dashboard-smoke.mjs`、browser screenshot |
 | hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |
 | 通知表示 | `notification.created` schema | `happy-path.finalScreen=Choice` までの遷移 |
 | 長文回答スクロール | `src/protocol/scrollModel.mjs` | `mixed-batch.scrollPages=2` |

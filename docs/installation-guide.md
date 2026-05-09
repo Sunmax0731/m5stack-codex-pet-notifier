@@ -81,7 +81,7 @@ Dashboard:
 http://127.0.0.1:8080/
 ```
 
-Dashboard では health、event log、debug command、Answer / Choice / Pet / Display / Notification 送信、ABC 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。side menu と tabs で作業領域を切り替え、`Display` tab では pet 表示面積と text size を `1..8`、animation FPS を `4..20` で実機へ送信できます。`M5Stack 表示プレビュー` では送信前に 320x240 画面の見え方を確認できます。
+Dashboard では health、event log、Answer / Decision / Notification 送信、Decision 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。side menu と tabs で作業領域を切り替え、`M5Stack 表示プレビュー` では現在の hatch-pet キャラ、pet 表示面積と text size `1..8`、render FPS `4..20`、motion step `120..800ms` を送信前に確認して実機へ送信できます。環境構築と debug command は sidebar の modal から確認します。
 
 別の PowerShell で sample event を送信します。
 
@@ -98,8 +98,10 @@ Codex の返答本文を Core2 に表示します。
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Codexの返答本文"
-cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
+cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
+cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:sessions -- --once --phase final

@@ -25,15 +25,30 @@ export async function runRelayCli(argv = process.argv.slice(2), options = {}) {
     return watchFileRelay(args, options);
   }
 
+  const bridgeUrl = args.bridge ?? args.url ?? process.env.HOST_BRIDGE_URL ?? defaultBridgeUrl;
+  const deviceId = args['device-id'] ?? args.deviceId ?? productProfile.sampleDeviceId;
+  const fetchImpl = options.fetchImpl ?? fetch;
   const event = await buildEvent(command, args, options);
   const result = await sendCodexEvent({
-    bridgeUrl: args.bridge ?? args.url ?? process.env.HOST_BRIDGE_URL ?? defaultBridgeUrl,
-    deviceId: args['device-id'] ?? args.deviceId ?? productProfile.sampleDeviceId,
+    bridgeUrl,
+    deviceId,
     event,
-    fetchImpl: options.fetchImpl ?? fetch
+    fetchImpl
   });
-  options.stdout?.write?.(`${JSON.stringify(result, null, 2)}\n`);
-  return result;
+  const finalResult = command === 'decision' && args.wait
+    ? {
+        ...result,
+        reply: await waitForDeviceReply({
+          bridgeUrl,
+          requestEventId: event.eventId,
+          timeoutMs: Number(args['wait-ms'] ?? args.waitMs ?? Number(args.timeout ?? args.timeoutSec ?? 300) * 1000),
+          intervalMs: Number(args['poll-ms'] ?? args.pollMs ?? 1000),
+          fetchImpl
+        })
+      }
+    : result;
+  options.stdout?.write?.(`${JSON.stringify(finalResult, null, 2)}\n`);
+  return finalResult;
 }
 
 export async function sendCodexEvent({ bridgeUrl = defaultBridgeUrl, deviceId = productProfile.sampleDeviceId, event, fetchImpl = fetch }) {
@@ -54,6 +69,52 @@ export async function sendCodexEvent({ bridgeUrl = defaultBridgeUrl, deviceId = 
     bridge: bridgeUrl,
     result: body
   };
+}
+
+export async function waitForDeviceReply({
+  bridgeUrl = defaultBridgeUrl,
+  requestEventId,
+  timeoutMs = 300000,
+  intervalMs = 1000,
+  fetchImpl = fetch
+}) {
+  if (!requestEventId) {
+    throw new Error('requestEventId is required to wait for a device reply');
+  }
+  const timeout = Math.max(1000, Number(timeoutMs) || 300000);
+  const interval = Math.max(50, Number(intervalMs) || 1000);
+  const deadline = Date.now() + timeout;
+  while (Date.now() <= deadline) {
+    const events = await fetchEvents({ bridgeUrl, fetchImpl });
+    const reply = [...(events.inbound ?? [])].reverse().find((entry) => (
+      entry.type === 'device.reply_selected' && entry.details?.requestEventId === requestEventId
+    ));
+    if (reply) {
+      return {
+        ok: true,
+        deviceId: reply.deviceId,
+        eventId: reply.eventId,
+        requestEventId,
+        choiceId: reply.details.choiceId,
+        input: reply.details.input ?? null
+      };
+    }
+    await sleep(interval);
+  }
+  throw new Error(`timed out waiting for device.reply_selected for ${requestEventId}`);
+}
+
+async function fetchEvents({ bridgeUrl, fetchImpl }) {
+  const response = await fetchImpl(new URL('/events', bridgeUrl));
+  const body = await response.json();
+  if (!response.ok || body.ok !== true) {
+    throw new Error(`event fetch failed: ${JSON.stringify(body)}`);
+  }
+  return body;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function buildEvent(command, args, options = {}) {
@@ -106,6 +167,20 @@ export async function buildEvent(command, args, options = {}) {
       uiTextScale: args['ui-text-scale'] ?? args.uiTextScale,
       bodyTextScale: args['body-text-scale'] ?? args.bodyTextScale,
       animationFps: args['animation-fps'] ?? args.animationFps,
+      motionStepMs: args['motion-step-ms'] ?? args.motionStepMs,
+      eventId: args['event-id'] ?? args.eventId
+    });
+  }
+  if (command === 'decision') {
+    return createChoiceEvent({
+      prompt: args.prompt ?? args.question ?? await resolveText(args, options),
+      choices: args.choices ?? [
+        `continue:${args.a ?? '進める'}`,
+        `revise:${args.b ?? '修正する'}`,
+        `hold:${args.c ?? '保留する'}`
+      ].join(','),
+      timeoutSec: args.timeout ?? args.timeoutSec ?? 300,
+      threadId: args.thread ?? args.threadId ?? 'thread-codex-decision',
       eventId: args['event-id'] ?? args.eventId
     });
   }
@@ -233,7 +308,8 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
-    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12',
+    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280',
+    '  decision --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" [--wait]',
     '  watch --file .\\dist\\codex-answer.txt',
     '',
     'Common options: --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',

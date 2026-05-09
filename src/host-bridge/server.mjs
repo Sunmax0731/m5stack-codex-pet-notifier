@@ -221,8 +221,21 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
       if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/dashboard')) {
         return sendStaticFile(response, path.join(dashboardRoot, 'index.html'));
       }
+      if (request.method === 'GET' && url.pathname === '/favicon.ico') {
+        return sendNoContent(response);
+      }
       if (request.method === 'GET' && url.pathname.startsWith('/dashboard/')) {
         return sendDashboardAsset(response, url.pathname);
+      }
+      if (request.method === 'GET' && url.pathname === '/pet/current/manifest') {
+        return sendJson(response, 200, buildCurrentPetManifest());
+      }
+      if (request.method === 'GET' && url.pathname === '/pet/current/spritesheet.webp') {
+        const filePath = resolveCurrentPetSpritesheetPath();
+        if (!filePath) {
+          return sendJson(response, 404, { ok: false, reason: 'pet-asset-not-found' });
+        }
+        return sendStaticFile(response, filePath);
       }
       if (request.method === 'GET' && url.pathname === '/debug/snapshot') {
         return sendJson(response, 200, {
@@ -262,6 +275,20 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
       if (request.method === 'POST' && url.pathname === '/codex/choice') {
         const body = await readJsonBody(request);
         const event = createChoiceEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/decision') {
+        const body = await readJsonBody(request);
+        const event = createChoiceEvent({
+          prompt: body.prompt ?? body.question,
+          choices: body.choices ?? [
+            { id: 'continue', label: body.a ?? '進める' },
+            { id: 'revise', label: body.b ?? '修正する' },
+            { id: 'hold', label: body.c ?? '保留する' }
+          ],
+          timeoutSec: body.timeoutSec ?? 300
+        });
         const result = bridge.publish(event, { deviceId: body.deviceId });
         return sendJson(response, 200, { ...result, event });
       }
@@ -354,6 +381,13 @@ function sendJson(response, statusCode, payload) {
   response.end(body);
 }
 
+function sendNoContent(response) {
+  response.writeHead(204, {
+    'cache-control': 'no-store'
+  });
+  response.end();
+}
+
 function sendDashboardAsset(response, requestPath) {
   const relativePath = decodeURIComponent(requestPath.replace(/^\/dashboard\//, ''));
   const filePath = path.resolve(dashboardRoot, relativePath);
@@ -373,7 +407,8 @@ function sendStaticFile(response, filePath) {
     '.html': 'text/html; charset=utf-8',
     '.css': 'text/css; charset=utf-8',
     '.js': 'application/javascript; charset=utf-8',
-    '.json': 'application/json; charset=utf-8'
+    '.json': 'application/json; charset=utf-8',
+    '.webp': 'image/webp'
   };
   const body = fs.readFileSync(filePath);
   response.writeHead(200, {
@@ -382,6 +417,76 @@ function sendStaticFile(response, filePath) {
     'cache-control': 'no-store'
   });
   response.end(body);
+}
+
+function buildCurrentPetManifest() {
+  const petDir = resolveCurrentPetDirectory();
+  const petJsonPath = path.join(petDir, 'pet.json');
+  if (!fs.existsSync(petJsonPath)) {
+    return {
+      ok: false,
+      reason: 'pet-json-not-found',
+      displayName: 'Fallback Pet',
+      frameWidth: 192,
+      frameHeight: 208,
+      columns: 8,
+      rows: 9,
+      idleFrames: 4
+    };
+  }
+  const pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  const spritesheetPath = path.resolve(petDir, pet.spritesheetPath ?? 'spritesheet.webp');
+  const headerInfo = readLocalPetHeaderInfo();
+  return {
+    ok: fs.existsSync(spritesheetPath),
+    id: pet.id ?? path.basename(petDir),
+    displayName: pet.displayName ?? pet.id ?? path.basename(petDir),
+    description: pet.description ?? '',
+    spritesheetUrl: '/pet/current/spritesheet.webp',
+    frameWidth: 192,
+    frameHeight: 208,
+    columns: 8,
+    rows: 9,
+    idleFrames: headerInfo.frameCount ?? 6,
+    firmwareFrameWidth: headerInfo.frameWidth ?? null,
+    firmwareFrameHeight: headerInfo.frameHeight ?? null
+  };
+}
+
+function resolveCurrentPetSpritesheetPath() {
+  const petDir = resolveCurrentPetDirectory();
+  const petJsonPath = path.join(petDir, 'pet.json');
+  if (!fs.existsSync(petJsonPath)) {
+    return null;
+  }
+  const pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  const spritesheetPath = path.resolve(petDir, pet.spritesheetPath ?? 'spritesheet.webp');
+  const rootPrefix = `${path.resolve(petDir)}${path.sep}`;
+  if (!spritesheetPath.startsWith(rootPrefix) || !fs.existsSync(spritesheetPath)) {
+    return null;
+  }
+  return spritesheetPath;
+}
+
+function resolveCurrentPetDirectory() {
+  if (process.env.M5STACK_PET_PACKAGE) {
+    return path.resolve(process.env.M5STACK_PET_PACKAGE);
+  }
+  const home = process.env.USERPROFILE ?? process.env.HOME ?? '';
+  return path.join(home, '.codex', 'pets', 'Mira');
+}
+
+function readLocalPetHeaderInfo() {
+  const headerPath = path.join(repoRoot, 'firmware', 'include', 'pet_asset.local.h');
+  if (!fs.existsSync(headerPath)) {
+    return {};
+  }
+  const source = fs.readFileSync(headerPath, 'utf8');
+  return {
+    frameCount: Number(source.match(/PET_ASSET_FRAME_COUNT\s*=\s*(\d+)/)?.[1] ?? 0) || undefined,
+    frameWidth: Number(source.match(/PET_ASSET_FRAME_WIDTH\s*=\s*(\d+)/)?.[1] ?? 0) || undefined,
+    frameHeight: Number(source.match(/PET_ASSET_FRAME_HEIGHT\s*=\s*(\d+)/)?.[1] ?? 0) || undefined
+  };
 }
 
 function summarizeDeviceEvent(event) {
@@ -444,7 +549,9 @@ function buildDebugCommands() {
     codexSessions: 'cmd.exe /d /s /c npm run codex:sessions -- --phase any',
     codexHook: 'cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
-    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12',
+    codexDecision: 'cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"',
+    codexDecisionWait: 'cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000',
+    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
   };

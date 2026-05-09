@@ -15,10 +15,10 @@
 | Codex session smoke | local session JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として queue / poll できることを検証する | `scripts/codex-session-smoke.mjs`、`dist/codex-session-smoke-result.json` |
 | Codex hook relay smoke | hook process 相当の one-shot relay が state file で重複を抑止することを検証する | `scripts/codex-session-smoke.mjs` |
 | clipboard UTF-8 relay smoke | 日本語 clipboard 本文を `answer.completed` として壊さず送れることを検証する | `scripts/codex-relay-smoke.mjs` |
-| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/choice`、`/codex/pet`、`/codex/display`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
+| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/decision`、`/codex/pet`、`/codex/display`、`/pet/current/manifest`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary、collapse、command modal を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
-| firmware pet animation source gate | firmware が pet avatar animation、runtime animation FPS 設定、`M5Canvas` Sprite buffer、pet surface だけの redraw path を含むことを検証する | `scripts/validate.mjs` |
+| firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet surface redraw path を含むことを検証する | `scripts/validate.mjs` |
 | hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、非空 frame 自動検出を検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
@@ -46,8 +46,10 @@
 | Core2 Codex session auto relay | `codex:sessions` で最近の Codex session の最新やり取りを自動送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Core2 Codex hook relay | Codex Hooks または `codex:hook` 手動実行で最新やり取りを送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
+| Dashboard current pet preview | Dashboard preview が `/pet/current/manifest` の現在の hatch-pet spritesheet を表示する | `docs/gui-tools-manual-check.md` |
+| Codex decision request | `codex:decision` または Dashboard Decision tab から三択を送り、Core2 A/B/C 返信を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
-| Core2 display settings | Dashboard から pet display area と text size を `1..8`、animation FPS を `4..20` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化、animation 速度変化を目視する | `docs/gui-tools-manual-check.md` |
+| Core2 display settings | Dashboard から pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化、pose 切替頻度変化を目視する | `docs/gui-tools-manual-check.md` |
 | Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/8`、`4/8`、`8/8` で低解像度 base frame のブロック拡大にならないことを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 sprite-buffered pet redraw | pet animation 中に Answer / Choice / footer text が毎フレーム塗り直されず、pet surface の更新だけでちらつきが抑えられることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
