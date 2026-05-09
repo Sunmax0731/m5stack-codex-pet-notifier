@@ -57,8 +57,16 @@
       "host_event type=notification.created",
       "host_event type=answer.completed",
       "host_event type=prompt.choice_requested",
-      "screen=Choice"
+      "screen=Choice",
+      "device.reply_selected"
     ]
+  },
+  "manualPhysicalInput": {
+    "core2ButtonA": {
+      "status": "passed",
+      "observedInboundEvent": "device.reply_selected",
+      "evidence": "Host Bridge /events inbound contained device.reply_selected after user pressed A on the M5Stack Choice screen"
+    }
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",

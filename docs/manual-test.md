@@ -20,7 +20,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、sa
 | C2-04 | `notification.created` を送る | 通知画面へ遷移し、serial log に host event が出る | 実施済み。serial で host event を確認 |
 | C2-05 | `answer.completed` で長文を送る | Answer 画面へ遷移する | 実施済み。serial で host event を確認 |
 | C2-06 | `prompt.choice_requested` を送る | Choice 画面へ遷移する | 実施済み。serial で `screen=Choice` を確認 |
-| C2-07 | A/B/C 相当入力を押す | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
+| C2-07 | A/B/C 相当入力を押す | `device.reply_selected` が Host Bridge inbound に出る | 実施済み。A 押下後に `device.reply_selected` を確認 |
 | C2-08 | pet 領域を tap する | pet 反応が表示され、`device.pet_interacted` が送られる | ユーザー手動 |
 | C2-09 | Answer 画面で swipe する | 本文ページが上下に移動する | ユーザー手動 |
 
