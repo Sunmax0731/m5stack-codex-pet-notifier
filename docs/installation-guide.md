@@ -35,6 +35,13 @@ cmd.exe /d /s /c npm run demo
 
 closed alpha では動作 firmware を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi、Host Bridge pairing、Codex relay answer 表示を確認対象にします。
 
+Codex Pets の素材を表示する場合は、build / upload の前に hatch-pet package から local asset header を生成します。`firmware/include/pet_asset.local.h` は `.gitignore` 対象で、個人 pet sprite を release asset に含めません。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
+```
+
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
@@ -44,6 +51,7 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
 PlatformIO を追加導入する場合は `C:\` ではなく `E:\DevEnv` 以下へ配置してください。
 
 この環境では PlatformIO を `E:\DevEnv\PlatformIO\venv` に配置します。
+Core2 / GRAY build は同じ `.pio` を使うため、並列ではなく順番に実行します。
 
 ```powershell
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4

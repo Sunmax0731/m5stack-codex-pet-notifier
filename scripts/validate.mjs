@@ -46,6 +46,7 @@ for (const required of [
   'scripts/bridge-smoke.mjs',
   'scripts/codex-relay-smoke.mjs',
   'scripts/dashboard-smoke.mjs',
+  'tools/generate-pet-firmware-asset.py',
   'src/host-bridge/dashboard/index.html',
   'src/host-bridge/dashboard/app.js',
   'src/host-bridge/dashboard/styles.css',
@@ -63,6 +64,11 @@ assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page tex
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
 assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
+assert(firmwareSource.includes('pet_asset.local.h'), 'firmware must support an ignored local hatch-pet asset header');
+assert(firmwareSource.includes('HAS_LOCAL_PET_ASSET'), 'firmware must gate local hatch-pet assets behind a compile-time flag');
+
+const gitignoreSource = fs.readFileSync('.gitignore', 'utf8');
+assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pet asset header must be ignored');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');

@@ -7,3 +7,4 @@ node_modules/
 *.log
 firmware/include/wifi_config.local.h
 firmware/include/host_config.local.h
+firmware/include/pet_asset.local.h

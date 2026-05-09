@@ -117,6 +117,13 @@
   },
   "petAnimation": {
     "firmwareAvatar": "drawPetAvatar",
+    "assetMode": "hatch-pet-local-header",
+    "assetSourcePackage": "Mira",
+    "localHeader": "firmware/include/pet_asset.local.h",
+    "localHeaderIgnoredByGit": true,
+    "assetFrames": 4,
+    "assetFrameSize": "36x40",
+    "fallbackAvatarAvailable": true,
     "frameIntervalMs": 320,
     "states": [
       "idle",
@@ -127,8 +134,11 @@
     "core2BuildPassed": true,
     "grayBuildPassed": true,
     "core2UploadPassed": true,
+    "core2BuildWithLocalAssetPassed": true,
+    "grayBuildWithLocalAssetPassed": true,
+    "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with pet avatar blink, bounce, tail animation and state color changes was built and uploaded to COM4. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
@@ -149,7 +159,7 @@
     "screen=Answer",
       "answer.completed",
       "dashboard:smoke",
-      "pet animation firmware upload"
+      "hatch-pet asset firmware upload"
     ]
   },
   "manualPhysicalInput": {
@@ -162,6 +172,7 @@
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
     "Dashboard Choice/Pet real-device visual confirmation is prepared but still requires user manual check",
+    "hatch-pet asset visual confirmation on Core2 is prepared but still requires user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file input",

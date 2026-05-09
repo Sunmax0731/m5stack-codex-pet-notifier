@@ -11,6 +11,7 @@
 | Device Profile | Core2 / GRAY の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
 | Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
 | Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
+| Pet asset generator | hatch-pet package の `spritesheet.webp` を firmware 用 RGB565 local header へ変換する | `tools/generate-pet-firmware-asset.py` |
 | Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson、日本語フォント表示による device loop | `firmware/` |
 
 ## LAN Host Bridge API
@@ -89,8 +90,11 @@
 ## Pet Animation
 
 - firmware は header に pet avatar を描画する。
+- `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
+- `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
+- local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` を受け付ける。
-- avatar は `PET_ANIMATION_INTERVAL_MS` ごとに blink、bounce、tail の frame を更新する。
+- avatar は `PET_ANIMATION_INTERVAL_MS` ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
 - `review`、`reacting`、`celebrate` は色または表情を変え、pet interaction 時は短時間 `reacting` として表示する。
 
 ## 保存方針

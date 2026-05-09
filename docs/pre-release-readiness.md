@@ -15,7 +15,7 @@
 - Core2 Codex answer 表示。
 - Core2 日本語 answer 表示の firmware 対応。
 - Dashboard Choice / Pet endpoint と GUI smoke。
-- Core2 pet avatar animation の firmware 対応と upload。
+- Core2 hatch-pet asset animation の firmware 対応と upload。
 - Runtime gate。
 - Security/privacy checklist。
 - QCDS metrics。
@@ -27,7 +27,7 @@
 - 長時間 Wi-Fi 再接続。
 - Core2 touch / swipe の物理 UX。
 - Core2 日本語 glyph のユーザー目視確認。
-- Dashboard からの Choice / Pet animation 実機目視確認。
+- Dashboard からの Choice / hatch-pet animation 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 

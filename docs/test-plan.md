@@ -17,6 +17,7 @@
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | firmware pet animation source gate | firmware が pet avatar animation を含むことを検証する | `scripts/validate.mjs` |
+| hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header を検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
 ## Representative Suite
@@ -40,7 +41,7 @@
 | Core2 Codex answer | `npm run codex:answer` で Core2 に Answer を表示する | `docs/hardware-runtime-evidence.json` |
 | Core2 Japanese answer | 日本語本文の `answer.completed` を送り、文字化けがないことを目視する | `docs/hardware-runtime-evidence.json` |
 | Core2 Clipboard Japanese answer | clipboard 経由の日本語本文を送り、文字化けがないことを目視する | `docs/hardware-runtime-evidence.json` |
-| Core2 pet animation | header の pet avatar が state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
+| Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

@@ -19,7 +19,8 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
-- `firmware/src/main.cpp` で pet avatar を描画し、state に応じた色、blink、bounce、tail animation を M5Stack 上で表示する。
+- `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換する。
+- `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。state に応じた色、frame animation、bounce を M5Stack 上で表示する。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
@@ -36,6 +37,7 @@ cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
+cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
@@ -43,6 +45,13 @@ cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。
 
 ## Firmware
+
+Codex Pets の素材を使う場合は、firmware build / upload の前に local asset header を生成します。生成先の `firmware/include/pet_asset.local.h` は `.gitignore` 対象で、release asset に含めません。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
+```
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware

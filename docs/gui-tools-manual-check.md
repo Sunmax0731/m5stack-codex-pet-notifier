@@ -7,7 +7,16 @@
 - Core2 に最新 firmware を upload 済みである。
 - PC と Core2 が同一 2.4GHz LAN に接続されている。
 - `firmware/include/wifi_config.local.h` の SSID、password、Host Bridge host は Git に含めない。
+- `%USERPROFILE%\.codex\pets\Mira` などの hatch-pet package から `firmware/include/pet_asset.local.h` を生成してから build / upload する。
 - 8080 番に古い Host Bridge が残っている場合は、その PowerShell を閉じてから起動する。閉じられない場合は、確認用に別 port を使う。
+
+Pet asset 生成:
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
+```
 
 ## 1. Host Bridge と Dashboard を起動する
 
@@ -50,15 +59,17 @@ Dashboard の `Answer` tab で summary と body を入力し、`Answer を送信
 - Core2 が `Answer page 1/1` または複数 page の Answer 画面へ遷移する。
 - 日本語本文が文字化けしない。
 
-## 4. Pet 更新とアニメーション
+## 4. Pet 更新と hatch-pet アニメーション
 
 Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして `Pet 更新を送信` を押します。
 
 期待結果:
 
 - outbound に `pet.updated` が出る。
-- Core2 ヘッダーの pet avatar の色または表情が変わる。
-- avatar が静止画ではなく、blink / bounce / tail の周期変化を続ける。
+- Core2 ヘッダーの pet avatar が `Mira` などの hatch-pet asset として表示される。
+- Core2 ヘッダーの pet avatar の背景色または表示状態が変わる。
+- avatar が静止画ではなく、frame / bounce の周期変化を続ける。
+- `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
 
 ## 5. ABC 返信ワークフロー
 

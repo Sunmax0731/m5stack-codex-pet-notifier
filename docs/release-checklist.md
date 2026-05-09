@@ -8,6 +8,7 @@
 - [x] Codex App 内部 API へ未確認依存していない。
 - [x] pet sprite と会話本文の privacy 境界が整理されている。
 - [x] Dashboard GUI と手動確認手順がある。
+- [x] hatch-pet asset 生成手順と ignored local header 方針がある。
 
 ## Implementation
 
@@ -22,6 +23,7 @@
 - [x] 日本語回答を UTF-8 境界で page / line 分割し、日本語フォントで表示できる。
 - [x] ボタン返信が Host Bridge へ届く。
 - [x] firmware が pet avatar animation を表示できる。
+- [x] firmware が hatch-pet local asset を優先表示し、未生成時は fallback avatar を表示できる。
 - [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
 
 ## Verification
@@ -33,8 +35,9 @@
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
 - [x] Core2 実機で build / upload / Wi-Fi / pairing / Codex relay answer を確認する。
+- [x] Core2 実機 firmware に hatch-pet local asset を含めて upload する。
 - [ ] Core2 実機で日本語 glyph を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Dashboard Choice / Pet animation を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Dashboard Choice / hatch-pet animation を目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
@@ -44,5 +47,6 @@
 - [x] firmware build / upload 証跡を redacted JSON と manual docs に残す。
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。
+- [x] `firmware/include/pet_asset.local.h` を release asset へ含めない。
 - [x] local Wi-Fi config を含む firmware binary は release asset にしない。
 - [x] GitHub prerelease 作成後に `docs/release-evidence.json` を実 URL で更新する。

@@ -65,6 +65,9 @@
     "core2CodexRelayAnswer": true,
     "core2JapaneseAnswerSourceGate": true,
     "firmwarePetAnimationSourceGate": true,
+    "hatchPetLocalAssetGenerator": true,
+    "firmwareLocalPetAssetGate": true,
+    "core2HatchPetAssetUpload": true,
     "core2PetAnimationFirmwareUpload": true,
     "clipboardUtf8RelaySmoke": true,
     "core2ClipboardJapaneseVisualConfirmation": true,
@@ -79,7 +82,7 @@
   "notes": [
     "GRAY実機、長時間運用、実Codex App内部API連携は対象外のためS+は付けない。",
     "Core2 file watch はユーザー提供画像で Answer page 1/1、summary、本文、footer 表示を確認済み。",
-    "Dashboard GUI、/codex/choice、/codex/pet、pet animation firmware upload を追加済み。実機GUI連携の最終目視は手動確認対象。",
+    "Dashboard GUI、/codex/choice、/codex/pet、hatch-pet asset firmware upload を追加済み。実機GUI連携の最終目視は手動確認対象。",
     "A-未満の観点はない。"
   ]
 }

@@ -16,6 +16,7 @@
     "codex:notification": "node src/codex-adapter/relay.mjs notification",
     "codex:pet": "node src/codex-adapter/relay.mjs pet",
     "codex:watch": "node src/codex-adapter/relay.mjs watch",
+    "pet:asset": "python tools/generate-pet-firmware-asset.py",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
     "closed-alpha:guard": "node tools/closed-alpha-guard.mjs",
     "demo": "node src/cli/index.mjs demo"

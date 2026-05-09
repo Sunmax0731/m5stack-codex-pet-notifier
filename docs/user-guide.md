@@ -22,10 +22,22 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - `Pet` tab から pet name / state / spriteRef を更新し、M5Stack の avatar 表示を確認する。
 - `debug JSON` で redacted snapshot と導入コマンドを確認する。
 
+## Pet Asset
+
+`%USERPROFILE%\.codex\pets` の hatch-pet package を使う場合は、firmware build / upload 前に local asset header を生成します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
+```
+
+`firmware/include/pet_asset.local.h` は local file です。Git、release asset、docs ZIP には含めません。
+
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
-- header の pet avatar は state に応じて色と表情が変わり、blink / bounce / tail animation を行う。
+- header の pet avatar は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。
+- header の pet avatar は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
 - Answer 画面では swipe または footer touch で本文ページを移動する。
 - Answer 画面は日本語本文に対応し、Codex relay から送った日本語の summary / body を表示する。
 - Choice 画面では下部 touch button または choice row tap を A/B/C として扱う。

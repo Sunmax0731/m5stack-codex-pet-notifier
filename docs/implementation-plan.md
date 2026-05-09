@@ -33,10 +33,13 @@
 - [x] Core2 実機 firmware flash、Wi-Fi、pairing、sample event poll を確認する。
 - [x] Core2 touch choice、footer touch、answer swipe の firmware 分岐を実装する。
 - [x] Core2 / GRAY firmware に pet avatar の blink / bounce / tail animation を実装する。
+- [x] hatch-pet package から ignored local firmware asset を生成するツールを追加する。
+- [x] firmware が local hatch-pet asset を優先表示し、未生成時は fallback avatar を使うようにする。
 
 ## Phase 4: Release Prep
 
 - [x] README、導入手順、manual test、security/privacy、release checklist を更新する。
+- [x] hatch-pet asset 生成と privacy 境界を docs に反映する。
 - [x] `docs/qcds-strict-metrics.json` と release notes を作る。
 - [x] docs ZIP を `npm test` で生成する。
 - [ ] GitHub prerelease 作成後、release evidence を実 URL で更新する。

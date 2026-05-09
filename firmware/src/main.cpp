@@ -2,11 +2,19 @@
 #include <HTTPClient.h>
 #include <M5Unified.h>
 #include <WiFi.h>
+#include <pgmspace.h>
 
 #if __has_include("wifi_config.local.h")
 #include "wifi_config.local.h"
 #else
 #include "wifi_config.example.h"
+#endif
+
+#if __has_include("pet_asset.local.h")
+#include "pet_asset.local.h"
+#define HAS_LOCAL_PET_ASSET 1
+#else
+#define HAS_LOCAL_PET_ASSET 0
 #endif
 
 struct DeviceProfile {
@@ -254,7 +262,24 @@ uint16_t petAccentColor() {
   return TFT_SKYBLUE;
 }
 
-void drawPetAvatar(int x, int y) {
+void drawLocalPetAsset(int x, int y) {
+#if HAS_LOCAL_PET_ASSET
+  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
+  for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
+    for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
+      const uint16_t color = pgm_read_word(&PET_ASSET_FRAMES[frameIndex][row * PET_ASSET_FRAME_WIDTH + col]);
+      if (color != PET_ASSET_TRANSPARENT) {
+        M5.Display.drawPixel(x + col, y + row, color);
+      }
+    }
+  }
+#else
+  (void)x;
+  (void)y;
+#endif
+}
+
+void drawVectorPetAvatar(int x, int y) {
   const int bounce = (petFrame % 4 == 1) ? -2 : ((petFrame % 4 == 3) ? 1 : 0);
   const bool blink = petFrame % 10 == 0;
   const String state = renderedPetState();
@@ -287,6 +312,17 @@ void drawPetAvatar(int x, int y) {
     M5.Display.drawPixel(x + 27, bodyY + 26, TFT_BLACK);
     M5.Display.drawPixel(x + 28, bodyY + 26, TFT_BLACK);
   }
+}
+
+void drawPetAvatar(int x, int y) {
+#if HAS_LOCAL_PET_ASSET
+  const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
+  M5.Display.fillRoundRect(x + 6, y + 7, 46, 46, 10, petAccentColor());
+  M5.Display.drawRoundRect(x + 6, y + 7, 46, 46, 10, TFT_WHITE);
+  drawLocalPetAsset(x + 11, y + 10 + bounce);
+#else
+  drawVectorPetAvatar(x, y);
+#endif
 }
 
 String pageText(const String& value, int page, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
@@ -757,6 +793,14 @@ void updatePetAnimation() {
     markDraw();
   }
 }
+
+void applyLocalPetAssetName() {
+#if HAS_LOCAL_PET_ASSET
+  if (petName == "Codex Pet") {
+    petName = PET_ASSET_NAME;
+  }
+#endif
+}
 }
 
 void setup() {
@@ -765,6 +809,7 @@ void setup() {
   M5.begin(cfg);
   M5.Display.setRotation(1);
   M5.Display.fillScreen(TFT_BLACK);
+  applyLocalPetAssetName();
   connectWifi();
   if (WiFi.status() == WL_CONNECTED) {
     if (!pairDevice()) {
