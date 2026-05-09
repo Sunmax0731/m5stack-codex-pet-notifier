@@ -2,6 +2,7 @@ import {
   moodFromState,
   rgbaCss,
   rgbaFromControls,
+  rgbaLabel,
   rgbaOverBlackCss,
   updateRgbaVisual
 } from './display-utils.js';

@@ -289,7 +289,9 @@ assert(dashboardAppSource.includes('compareDisplaySettings'), 'Dashboard must co
 assert(dashboardAppSource.includes('displayTargetDeviceIds'), 'Dashboard must use paired device heartbeats for display sync when the debug device field is stale');
 assert(dashboardAppSource.includes('scheduleAutoDisplaySync'), 'Dashboard must debounce and auto-send display setting changes');
 assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
+assert(dashboardAppSource.includes('rgbaLabel,'), 'Dashboard must import the RGBA label helper used by renderDisplayControls');
 assert(dashboardDisplayUtilsSource.includes('export function rgbaFromControls'), 'Dashboard RGBA handling must live in the display utility module');
+assert(dashboardDisplayUtilsSource.includes('export function rgbaLabel'), 'Dashboard display utility module must export the RGBA label helper');
 assert(dashboardDisplayUtilsSource.includes('export function moodFromState'), 'Dashboard mood fallback handling must live in the display utility module');
 assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
