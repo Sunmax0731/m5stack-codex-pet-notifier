@@ -70,6 +70,7 @@ assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must anim
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 assert(firmwareSource.includes('petDisplayScale = 2'), 'firmware must default to a 2x pet display scale');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
+assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
 assert(firmwareSource.includes('pet_asset.local.h'), 'firmware must support an ignored local hatch-pet asset header');
 assert(firmwareSource.includes('HAS_LOCAL_PET_ASSET'), 'firmware must gate local hatch-pet assets behind a compile-time flag');
@@ -107,6 +108,7 @@ assert(dashboardIndexSource.includes('body text scale'), 'Dashboard must expose 
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
+assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

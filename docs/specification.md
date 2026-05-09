@@ -96,6 +96,7 @@
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Choice / Pet / Notification はそれぞれ `/codex/answer`、`/codex/choice`、`/codex/pet`、`/codex/notification` を使う。
 - Display は `/codex/display` を使い、pet 表示倍率、UI text size、body text size を M5Stack へ送る。
+- 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
 - command panel は `codex:sessions` を表示し、Codex 最新 session 自動送信の起動コマンドを確認できる。
 - ABC 返信ワークフローでは、Choice 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
@@ -107,6 +108,7 @@
 - pet avatar は既定で幅2倍・高さ2倍に拡大し、従来比4倍の表示面積を使う。
 - `display.settings_updated.display.petScale` は `1` または `2` を受け付け、Dashboard から動的に変更できる。
 - `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1` または `2` を受け付け、header / footer と本文の text size を個別に変更できる。
+- firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。

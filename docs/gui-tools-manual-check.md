@@ -86,6 +86,7 @@ Dashboard の `Display` tab を開き、次を送信します。
 
 - Dashboard の send result が `ok=true`。
 - outbound に `display.settings_updated` が出る。
+- 古い Host Bridge process が残っている場合は fallback として `pet.updated` が出る。この場合も Core2 の display 設定が変われば合格とする。
 - Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示される。
 - `UI text scale` を変更すると header / footer の文字サイズが変わる。
 - `body text scale` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。

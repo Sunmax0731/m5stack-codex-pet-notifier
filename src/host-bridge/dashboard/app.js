@@ -189,6 +189,40 @@ function displaySettingsPayload() {
   };
 }
 
+async function publishDisplaySettings() {
+  const payload = displaySettingsPayload();
+  try {
+    return await submitJson('/codex/display', payload);
+  } catch (error) {
+    if (!String(error.message).includes('not-found')) {
+      throw error;
+    }
+    return submitJson('/codex/event', {
+      deviceId: payload.deviceId,
+      event: createDisplayFallbackPetEvent(payload)
+    });
+  }
+}
+
+function createDisplayFallbackPetEvent(payload) {
+  return {
+    type: 'pet.updated',
+    eventId: `evt-display-fallback-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    pet: {
+      id: 'display-settings',
+      name: 'Codex Pet',
+      state: 'idle',
+      spriteRef: 'host://display/settings'
+    },
+    display: {
+      petScale: payload.petScale,
+      uiTextScale: payload.uiTextScale,
+      bodyTextScale: payload.bodyTextScale
+    }
+  };
+}
+
 function renderDisplayControls() {
   elements.petScaleValue.textContent = `${elements.petScale.value}x`;
   elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}x`;
@@ -261,7 +295,7 @@ function wireForms() {
 
   $('#displayForm').addEventListener('submit', (event) => {
     event.preventDefault();
-    submitJson('/codex/display', displaySettingsPayload()).catch(showError);
+    publishDisplaySettings().catch(showError);
   });
 
   $('#notificationForm').addEventListener('submit', (event) => {

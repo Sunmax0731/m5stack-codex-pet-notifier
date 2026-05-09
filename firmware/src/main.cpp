@@ -78,6 +78,7 @@ int bodyTextScale = 1;
 
 void pollHost();
 void sendPetInteraction(const char* interaction);
+int pageCount(const String& value, int charsPerPage);
 
 String screenName() {
   switch (screenState) {
@@ -170,6 +171,16 @@ int maxBodyLinesFrom(int y) {
 
 int answerCharsPerPage() {
   return max(36, ANSWER_CHARS_PER_PAGE / bodyTextScale);
+}
+
+void applyDisplaySettings(JsonVariant display) {
+  if (display.isNull()) {
+    return;
+  }
+  petDisplayScale = clampDisplayScale(display["petScale"] | petDisplayScale);
+  uiTextScale = clampDisplayScale(display["uiTextScale"] | uiTextScale);
+  bodyTextScale = clampDisplayScale(display["bodyTextScale"] | bodyTextScale);
+  answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
 }
 
 int utf8CharBytes(const String& value, int index) {
@@ -673,6 +684,7 @@ void handleHostEvent(JsonVariant event) {
     petState = String(event["pet"]["state"] | "idle");
     title = "Pet updated";
     body = String(event["pet"]["spriteRef"] | "fallback");
+    applyDisplaySettings(event["display"]);
     screenState = SCREEN_IDLE;
   } else if (type == "notification.created") {
     title = String(event["title"] | "Notification");
@@ -699,10 +711,7 @@ void handleHostEvent(JsonVariant event) {
     }
     screenState = SCREEN_CHOICE;
   } else if (type == "display.settings_updated") {
-    petDisplayScale = clampDisplayScale(event["display"]["petScale"] | petDisplayScale);
-    uiTextScale = clampDisplayScale(event["display"]["uiTextScale"] | uiTextScale);
-    bodyTextScale = clampDisplayScale(event["display"]["bodyTextScale"] | bodyTextScale);
-    answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
+    applyDisplaySettings(event["display"]);
   } else {
     lastError = String("unknown event: ") + type;
     screenState = SCREEN_ERROR;

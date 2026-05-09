@@ -53,7 +53,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-10 | `Display` tab で pet display scale、UI text scale、body text scale を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-10 | `Display` tab で pet display scale、UI text scale、body text scale を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
 
 ## 記録項目
 
