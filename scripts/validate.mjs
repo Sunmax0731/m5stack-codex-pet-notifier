@@ -45,6 +45,10 @@ for (const required of [
   'src/simulator/mockDevice.mjs',
   'scripts/bridge-smoke.mjs',
   'scripts/codex-relay-smoke.mjs',
+  'scripts/dashboard-smoke.mjs',
+  'src/host-bridge/dashboard/index.html',
+  'src/host-bridge/dashboard/app.js',
+  'src/host-bridge/dashboard/styles.css',
   'firmware/src/main.cpp',
   'firmware/platformio.ini',
   'samples/representative-suite.json',
@@ -57,10 +61,17 @@ const firmwareSource = fs.readFileSync('firmware/src/main.cpp', 'utf8');
 assert(firmwareSource.includes('fonts::efontJA_12'), 'firmware must set a Japanese-capable M5GFX font');
 assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page text on UTF-8 codepoint boundaries');
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
+assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
+assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
 assert(relaySource.includes("Buffer.from(result.stdout.trim(), 'base64').toString('utf8')"), 'clipboard relay must restore UTF-8 from Base64');
+
+const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
+assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');
+assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must expose a pet update endpoint');
+assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

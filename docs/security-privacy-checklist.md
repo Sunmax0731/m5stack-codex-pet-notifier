@@ -10,6 +10,7 @@
 | device に本文を永続保存しない | Pass | `sample-telemetry.json`、`persistentMessageBodies=false` |
 | 個人 pet sprite を release asset に含めない | Pass | sample は `host://` 参照のみ |
 | Codex App 内部 API に固定依存しない | Pass | Codex relay は clipboard / stdin / file を source にし、非公開 API scraping を行わない |
+| Dashboard が秘密情報を永続化しない | Pass | `/debug/snapshot` と `/events` は token、SSID、host IP、回答本文を release evidence として保存しない |
 | relay 入力を release asset に含めない | Pass | `codex-relay-manual-check.md` は手順のみ。実会話本文は保存しない |
 | 実機 Wi-Fi の安全設定確認 | Partial pass | SSID / password は ignored local header のみ。公開証跡は redacted |
 

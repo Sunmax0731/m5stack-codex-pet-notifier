@@ -15,7 +15,7 @@
         "name": { "type": "string", "minLength": 1 },
         "state": {
           "type": "string",
-          "enum": ["idle", "waiting", "running", "failed", "review"]
+          "enum": ["idle", "waiting", "running", "failed", "review", "reacting", "celebrate"]
         },
         "spriteRef": { "type": "string", "minLength": 1 },
         "fallbackState": { "type": "string" }

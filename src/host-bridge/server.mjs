@@ -3,11 +3,17 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createAnswerEvent, createNotificationEvent } from '../codex-adapter/eventFactory.mjs';
+import {
+  createAnswerEvent,
+  createChoiceEvent,
+  createNotificationEvent,
+  createPetEvent
+} from '../codex-adapter/eventFactory.mjs';
 import { productProfile } from '../core/product-profile.mjs';
 import { loadSchemas, validateEvent } from '../protocol/validator.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+const dashboardRoot = path.join(repoRoot, 'src', 'host-bridge', 'dashboard');
 const hostToDeviceTypes = new Set([
   'pet.updated',
   'notification.created',
@@ -160,6 +166,20 @@ export class LanHostBridge {
     };
   }
 
+  safeEvents() {
+    return {
+      ok: true,
+      outbound: this.outboundLog,
+      inbound: this.inboundLog.map((entry) => ({
+        deviceId: entry.deviceId,
+        type: entry.type,
+        eventId: entry.eventId,
+        details: summarizeDeviceEvent(entry.event)
+      })),
+      security: this.securityLog
+    };
+  }
+
   ensureDevice(deviceId) {
     if (!this.devices.has(deviceId)) {
       this.devices.set(deviceId, {
@@ -194,6 +214,20 @@ export function createBridgeHttpServer(bridge = new LanHostBridge()) {
       if (request.method === 'GET' && url.pathname === '/health') {
         return sendJson(response, 200, { ok: true, ...bridge.summary() });
       }
+      if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/dashboard')) {
+        return sendStaticFile(response, path.join(dashboardRoot, 'index.html'));
+      }
+      if (request.method === 'GET' && url.pathname.startsWith('/dashboard/')) {
+        return sendDashboardAsset(response, url.pathname);
+      }
+      if (request.method === 'GET' && url.pathname === '/debug/snapshot') {
+        return sendJson(response, 200, {
+          ok: true,
+          health: bridge.summary(),
+          events: bridge.safeEvents(),
+          commands: buildDebugCommands()
+        });
+      }
       if (request.method === 'POST' && url.pathname === '/pair') {
         const body = await readJsonBody(request);
         return sendJson(response, 200, bridge.pair(body.deviceId, body.pairingCode));
@@ -221,21 +255,24 @@ export function createBridgeHttpServer(bridge = new LanHostBridge()) {
         const result = bridge.publish(event, { deviceId: body.deviceId });
         return sendJson(response, 200, { ...result, event });
       }
+      if (request.method === 'POST' && url.pathname === '/codex/choice') {
+        const body = await readJsonBody(request);
+        const event = createChoiceEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/pet') {
+        const body = await readJsonBody(request);
+        const event = createPetEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
+      }
       if (request.method === 'POST' && url.pathname === '/codex/replay-samples') {
         const body = await readJsonBody(request);
         return sendJson(response, 200, bridge.replaySamples(body));
       }
       if (request.method === 'GET' && url.pathname === '/events') {
-        return sendJson(response, 200, {
-          ok: true,
-          outbound: bridge.outboundLog,
-          inbound: bridge.inboundLog.map((entry) => ({
-            deviceId: entry.deviceId,
-            type: entry.type,
-            eventId: entry.eventId
-          })),
-          security: bridge.securityLog
-        });
+        return sendJson(response, 200, bridge.safeEvents());
       }
       sendJson(response, 404, { ok: false, reason: 'not-found' });
     } catch (error) {
@@ -279,6 +316,74 @@ function sendJson(response, statusCode, payload) {
     'content-length': Buffer.byteLength(body)
   });
   response.end(body);
+}
+
+function sendDashboardAsset(response, requestPath) {
+  const relativePath = decodeURIComponent(requestPath.replace(/^\/dashboard\//, ''));
+  const filePath = path.resolve(dashboardRoot, relativePath);
+  const rootPrefix = `${dashboardRoot}${path.sep}`;
+  if (filePath !== dashboardRoot && !filePath.startsWith(rootPrefix)) {
+    return sendJson(response, 403, { ok: false, reason: 'forbidden' });
+  }
+  return sendStaticFile(response, filePath);
+}
+
+function sendStaticFile(response, filePath) {
+  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+    return sendJson(response, 404, { ok: false, reason: 'not-found' });
+  }
+  const extension = path.extname(filePath).toLowerCase();
+  const contentTypes = {
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.js': 'application/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8'
+  };
+  const body = fs.readFileSync(filePath);
+  response.writeHead(200, {
+    'content-type': contentTypes[extension] ?? 'application/octet-stream',
+    'content-length': body.length,
+    'cache-control': 'no-store'
+  });
+  response.end(body);
+}
+
+function summarizeDeviceEvent(event) {
+  if (!event || typeof event !== 'object') {
+    return {};
+  }
+  if (event.type === 'device.reply_selected') {
+    return {
+      requestEventId: event.requestEventId,
+      choiceId: event.choiceId,
+      input: event.input ?? null
+    };
+  }
+  if (event.type === 'device.pet_interacted') {
+    return {
+      petId: event.petId,
+      interaction: event.interaction
+    };
+  }
+  if (event.type === 'device.heartbeat') {
+    return {
+      battery: event.battery ?? null,
+      wifiRssi: event.wifiRssi ?? null,
+      screen: event.screen ?? null
+    };
+  }
+  return {};
+}
+
+function buildDebugCommands() {
+  return {
+    bridgeStart: 'cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080',
+    core2Upload: 'E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4',
+    codexAnswer: 'cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"',
+    codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
+    codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
+    codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
+  };
 }
 
 function readJsonBody(request) {

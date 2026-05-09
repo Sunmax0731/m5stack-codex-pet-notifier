@@ -12,6 +12,8 @@
 - [x] PC 上で起動する LAN Host Bridge server を作る。
 - [x] `/pair`、`/device/poll`、`/device/event`、`/codex/event`、`/codex/replay-samples`、`/health`、`/events` を実装する。
 - [x] `/codex/answer` と `/codex/notification` を実装する。
+- [x] `/codex/choice` と `/codex/pet` を実装し、GUI と CLI から送れるようにする。
+- [x] Host Bridge 同梱 Dashboard で状態確認、event 送信、ABC 返信確認、debug command 参照を実装する。
 - [x] Host -> Device event を validation 後に simulator へ配信する。
 - [x] `device.reply_selected`、`device.pet_interacted`、`device.heartbeat` を受信する。
 - [x] clipboard / stdin / file から返答本文を送る Codex relay を追加する。
@@ -30,6 +32,7 @@
 - [x] Core2 / GRAY の firmware build を確認する。
 - [x] Core2 実機 firmware flash、Wi-Fi、pairing、sample event poll を確認する。
 - [x] Core2 touch choice、footer touch、answer swipe の firmware 分岐を実装する。
+- [x] Core2 / GRAY firmware に pet avatar の blink / bounce / tail animation を実装する。
 
 ## Phase 4: Release Prep
 

@@ -14,6 +14,7 @@ export const productProfile = {
     'deviceAdapter',
     'hostAdapter',
     'lanHostBridge',
+    'dashboardGui',
     'codexRelay',
     'securityPrivacy'
   ],
@@ -28,6 +29,7 @@ export const productProfile = {
     'docs/implementation-plan.md',
     'docs/test-plan.md',
     'docs/manual-test.md',
+    'docs/gui-tools-manual-check.md',
     'docs/installation-guide.md',
     'docs/user-guide.md',
     'docs/release-checklist.md',

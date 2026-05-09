@@ -8,12 +8,24 @@
 4. Idle 画面で pet、接続状態、未読件数を確認する。
 5. Codex relay で通知や回答を送り、M5Stack 画面で内容を確認する。
 6. Choice 画面では A/B/C に対応する選択肢を押して返信する。
+7. PC の Dashboard で event log と inbound reply を確認する。
 
 Host Bridge の closed alpha endpoint は LAN 内限定です。公開ネットワークやポート開放した環境では起動しません。
+
+## Dashboard
+
+Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
+
+- 状態確認で paired device、outbound、inbound、security rejection を見る。
+- `Answer` tab から Codex の返答本文を M5Stack へ送る。
+- `Choice` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound で確認する。
+- `Pet` tab から pet name / state / spriteRef を更新し、M5Stack の avatar 表示を確認する。
+- `debug JSON` で redacted snapshot と導入コマンドを確認する。
 
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
+- header の pet avatar は state に応じて色と表情が変わり、blink / bounce / tail animation を行う。
 - Answer 画面では swipe または footer touch で本文ページを移動する。
 - Answer 画面は日本語本文に対応し、Codex relay から送った日本語の summary / body を表示する。
 - Choice 画面では下部 touch button または choice row tap を A/B/C として扱う。

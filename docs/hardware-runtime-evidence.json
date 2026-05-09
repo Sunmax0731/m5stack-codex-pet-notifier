@@ -1,7 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
   "version": "0.1.0-alpha.5",
-  "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer",
+  "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
     "serialPort": "COM4",
@@ -15,8 +15,21 @@
     "commands": [
       "pio run -e m5stack-core2",
       "pio run -e m5stack-gray",
-      "pio run -e m5stack-core2 -t upload --upload-port COM4"
+      "pio run -e m5stack-core2 -t upload --upload-port COM4",
+      "npm run dashboard:smoke"
     ]
+  },
+  "dashboardGui": {
+    "servedBy": "src/host-bridge/server.mjs",
+    "dashboardPath": "/",
+    "debugSnapshotPath": "/debug/snapshot",
+    "dashboardSmokePassed": true,
+    "browserSmokeDesktop": "dist/dashboard-smoke.png",
+    "browserSmokeMobile": "dist/dashboard-mobile-smoke.png",
+    "choiceEndpoint": "/codex/choice",
+    "petEndpoint": "/codex/pet",
+    "abcReplySummaryInEvents": true,
+    "evidence": "Dashboard assets, debug snapshot, choice/pet endpoints, and inbound reply details passed dashboard-smoke. Desktop and mobile screenshots were captured with Playwright."
   },
   "wifi": {
     "sourceSecretFile": "D:\\AI\\secure\\ssid.txt",
@@ -102,6 +115,21 @@
     "core2VisualConfirmationByUser": true,
     "evidence": "Firmware source and build now use a Japanese-capable font and UTF-8 codepoint paging. Japanese answer.completed events were queued and polled by Core2. User confirmed the clipboard Japanese answer rendered without mojibake on the physical screen."
   },
+  "petAnimation": {
+    "firmwareAvatar": "drawPetAvatar",
+    "frameIntervalMs": 320,
+    "states": [
+      "idle",
+      "review",
+      "reacting",
+      "celebrate"
+    ],
+    "core2BuildPassed": true,
+    "grayBuildPassed": true,
+    "core2UploadPassed": true,
+    "manualVisualConfirmation": "pending-user-check",
+    "evidence": "Core2 firmware with pet avatar blink, bounce, tail animation and state color changes was built and uploaded to COM4. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
+  },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
     "redaction": [
@@ -116,10 +144,12 @@
       "host_event type=notification.created",
       "host_event type=answer.completed",
       "host_event type=prompt.choice_requested",
-      "screen=Choice",
-      "device.reply_selected",
-      "screen=Answer",
-      "answer.completed"
+    "screen=Choice",
+    "device.reply_selected",
+    "screen=Answer",
+      "answer.completed",
+      "dashboard:smoke",
+      "pet animation firmware upload"
     ]
   },
   "manualPhysicalInput": {
@@ -131,6 +161,7 @@
   },
   "remainingRisks": [
     "Core2 touch and swipe physical interaction not exercised",
+    "Dashboard Choice/Pet real-device visual confirmation is prepared but still requires user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file input",

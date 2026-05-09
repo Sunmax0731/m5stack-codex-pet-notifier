@@ -66,6 +66,29 @@ cmd.exe /d /s /c npm run codex:watch -- --file dist\codex-answer.txt --once
 - Core2 が `Answer` 画面へ遷移し、summary と file 内容が表示される。
 - footer が `A up`、`B idle`、`C down` になる。
 
+## 5. Choice relay
+
+```powershell
+cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
+```
+
+期待結果:
+
+- Core2 が `Choice` 画面へ遷移する。
+- A/B/C の label が表示される。
+- A/B/C を押すと `/events` の inbound に `device.reply_selected` が出る。
+
+## 6. Pet relay
+
+```powershell
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
+```
+
+期待結果:
+
+- Core2 header の pet avatar が state に応じて色または表情を変える。
+- pet avatar が blink / bounce / tail animation を継続する。
+
 ## 確認コマンド
 
 ```powershell

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>M5Stack Codex Pet Console</title>
+    <link rel="stylesheet" href="/dashboard/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>M5Stack Codex Pet Console</h1>
+          <p id="bridgeLine">Host Bridge 状態を読み込み中</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="refreshButton" type="button">更新</button>
+          <a class="button secondary" href="/debug/snapshot" target="_blank" rel="noreferrer">debug JSON</a>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="panel status-panel" aria-labelledby="statusHeading">
+          <div class="panel-header">
+            <h2 id="statusHeading">状態確認</h2>
+            <span id="lastUpdated" class="muted">未更新</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <span class="metric-label">paired</span>
+              <strong id="pairedCount">0</strong>
+            </div>
+            <div class="metric">
+              <span class="metric-label">outbound</span>
+              <strong id="outboundCount">0</strong>
+            </div>
+            <div class="metric">
+              <span class="metric-label">inbound</span>
+              <strong id="inboundCount">0</strong>
+            </div>
+            <div class="metric">
+              <span class="metric-label">security</span>
+              <strong id="securityCount">0</strong>
+            </div>
+          </div>
+          <div id="deviceList" class="device-list"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="eventHeading">
+          <div class="panel-header">
+            <h2 id="eventHeading">Codex から M5Stack へ送る</h2>
+            <span class="muted">deviceId は必要に応じて変更</span>
+          </div>
+          <label class="field">
+            <span>deviceId</span>
+            <input id="deviceId" value="m5stack-sample-001" autocomplete="off">
+          </label>
+          <div class="tabbar" role="tablist" aria-label="event sender">
+            <button class="tab active" type="button" data-tab="answer">Answer</button>
+            <button class="tab" type="button" data-tab="choice">Choice</button>
+            <button class="tab" type="button" data-tab="pet">Pet</button>
+            <button class="tab" type="button" data-tab="notification">Notify</button>
+          </div>
+
+          <form id="answerForm" class="tab-panel active">
+            <label class="field">
+              <span>summary</span>
+              <input id="answerSummary" value="Codex GUI answer">
+            </label>
+            <label class="field">
+              <span>body</span>
+              <textarea id="answerBody" rows="5">Codex の回答本文を M5Stack の Answer 画面へ送ります。</textarea>
+            </label>
+            <button type="submit">Answer を送信</button>
+          </form>
+
+          <form id="choiceForm" class="tab-panel">
+            <label class="field">
+              <span>prompt</span>
+              <textarea id="choicePrompt" rows="3">次の作業を M5Stack から選択してください。</textarea>
+            </label>
+            <div class="choice-grid">
+              <label class="field">
+                <span>A</span>
+                <input id="choiceA" value="進める">
+              </label>
+              <label class="field">
+                <span>B</span>
+                <input id="choiceB" value="止める">
+              </label>
+              <label class="field">
+                <span>C</span>
+                <input id="choiceC" value="別案">
+              </label>
+            </div>
+            <button type="submit">Choice を送信</button>
+          </form>
+
+          <form id="petForm" class="tab-panel">
+            <div class="choice-grid">
+              <label class="field">
+                <span>name</span>
+                <input id="petName" value="Codex Pet">
+              </label>
+              <label class="field">
+                <span>state</span>
+                <select id="petState">
+                  <option value="idle">idle</option>
+                  <option value="review">review</option>
+                  <option value="reacting">reacting</option>
+                  <option value="celebrate">celebrate</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span>spriteRef</span>
+              <input id="petSprite" value="host://pet/codex-default">
+            </label>
+            <button type="submit">Pet 更新を送信</button>
+          </form>
+
+          <form id="notificationForm" class="tab-panel">
+            <div class="choice-grid">
+              <label class="field">
+                <span>title</span>
+                <input id="notificationTitle" value="Codex notification">
+              </label>
+              <label class="field">
+                <span>severity</span>
+                <select id="notificationSeverity">
+                  <option value="info">info</option>
+                  <option value="warning">warning</option>
+                  <option value="error">error</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span>body</span>
+              <textarea id="notificationBody" rows="4">確認が必要な通知です。</textarea>
+            </label>
+            <button type="submit">Notification を送信</button>
+          </form>
+          <pre id="sendResult" class="result" aria-live="polite"></pre>
+        </section>
+
+        <section class="panel" aria-labelledby="workflowHeading">
+          <div class="panel-header">
+            <h2 id="workflowHeading">ABC 返信ワークフロー</h2>
+            <button id="replayButton" type="button" class="secondary">sample replay</button>
+          </div>
+          <ol class="workflow-list">
+            <li>Choice を送信する。</li>
+            <li>M5Stack の A/B/C を押す。</li>
+            <li>inbound に `device.reply_selected` が出る。</li>
+          </ol>
+          <div id="latestReply" class="reply-box">まだ返信はありません。</div>
+        </section>
+
+        <section class="panel event-log" aria-labelledby="logHeading">
+          <div class="panel-header">
+            <h2 id="logHeading">イベントログ</h2>
+            <button id="clearViewButton" type="button" class="secondary">表示を再描画</button>
+          </div>
+          <div class="log-columns">
+            <div>
+              <h3>outbound</h3>
+              <ul id="outboundLog" class="log-list"></ul>
+            </div>
+            <div>
+              <h3>inbound</h3>
+              <ul id="inboundLog" class="log-list"></ul>
+            </div>
+            <div>
+              <h3>security</h3>
+              <ul id="securityLog" class="log-list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel command-panel" aria-labelledby="commandHeading">
+          <div class="panel-header">
+            <h2 id="commandHeading">環境構築とデバッグコマンド</h2>
+            <button id="loadCommandsButton" type="button" class="secondary">再読込</button>
+          </div>
+          <div id="commandList" class="command-list"></div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/dashboard/app.js"></script>
+  </body>
+</html>

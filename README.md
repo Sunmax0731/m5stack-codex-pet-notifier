@@ -15,9 +15,11 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
+- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Choice / Pet / Notification 送信、ABC 返信確認を GUI から扱う。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
+- `firmware/src/main.cpp` で pet avatar を描画し、state に応じた色、blink、bounce、tail animation を M5Stack 上で表示する。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
@@ -28,12 +30,17 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm test
 cmd.exe /d /s /c npm run bridge:smoke
+cmd.exe /d /s /c npm run dashboard:smoke
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
+cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
+
+Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。
 
 ## Firmware
 
@@ -60,6 +67,7 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - [architecture.md](docs/architecture.md)
 - [test-plan.md](docs/test-plan.md)
 - [manual-test.md](docs/manual-test.md)
+- [gui-tools-manual-check.md](docs/gui-tools-manual-check.md)
 - [host-bridge-manual-check.md](docs/host-bridge-manual-check.md)
 - [codex-relay-manual-check.md](docs/codex-relay-manual-check.md)
 - [installation-guide.md](docs/installation-guide.md)

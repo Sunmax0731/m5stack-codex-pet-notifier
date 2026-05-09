@@ -28,10 +28,23 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-12 | `codex:answer` で日本語本文を送る | Core2 の Answer 画面で日本語が文字化けせず表示される | 準備済み。ユーザー目視 |
 | C2-13 | 日本語本文を clipboard に入れ、`codex:clipboard` を実行する | Core2 の Answer 画面で clipboard 日本語本文が文字化けせず表示される | 実施済み。ユーザー目視で文字化けなし |
 | C2-14 | `codex:watch --once` で UTF-8 file 内容を送る | Core2 が `Answer` 画面へ遷移し、summary と file 内容を表示する | 実施済み。ユーザー提供画像で `Answer page 1/1`、summary、file 内容、`A up / B idle / C down` footer を確認 |
+| C2-15 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 header の pet avatar が色 / 表情を変え、blink / bounce / tail animation を継続する | 準備済み。ユーザー手動 |
+| C2-16 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
 今回の手動テスト対象は Core2 です。GRAY firmware build は自動確認しますが、GRAY 実機 flash / button / IMU は今回対象外です。
+
+## Dashboard GUI
+
+| No | 手順 | 期待結果 | 結果 |
+| --- | --- | --- | --- |
+| GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
+| GUI-02 | `debug JSON` を開く | `/debug/snapshot` に health、redacted events、debug commands が出る | `dashboard:smoke` 済み |
+| GUI-03 | Dashboard の Answer tab から本文を送る | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
+| GUI-04 | Dashboard の Pet tab から `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションする | ユーザー手動 |
+| GUI-05 | Dashboard の Choice tab から A/B/C を送り、Core2 で A/B/C を押す | inbound に `device.reply_selected`、workflow panel に choiceId / input が出る | ユーザー手動 |
+| GUI-06 | `sample replay` を押す | sample events が outbound に追加され、Core2 が poll する | ユーザー手動 |
 
 ## 記録項目
 
@@ -49,6 +62,12 @@ cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ```
 
+Dashboard:
+
+```text
+http://127.0.0.1:8080/
+```
+
 別ターミナル:
 
 ```powershell
@@ -60,6 +79,8 @@ Codex relay:
 
 ```powershell
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
+cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 ```
 
@@ -86,5 +107,6 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。
 - Clipboard Japanese evidence: `codex:clipboard` で日本語本文を送信し、Core2 の Answer 表示が文字化けしていないことをユーザー目視で確認済み。
 - File watch evidence: `codex:watch --file dist\codex-answer.txt --once` で `Codex file watch answer` を送信し、Core2 の `Answer page 1/1` に summary、本文、`A up / B idle / C down` footer が表示されたことをユーザー提供画像で確認済み。
+- Dashboard evidence: `dashboard:smoke`、desktop / mobile browser screenshot、Core2 firmware upload を実施済み。GUI と実機連携の最終目視は `docs/gui-tools-manual-check.md` に従って実施する。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
 - 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。

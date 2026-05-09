@@ -35,6 +35,7 @@ constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t POLL_INTERVAL_MS = 1200;
 constexpr uint32_t HEARTBEAT_INTERVAL_MS = 10000;
 constexpr uint32_t STATUS_INTERVAL_MS = 5000;
+constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 320;
 constexpr int ANSWER_CHARS_PER_PAGE = 90;
 constexpr int BODY_TEXT_WIDTH = 304;
 constexpr int BODY_LINE_HEIGHT = 18;
@@ -54,10 +55,13 @@ int unreadCount = 0;
 int answerPage = 0;
 String lastError = "";
 bool needsRedraw = true;
+uint8_t petFrame = 0;
 uint32_t lastPoll = 0;
 uint32_t lastHeartbeat = 0;
 uint32_t lastStatus = 0;
 uint32_t lastTouchEvent = 0;
+uint32_t lastPetFrame = 0;
+uint32_t petReactUntil = 0;
 
 void pollHost();
 void sendPetInteraction(const char* interaction);
@@ -229,6 +233,62 @@ void drawWrappedBlock(const String& value, int x, int y, int maxWidth, int lineH
   }
 }
 
+String renderedPetState() {
+  if (petReactUntil && millis() < petReactUntil) {
+    return "reacting";
+  }
+  return petState;
+}
+
+uint16_t petAccentColor() {
+  const String state = renderedPetState();
+  if (state == "review") {
+    return TFT_ORANGE;
+  }
+  if (state == "reacting") {
+    return TFT_CYAN;
+  }
+  if (state == "celebrate") {
+    return TFT_GREEN;
+  }
+  return TFT_SKYBLUE;
+}
+
+void drawPetAvatar(int x, int y) {
+  const int bounce = (petFrame % 4 == 1) ? -2 : ((petFrame % 4 == 3) ? 1 : 0);
+  const bool blink = petFrame % 10 == 0;
+  const String state = renderedPetState();
+  const uint16_t accent = petAccentColor();
+  const uint16_t shadow = TFT_DARKGREY;
+  const int bodyY = y + 10 + bounce;
+
+  M5.Display.fillEllipse(x + 26, y + 45, 22, 4, shadow);
+  M5.Display.fillTriangle(x + 9, bodyY + 4, x + 16, bodyY - 8, x + 22, bodyY + 7, accent);
+  M5.Display.fillTriangle(x + 31, bodyY + 7, x + 39, bodyY - 8, x + 45, bodyY + 6, accent);
+  M5.Display.fillRoundRect(x + 6, bodyY + 4, 42, 32, 12, accent);
+  M5.Display.drawRoundRect(x + 6, bodyY + 4, 42, 32, 12, TFT_WHITE);
+
+  const int tail = petFrame % 6 < 3 ? 0 : 3;
+  M5.Display.fillCircle(x + 50 + tail, bodyY + 23, 4, accent);
+
+  if (blink) {
+    M5.Display.drawFastHLine(x + 18, bodyY + 18, 6, TFT_BLACK);
+    M5.Display.drawFastHLine(x + 32, bodyY + 18, 6, TFT_BLACK);
+  } else {
+    M5.Display.fillCircle(x + 21, bodyY + 18, 3, TFT_BLACK);
+    M5.Display.fillCircle(x + 35, bodyY + 18, 3, TFT_BLACK);
+  }
+
+  if (state == "reacting" || state == "celebrate") {
+    M5.Display.drawArc(x + 28, bodyY + 23, 8, 5, 15, 165, TFT_BLACK);
+  } else if (state == "review") {
+    M5.Display.drawFastHLine(x + 24, bodyY + 26, 10, TFT_BLACK);
+  } else {
+    M5.Display.drawPixel(x + 27, bodyY + 26, TFT_BLACK);
+    M5.Display.drawPixel(x + 28, bodyY + 26, TFT_BLACK);
+  }
+}
+
 String pageText(const String& value, int page, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
   int start = page * charsPerPage;
   if (start >= utf8CodepointCount(value)) {
@@ -246,10 +306,11 @@ void drawHeader() {
   M5.Display.fillRect(0, 0, 320, 58, TFT_DARKGREY);
   M5.Display.setTextColor(TFT_WHITE, TFT_DARKGREY);
   applyDisplayFont();
-  drawLine(petName, 8, 8, 20);
-  drawLine(String("state: ") + petState + " / " + profile.name, 8, 34, 38);
-  M5.Display.drawString((WiFi.status() == WL_CONNECTED ? "LAN" : "NO LAN"), 258, 8);
-  M5.Display.drawString((String("U:") + unreadCount).c_str(), 258, 34);
+  drawLinePx(petName, 8, 8, 190);
+  drawLinePx(String("state: ") + renderedPetState() + " / " + profile.name, 8, 34, 190);
+  drawPetAvatar(205, 4);
+  drawLinePx((WiFi.status() == WL_CONNECTED ? "LAN" : "NO LAN"), 272, 8, 46);
+  drawLinePx(String("U:") + unreadCount, 272, 34, 46);
 }
 
 void drawFooter(const char* a, const char* b, const char* c) {
@@ -481,6 +542,7 @@ void sendPetInteraction(const char* interaction) {
   doc["interaction"] = interaction;
   sendDeviceEvent(doc);
   petState = "reacting";
+  petReactUntil = millis() + 2500;
   markDraw();
 }
 
@@ -682,6 +744,19 @@ void handleTouch() {
     }
   }
 }
+
+void updatePetAnimation() {
+  if (millis() - lastPetFrame >= PET_ANIMATION_INTERVAL_MS) {
+    lastPetFrame = millis();
+    petFrame = (petFrame + 1) % 30;
+    markDraw();
+  }
+  if (petReactUntil && millis() > petReactUntil && petState == "reacting") {
+    petReactUntil = 0;
+    petState = "idle";
+    markDraw();
+  }
+}
 }
 
 void setup() {
@@ -703,6 +778,7 @@ void loop() {
   M5.update();
   handleButtons();
   handleTouch();
+  updatePetAnimation();
 
   if (millis() - lastStatus > STATUS_INTERVAL_MS) {
     lastStatus = millis();

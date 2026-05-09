@@ -18,6 +18,7 @@ cmd.exe /d /s /c npm test
 期待結果:
 
 - `platform runtime gate passed for m5stack-codex-pet-notifier`
+- `dashboard smoke passed`
 - `validated m5stack-codex-pet-notifier`
 - `closed alpha guard passed for m5stack-codex-pet-notifier`
 - `dist/validation-result.json` と `dist/m5stack-codex-pet-notifier-docs.zip` が生成される。
@@ -66,6 +67,14 @@ cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ```
 
+Dashboard:
+
+```text
+http://127.0.0.1:8080/
+```
+
+Dashboard では health、event log、debug command、Answer / Choice / Pet / Notification 送信、ABC 返信確認を GUI から実行できます。
+
 別の PowerShell で sample event を送信します。
 
 ```powershell
@@ -81,6 +90,8 @@ Codex の返答本文を Core2 に表示します。
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Codexの返答本文"
+cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:answer -- --summary "日本語表示" --text "これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。"
 ```
