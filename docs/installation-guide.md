@@ -32,7 +32,7 @@ cmd.exe /d /s /c npm test
 - Start Menu shortcut: `M5Stack Codex Pet Notifier`
 - install manifest: `%LOCALAPPDATA%\M5StackCodexPetNotifier\install.json`
 
-shortcut は repo 内の `start-dashboard.bat` を起動します。`start-dashboard.bat` は hidden PowerShell launcher に処理を渡し、Host Bridge を background process として起動してから既定ブラウザで `http://127.0.0.1:8080/` を開きます。
+shortcut は repo 内の `start-dashboard.bat` を起動します。`start-dashboard.bat` は hidden PowerShell launcher に処理を渡し、Host Bridge を background process として起動してから既定ブラウザで Dashboard を開きます。8080 番に古い Bridge が残っている場合は `/health` の version を照合し、18081 以降の port へ自動 fallback して現在の beta Dashboard を開きます。
 
 installer zip を開発環境で再生成する場合:
 
@@ -109,7 +109,7 @@ http://127.0.0.1:8080/
 
 Dashboard では health、event log、Answer / Decision / Notification 送信、Decision 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。状態確認は sidebar に常時表示し、side menu はプレビュー、最近の回答、ログの作業領域を切り替えます。`M5Stack 表示プレビュー` では現在の hatch-pet キャラ、pet 表示面積 `1..32`、text size `1..8`、render FPS `4..20`、motion step `120..800ms` を送信前に確認できます。pet はプレビュー上でドラッグして X/Y 位置を調整し、位置リセットで `0,0` に戻せます。`変更を自動送信` がonの場合は表示パラメータ変更後に自動で実機へ送信され、offの場合は `表示設定を送信` で手動送信します。環境構築と debug command は sidebar の modal から確認し、タブ内のフォームでパラメータを変更して localhost から実行できます。sidebar には Bridge の foreground / background、pid、uptime が表示されます。
 
-Windows では repo root の `start-dashboard.bat` をダブルクリックすると、PowerShell 画面を残さず background Bridge 起動と Dashboard 表示をまとめて実行できます。Dashboard の送信フォームは `環境構築コマンド` modal に統合され、`M5Stack 表示プレビュー` から screen / pet / text / border RGBA、pet X/Y offset、text border 表示、pet mood を送信できます。Dashboard は既定でOS themeに追従し、label は日本語/Englishを切り替えできます。
+Windows では repo root の `start-dashboard.bat` をダブルクリックすると、PowerShell 画面を残さず background Bridge 起動と Dashboard 表示をまとめて実行できます。古い Bridge が既定 port を使っている場合は、既存プロセスを強制終了せずに beta Bridge の fallback port を開きます。Dashboard の送信フォームは `環境構築コマンド` modal に統合され、`M5Stack 表示プレビュー` から screen / pet / text / border RGBA、pet X/Y offset、text border 表示、pet mood を送信できます。Dashboard は既定でOS themeに追従し、label は日本語/Englishを切り替えできます。
 
 別の PowerShell で sample event を送信します。
 

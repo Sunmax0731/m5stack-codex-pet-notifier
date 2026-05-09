@@ -160,6 +160,8 @@ const hiddenDashboardSource = fs.readFileSync('tools/start-dashboard-hidden.ps1'
 assert(hiddenDashboardSource.includes('WindowStyle Hidden'), 'hidden dashboard launcher must run the bridge start command without a visible PowerShell window');
 assert(hiddenDashboardSource.includes('bridge:start:bg'), 'hidden dashboard launcher must start the background bridge');
 assert(hiddenDashboardSource.includes('http://127.0.0.1:$Port/'), 'hidden dashboard launcher must open the local dashboard URL');
+assert(hiddenDashboardSource.includes('$candidatePorts'), 'hidden dashboard launcher must fall back to another port when an old bridge owns 8080');
+assert(hiddenDashboardSource.includes('$health.version -eq $expectedVersion'), 'hidden dashboard launcher must verify the bridge version before opening the browser');
 const installerSource = fs.readFileSync('installer/install-windows.ps1', 'utf8');
 assert(installerSource.includes('WScript.Shell'), 'Windows installer must create user shortcuts');
 assert(installerSource.includes('DesktopDirectory'), 'Windows installer must create a desktop shortcut');
