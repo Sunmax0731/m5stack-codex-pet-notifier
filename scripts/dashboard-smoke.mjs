@@ -72,6 +72,7 @@ try {
   assert.match(index, /テキスト枠を表示/);
   assert.match(index, /Codex回答のビープ通知/);
   assert.match(index, /変更を自動送信/);
+  assert.match(index, /反映確認を表示/);
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
   assert.match(index, /preview-settings-dock/);
@@ -112,6 +113,7 @@ try {
   assert.match(app, /scheduleAutoDisplaySync/);
   assert.match(app, /updateRgbaVisual/);
   assert.match(app, /beepOnAnswer/);
+  assert.match(app, /visualProbe/);
   assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
@@ -207,7 +209,8 @@ try {
     petOffsetY: 24,
     textBorderEnabled: true,
     textBorderRgba: { r: 120, g: 200, b: 255, a: 255 },
-    beepOnAnswer: true
+    beepOnAnswer: true,
+    visualProbe: true
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
@@ -225,6 +228,7 @@ try {
   assert.equal(display.event.display.textBorderEnabled, true);
   assert.deepEqual(display.event.display.textBorderRgba, { r: 120, g: 200, b: 255, a: 255 });
   assert.equal(display.event.display.beepOnAnswer, true);
+  assert.equal(display.event.display.visualProbe, true);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -315,6 +319,7 @@ try {
       textBorderEnabled: true,
       textBorderRgba: { r: 120, g: 200, b: 255, a: 255 },
       beepOnAnswer: true,
+      visualProbe: true,
       applyCount: 2,
       lastEventId: display.event.eventId
     }
@@ -377,6 +382,7 @@ try {
       displaySettingsTextBorderControl: true,
       displaySettingsBeepControl: true,
       displaySettingsAutoSync: true,
+      displaySettingsVisualProbe: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
       m5StackPreviewDeviceSwitch: true,

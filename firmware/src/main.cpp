@@ -105,8 +105,11 @@ RgbaColor textBackgroundRgba{0, 0, 0, 178};
 RgbaColor textBorderRgba{255, 255, 255, 255};
 bool textBorderEnabled = false;
 bool beepOnAnswer = true;
+bool visualProbeOnDisplayUpdate = false;
 uint32_t displayApplyCount = 0;
 String lastDisplayEventId = "";
+bool displayProbeActive = false;
+uint32_t displayProbeUntil = 0;
 
 M5Canvas petSprite(&M5.Display);
 bool petSpriteReady = false;
@@ -120,6 +123,7 @@ int footerTop();
 int bodyLineHeight();
 void drawScreenContentOverlay(bool includeFooter);
 void invalidatePetSprite();
+void triggerDisplayProbe();
 
 String screenName() {
   switch (screenState) {
@@ -349,6 +353,7 @@ void writeDisplayDiagnostics(JsonObject target) {
   target["petOffsetY"] = petOffsetY;
   target["textBorderEnabled"] = textBorderEnabled;
   target["beepOnAnswer"] = beepOnAnswer;
+  target["visualProbe"] = visualProbeOnDisplayUpdate;
   target["applyCount"] = displayApplyCount;
   if (lastDisplayEventId.length()) {
     target["lastEventId"] = lastDisplayEventId;
@@ -517,6 +522,7 @@ bool applyDisplaySettings(JsonVariant display) {
   textBorderEnabled = display["textBorderEnabled"] | textBorderEnabled;
   applyRgbaSetting(display["textBorderRgba"], textBorderRgba);
   beepOnAnswer = display["beepOnAnswer"] | beepOnAnswer;
+  visualProbeOnDisplayUpdate = display["visualProbe"] | visualProbeOnDisplayUpdate;
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
   invalidatePetSprite();
   return true;
@@ -545,6 +551,28 @@ void rememberDisplaySettings(JsonVariant event) {
     textBackgroundRgba.b,
     textBackgroundRgba.a
   );
+}
+
+void drawDisplayProbe() {
+  M5.Display.fillScreen(screenBackgroundColor());
+  const int w = M5.Display.width();
+  const int h = M5.Display.height();
+  M5.Display.fillRect(0, 0, w, max(28, h / 6), petBackgroundColor());
+  M5.Display.fillRect(0, h - max(28, h / 6), w, max(28, h / 6), textPanelFillColor());
+  M5.Display.drawRect(0, 0, w, h, textBorderEnabled ? textBorderColor() : TFT_WHITE);
+  applyDisplayFont(1);
+  M5.Display.setTextColor(TFT_WHITE, screenBackgroundColor());
+  M5.Display.drawString("display applied", 8, max(36, h / 2 - 28));
+  M5.Display.drawString((String("scale ") + petDisplayScale + " x " + petOffsetX + " y " + petOffsetY).c_str(), 8, max(56, h / 2 - 8));
+  M5.Display.drawString((String("#") + displayApplyCount).c_str(), 8, max(76, h / 2 + 12));
+}
+
+void triggerDisplayProbe() {
+  displayProbeActive = true;
+  displayProbeUntil = millis() + 2500;
+  needsRedraw = false;
+  needsPetRedraw = false;
+  drawDisplayProbe();
 }
 
 int utf8CharBytes(const String& value, int index) {
@@ -1236,6 +1264,9 @@ void handleHostEvent(JsonVariant event) {
     body = String(event["pet"]["spriteRef"] | "fallback");
     if (applyDisplaySettings(event["display"])) {
       rememberDisplaySettings(event);
+      if (visualProbeOnDisplayUpdate) {
+        triggerDisplayProbe();
+      }
     }
     screenState = SCREEN_IDLE;
   } else if (type == "notification.created") {
@@ -1266,6 +1297,9 @@ void handleHostEvent(JsonVariant event) {
   } else if (type == "display.settings_updated") {
     if (applyDisplaySettings(event["display"])) {
       rememberDisplaySettings(event);
+      if (visualProbeOnDisplayUpdate) {
+        triggerDisplayProbe();
+      }
     }
     if (screenState == SCREEN_ERROR) {
       lastError = "";
@@ -1507,6 +1541,16 @@ void loop() {
     if (millis() - lastHeartbeat > HEARTBEAT_INTERVAL_MS) {
       lastHeartbeat = millis();
       sendHeartbeat();
+    }
+  }
+
+  if (displayProbeActive) {
+    if (millis() >= displayProbeUntil) {
+      displayProbeActive = false;
+      markDraw();
+    } else {
+      delay(LOOP_IDLE_DELAY_MS);
+      return;
     }
   }
 

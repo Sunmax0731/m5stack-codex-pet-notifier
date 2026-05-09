@@ -28,6 +28,7 @@
         "textBorderEnabled": { "type": "boolean" },
         "textBorderRgba": { "$ref": "#/$defs/rgba" },
         "beepOnAnswer": { "type": "boolean" },
+        "visualProbe": { "type": "boolean" },
         "applyCount": { "type": "integer", "minimum": 0 },
         "lastEventId": { "type": "string" }
       }

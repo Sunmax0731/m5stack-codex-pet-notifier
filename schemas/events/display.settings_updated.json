@@ -24,7 +24,8 @@
         "petOffsetY": { "type": "integer", "minimum": -240, "maximum": 240 },
         "textBorderEnabled": { "type": "boolean" },
         "textBorderRgba": { "$ref": "#/$defs/rgba" },
-        "beepOnAnswer": { "type": "boolean" }
+        "beepOnAnswer": { "type": "boolean" },
+        "visualProbe": { "type": "boolean" }
       }
     }
   },

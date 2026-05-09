@@ -125,7 +125,8 @@ function normalizeDisplaySettings(options = {}) {
       b: 255,
       a: 255
     }),
-    beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true)
+    beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true),
+    visualProbe: normalizeBoolean(options.visualProbe, false)
   };
 }
 

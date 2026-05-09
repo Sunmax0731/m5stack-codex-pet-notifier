@@ -867,7 +867,8 @@ function buildDashboardCommandDefinitions(request) {
           { name: 'petOffsetY', label: 'petOffsetY', type: 'number', defaultValue: '0' },
           { name: 'textBorderEnabled', label: 'textBorderEnabled', type: 'checkbox', defaultValue: false },
           { name: 'textBorderColor', label: 'textBorderColor', type: 'text', defaultValue: '#ffffffff' },
-          { name: 'beepOnAnswer', label: 'beepOnAnswer', type: 'checkbox', defaultValue: true }
+          { name: 'beepOnAnswer', label: 'beepOnAnswer', type: 'checkbox', defaultValue: true },
+          { name: 'visualProbe', label: 'visualProbe', type: 'checkbox', defaultValue: true }
         ]
       },
       {
@@ -946,7 +947,8 @@ async function runDashboardCommand(commandId, params, request, bridge) {
         '--pet-offset-y', values.petOffsetY || '0',
         '--text-border-enabled', String(values.textBorderEnabled ?? false),
         '--text-border-color', values.textBorderColor || '#ffffffff',
-        '--beep-on-answer', String(values.beepOnAnswer ?? true)
+        '--beep-on-answer', String(values.beepOnAnswer ?? true),
+        '--visual-probe', String(values.visualProbe ?? true)
       ], { timeoutMs: 60000 });
     case 'codexSessions':
       return runNpmScript('codex:sessions', [

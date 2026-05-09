@@ -52,10 +52,10 @@
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
-| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.screenBackgroundRgba`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.petOffsetX`, `display.petOffsetY`, `display.textBorderEnabled`, `display.textBorderRgba`, `display.beepOnAnswer` |
+| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.screenBackgroundRgba`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.petOffsetX`, `display.petOffsetY`, `display.textBorderEnabled`, `display.textBorderRgba`, `display.beepOnAnswer`, `display.visualProbe` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
-| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.applyCount`、`display.lastEventId` |
+| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.beepOnAnswer`、`display.visualProbe`、`display.applyCount`、`display.lastEventId` |
 
 ## 画面状態
 

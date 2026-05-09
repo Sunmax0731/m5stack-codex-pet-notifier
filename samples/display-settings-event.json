@@ -16,6 +16,7 @@
     "petOffsetY": 0,
     "textBorderEnabled": false,
     "textBorderRgba": { "r": 255, "g": 255, "b": 255, "a": 255 },
-    "beepOnAnswer": true
+    "beepOnAnswer": true,
+    "visualProbe": false
   }
 }

@@ -73,6 +73,7 @@ const elements = {
   textBorderEnabled: $('#textBorderEnabled'),
   beepOnAnswer: $('#beepOnAnswer'),
   autoDisplaySync: $('#autoDisplaySync'),
+  visualProbe: $('#visualProbe'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
@@ -149,6 +150,7 @@ const labels = {
     sendPet: 'ペット更新を送信',
     sendDisplay: '表示設定を送信',
     autoDisplaySync: '変更を自動送信',
+    visualProbe: '反映確認を表示',
     localPetAsset: 'local hatch-pet アセット',
     reloadAsset: 'asset 再読み込み',
     petName: 'ペット名',
@@ -235,6 +237,7 @@ const labels = {
     sendPet: 'Send pet update',
     sendDisplay: 'Send display settings',
     autoDisplaySync: 'Auto-send changes',
+    visualProbe: 'Show apply probe',
     localPetAsset: 'local hatch-pet asset',
     reloadAsset: 'Reload asset',
     petName: 'pet name',
@@ -958,7 +961,8 @@ function displaySettingsPayload() {
     petOffsetY: Number(elements.petOffsetY.value),
     textBorderEnabled: elements.textBorderEnabled.checked,
     textBorderRgba: rgbaFromControls(elements.textBorderColor, elements.textBorderAlpha),
-    beepOnAnswer: elements.beepOnAnswer.checked
+    beepOnAnswer: elements.beepOnAnswer.checked,
+    visualProbe: elements.visualProbe.checked
   };
 }
 
@@ -1002,7 +1006,8 @@ function createDisplayFallbackPetEvent(payload) {
       petOffsetY: payload.petOffsetY,
       textBorderEnabled: payload.textBorderEnabled,
       textBorderRgba: payload.textBorderRgba,
-      beepOnAnswer: payload.beepOnAnswer
+      beepOnAnswer: payload.beepOnAnswer,
+      visualProbe: payload.visualProbe
     }
   };
 }
@@ -1318,7 +1323,8 @@ function wireActions() {
     elements.textBorderColor,
     elements.textBorderAlpha,
     elements.textBorderEnabled,
-    elements.beepOnAnswer
+    elements.beepOnAnswer,
+    elements.visualProbe
   ].forEach((control) => {
     control.addEventListener('input', () => {
       renderDisplayControls();

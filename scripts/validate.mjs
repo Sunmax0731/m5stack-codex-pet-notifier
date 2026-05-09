@@ -84,6 +84,7 @@ assert(firmwareSource.includes('display["petOffsetY"]'), 'firmware must accept p
 assert(firmwareSource.includes('display["textBorderEnabled"]'), 'firmware must accept text border visibility in display settings');
 assert(firmwareSource.includes('display["textBorderRgba"]'), 'firmware must accept text border color in display settings');
 assert(firmwareSource.includes('display["beepOnAnswer"]'), 'firmware must accept answer beep setting in display settings');
+assert(firmwareSource.includes('display["visualProbe"]'), 'firmware must accept display apply visual probe setting');
 assert(firmwareSource.includes('M5.Speaker.tone'), 'firmware must beep when configured answer events arrive');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 assert(firmwareSource.includes('M5Canvas petSprite'), 'firmware must use an off-screen sprite for pet rendering');
@@ -103,6 +104,7 @@ assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmw
 assert(firmwareSource.includes('writeDisplayDiagnostics'), 'firmware heartbeat must report the display settings currently applied on the device');
 assert(firmwareSource.includes('displayApplyCount'), 'firmware heartbeat must expose display settings apply count for manual diagnosis');
 assert(firmwareSource.includes('invalidatePetSprite()'), 'firmware must rebuild the pet sprite after display setting changes');
+assert(firmwareSource.includes('triggerDisplayProbe'), 'firmware must show a visible display apply probe for end-to-end sync diagnosis');
 assert(firmwareSource.includes('screenState == SCREEN_ERROR'), 'firmware display settings events must recover from transient error screen state');
 assert(firmwareSource.includes('parseRgbaString'), 'firmware must accept string RGBA settings as well as object RGBA settings');
 assert(!firmwareSource.includes('target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor())'), 'local hatch-pet transparent pixels must reveal the configured pet background instead of a fixed accent card');
@@ -196,6 +198,7 @@ assert(dashboardIndexSource.includes('文字背景'), 'Dashboard must expose tex
 assert(dashboardIndexSource.includes('data-rgba-picker'), 'Dashboard must expose a unified RGBA picker for color and alpha controls');
 assert(dashboardIndexSource.includes('rgba-swatch'), 'Dashboard must show the currently selected RGBA color in each color section');
 assert(dashboardIndexSource.includes('autoDisplaySync'), 'Dashboard must expose display setting auto-sync so slider changes reach the device');
+assert(dashboardIndexSource.includes('visualProbe'), 'Dashboard must expose a visible apply probe option for display sync diagnosis');
 assert(dashboardIndexSource.includes('ペットX位置'), 'Dashboard must expose horizontal pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('ペットY位置'), 'Dashboard must expose vertical pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('文字枠'), 'Dashboard must expose text border color controls in Japanese by default');
@@ -234,6 +237,7 @@ assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertic
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');
 assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
+assert(dashboardAppSource.includes('visualProbe'), 'Dashboard must publish display apply visual probe setting');
 assert(dashboardAppSource.includes('scheduleAutoDisplaySync'), 'Dashboard must debounce and auto-send display setting changes');
 assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
 assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');

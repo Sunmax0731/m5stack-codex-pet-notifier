@@ -177,6 +177,7 @@ export async function buildEvent(command, args, options = {}) {
       textBorderEnabled: args['text-border-enabled'] ?? args.textBorderEnabled ?? args.textBorder,
       textBorderRgba: args['text-border-color'] ?? args.textBorderColor ?? args.textBorderRgba,
       beepOnAnswer: args['beep-on-answer'] ?? args.beepOnAnswer,
+      visualProbe: args['visual-probe'] ?? args.visualProbe,
       eventId: args['event-id'] ?? args.eventId
     });
   }
