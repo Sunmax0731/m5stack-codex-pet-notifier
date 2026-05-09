@@ -62,6 +62,7 @@
     "core2JapaneseAnswerSourceGate": true,
     "clipboardUtf8RelaySmoke": true,
     "core2ClipboardJapaneseVisualConfirmation": true,
+    "core2FileWatchVisualConfirmation": true,
     "representativeSuite": [
       "happy-path",
       "missing-required",

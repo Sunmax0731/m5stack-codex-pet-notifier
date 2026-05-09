@@ -75,6 +75,16 @@
     "bodyPersistedInEvidence": false,
     "evidence": "Clipboard relay no longer reads non-ASCII text directly from PowerShell stdout. It base64-encodes UTF-8 bytes in PowerShell and decodes them in Node.js. User confirmed the Core2 displayed the clipboard Japanese answer without mojibake."
   },
+  "fileWatchRelay": {
+    "command": "cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once",
+    "fileEncoding": "UTF-8",
+    "fileBody": "Codex file watch answer",
+    "answerCompletedObserved": true,
+    "core2VisualConfirmationByUser": true,
+    "latestFileWatchAnswerEventId": "evt-answer-1778290810438-8f72ae9c",
+    "bodyPersistedInEvidence": true,
+    "evidence": "User ran the file watch command and provided a Core2 photo showing the file body text on the device screen."
+  },
   "japaneseDisplay": {
     "firmwareFont": "fonts::efontJA_12",
     "utf8BoundarySafePaging": true,
