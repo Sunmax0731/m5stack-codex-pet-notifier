@@ -2,24 +2,42 @@
   "product": "m5stack-codex-pet-notifier",
   "repository": "Sunmax0731/m5stack-codex-pet-notifier",
   "githubUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier",
-  "releaseStatus": "pending",
-  "releaseUrl": null,
+  "releaseStatus": "created",
+  "releaseUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier/releases/tag/v0.2.0-beta.1",
   "tag": "v0.2.0-beta.1",
   "isPrereleasePlanned": true,
-  "prerelease": null,
-  "latest": null,
-  "assetCount": 0,
+  "prerelease": true,
+  "latest": false,
+  "latestVerification": {
+    "method": "gh api repos/Sunmax0731/m5stack-codex-pet-notifier/releases/latest",
+    "result": "404 Not Found",
+    "interpretation": "No stable latest release exists; the beta prerelease is not returned as latest."
+  },
+  "assetCount": 9,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
       "dist/m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip",
+      "dist/validation-result.json",
+      "dist/dashboard-smoke-result.json",
       "docs/manual-test.md",
       "docs/strict-manual-test-addendum.md",
       "docs/hardware-runtime-evidence.json",
-      "docs/display-sync-evidence.json"
+      "docs/display-sync-evidence.json",
+      "docs/release-evidence.json"
     ],
-    "actualNames": [],
-    "allRequiredPresent": false
+    "actualNames": [
+      "dashboard-smoke-result.json",
+      "display-sync-evidence.json",
+      "hardware-runtime-evidence.json",
+      "m5stack-codex-pet-notifier-docs.zip",
+      "m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip",
+      "manual-test.md",
+      "release-evidence.json",
+      "strict-manual-test-addendum.md",
+      "validation-result.json"
+    ],
+    "allRequiredPresent": true
   },
   "qcdsEvaluation": {
     "Quality": "S-",
@@ -27,17 +45,34 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "partial-pass-core2-existing-upload-wifi-pairing-codex-relay-answer-button-reply; beta mood-gesture-installer checks prepared",
+  "manualTest": "partial-pass-core2-existing-upload-wifi-pairing-codex-relay-answer-button-reply; beta mood-gesture-installer checks prepared but not executed by Codex",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
-      "result": "pending-final-run"
+      "result": "passed"
+    },
+    {
+      "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2",
+      "result": "passed"
+    },
+    {
+      "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-gray",
+      "result": "passed"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run installer:package",
+      "result": "passed"
+    },
+    {
+      "command": "Browser plugin reload of http://127.0.0.1:18083/",
+      "result": "passed-no-console-errors"
     }
   ],
   "git": {
-    "clean": false,
-    "ahead": null,
-    "behind": null,
-    "status": "pending-beta-release"
+    "branch": "main",
+    "clean": true,
+    "ahead": 0,
+    "behind": 0,
+    "status": "clean-after-release-evidence-commit"
   }
 }
