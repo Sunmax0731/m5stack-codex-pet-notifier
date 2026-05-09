@@ -4,6 +4,7 @@ const state = {
   commands: null,
   latestSession: null,
   petManifest: null,
+  petPackages: [],
   previewPetFrame: 0,
   previewAnimationInterval: null,
   previewAnimationDelay: null
@@ -33,21 +34,35 @@ const elements = {
   petName: $('#petName'),
   petState: $('#petState'),
   petSprite: $('#petSprite'),
+  petPackage: $('#petPackage'),
+  petPackagePath: $('#petPackagePath'),
   petScale: $('#petScale'),
   uiTextScale: $('#uiTextScale'),
   bodyTextScale: $('#bodyTextScale'),
   animationFps: $('#animationFps'),
   motionStepMs: $('#motionStepMs'),
+  petBgColor: $('#petBgColor'),
+  petBgAlpha: $('#petBgAlpha'),
+  textColor: $('#textColor'),
+  textAlpha: $('#textAlpha'),
+  textBgColor: $('#textBgColor'),
+  textBgAlpha: $('#textBgAlpha'),
+  beepOnAnswer: $('#beepOnAnswer'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
   animationFpsValue: $('#animationFpsValue'),
   motionStepValue: $('#motionStepValue'),
+  petBgValue: $('#petBgValue'),
+  textColorValue: $('#textColorValue'),
+  textBgValue: $('#textBgValue'),
+  previewDevice: $('#previewDevice'),
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
   previewPet: $('#previewPet'),
   previewBody: $('#previewBody'),
   previewFooter: $('#previewFooter'),
+  previewDeviceReadout: $('#previewDeviceReadout'),
   previewPetReadout: $('#previewPetReadout'),
   previewUiReadout: $('#previewUiReadout'),
   previewBodyReadout: $('#previewBodyReadout'),
@@ -98,12 +113,49 @@ async function refresh() {
 
 async function loadCurrentPetManifest() {
   try {
-    state.petManifest = await api('/pet/current/manifest');
+    state.petManifest = await api(`/pet/current/manifest${selectedPetQuery()}`);
   } catch (error) {
     state.petManifest = { ok: false, reason: error.message };
   }
   renderPetManifest();
   renderM5Preview();
+}
+
+async function loadPetPackages() {
+  try {
+    const result = await api('/pet/packages');
+    state.petPackages = result.packages ?? [];
+  } catch {
+    state.petPackages = [];
+  }
+  renderPetPackages();
+  await loadCurrentPetManifest();
+}
+
+function renderPetPackages() {
+  if (!elements.petPackage) {
+    return;
+  }
+  if (!state.petPackages.length) {
+    elements.petPackage.innerHTML = '<option value="">fallback / env default</option>';
+    return;
+  }
+  const current = elements.petPackage.value || state.petManifest?.packageName || 'Mira';
+  elements.petPackage.innerHTML = state.petPackages.map((pet) => (
+    `<option value="${escapeHtml(pet.name)}">${escapeHtml(pet.displayName)} (${escapeHtml(pet.name)})</option>`
+  )).join('');
+  if (state.petPackages.some((pet) => pet.name === current)) {
+    elements.petPackage.value = current;
+  }
+}
+
+function selectedPetQuery() {
+  const petDir = elements.petPackagePath?.value?.trim();
+  if (petDir) {
+    return `?petDir=${encodeURIComponent(petDir)}`;
+  }
+  const packageName = elements.petPackage?.value;
+  return packageName ? `?package=${encodeURIComponent(packageName)}` : '';
 }
 
 function render() {
@@ -216,6 +268,24 @@ function formatDetails(details = {}) {
   )).join('<br>');
 }
 
+function rgbaFromControls(colorInput, alphaInput) {
+  const hex = colorInput.value.replace('#', '');
+  return {
+    r: Number.parseInt(hex.slice(0, 2), 16),
+    g: Number.parseInt(hex.slice(2, 4), 16),
+    b: Number.parseInt(hex.slice(4, 6), 16),
+    a: Number(alphaInput.value)
+  };
+}
+
+function rgbaCss(value) {
+  return `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a / 255})`;
+}
+
+function rgbaLabel(colorInput, alphaInput) {
+  return `${colorInput.value} / ${alphaInput.value}`;
+}
+
 function displaySettingsPayload() {
   return {
     deviceId: deviceId(),
@@ -223,7 +293,11 @@ function displaySettingsPayload() {
     uiTextScale: Number(elements.uiTextScale.value),
     bodyTextScale: Number(elements.bodyTextScale.value),
     animationFps: Number(elements.animationFps.value),
-    motionStepMs: Number(elements.motionStepMs.value)
+    motionStepMs: Number(elements.motionStepMs.value),
+    petBackgroundRgba: rgbaFromControls(elements.petBgColor, elements.petBgAlpha),
+    textColorRgba: rgbaFromControls(elements.textColor, elements.textAlpha),
+    textBackgroundRgba: rgbaFromControls(elements.textBgColor, elements.textBgAlpha),
+    beepOnAnswer: elements.beepOnAnswer.checked
   };
 }
 
@@ -258,7 +332,11 @@ function createDisplayFallbackPetEvent(payload) {
       uiTextScale: payload.uiTextScale,
       bodyTextScale: payload.bodyTextScale,
       animationFps: payload.animationFps,
-      motionStepMs: payload.motionStepMs
+      motionStepMs: payload.motionStepMs,
+      petBackgroundRgba: payload.petBackgroundRgba,
+      textColorRgba: payload.textColorRgba,
+      textBackgroundRgba: payload.textBackgroundRgba,
+      beepOnAnswer: payload.beepOnAnswer
     }
   };
 }
@@ -278,6 +356,9 @@ function renderDisplayControls() {
   elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
   elements.animationFpsValue.textContent = `${elements.animationFps.value} fps`;
   elements.motionStepValue.textContent = `${elements.motionStepMs.value} ms`;
+  elements.petBgValue.textContent = rgbaLabel(elements.petBgColor, elements.petBgAlpha);
+  elements.textColorValue.textContent = rgbaLabel(elements.textColor, elements.textAlpha);
+  elements.textBgValue.textContent = rgbaLabel(elements.textBgColor, elements.textBgAlpha);
   renderM5Preview();
 }
 
@@ -290,6 +371,9 @@ function renderPetManifest() {
   }
   elements.petAssetName.textContent = manifest.displayName ?? manifest.id ?? 'current pet';
   elements.petAssetDescription.textContent = manifest.description ?? 'local hatch-pet asset';
+  if (manifest.packageName && elements.petPackage && elements.petPackage.value !== manifest.packageName) {
+    elements.petPackage.value = manifest.packageName;
+  }
   if (elements.petName.value === 'Codex Pet') {
     elements.petName.value = manifest.displayName ?? manifest.id ?? elements.petName.value;
   }
@@ -305,6 +389,10 @@ function renderM5Preview() {
   const animationFps = Number(elements.animationFps.value);
   const motionStepMs = Number(elements.motionStepMs.value);
   const mode = elements.previewMode.value;
+  const device = elements.previewDevice.value;
+  const petBackground = rgbaFromControls(elements.petBgColor, elements.petBgAlpha);
+  const textColor = rgbaFromControls(elements.textColor, elements.textAlpha);
+  const textBackground = rgbaFromControls(elements.textBgColor, elements.textBgAlpha);
   const petHeight = Math.round(42 + ((petScale - 1) / 7) * 178);
   const manifest = state.petManifest;
   const aspect = manifest?.ok ? manifest.frameWidth / manifest.frameHeight : 1;
@@ -313,10 +401,15 @@ function renderM5Preview() {
   const uiSize = Math.min(24, 9 + uiTextScale * 2);
 
   elements.m5Preview.dataset.mode = mode;
+  elements.m5Preview.dataset.device = device;
   elements.m5Preview.style.setProperty('--pet-width', `${petWidth}px`);
   elements.m5Preview.style.setProperty('--pet-height', `${petHeight}px`);
   elements.m5Preview.style.setProperty('--body-size', `${bodySize}px`);
   elements.m5Preview.style.setProperty('--ui-size', `${uiSize}px`);
+  elements.m5Preview.style.setProperty('--pet-bg', rgbaCss(petBackground));
+  elements.m5Preview.style.setProperty('--overlay-text', rgbaCss(textColor));
+  elements.m5Preview.style.setProperty('--overlay-bg', rgbaCss(textBackground));
+  elements.previewDeviceReadout.textContent = device === 'gray' ? 'GRAY / 320x240 / buttons' : 'Core2 / 320x240 / touch';
   elements.previewPetReadout.textContent = `${petScale}/8`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
@@ -339,7 +432,7 @@ function renderM5Preview() {
 
   const preview = previewContent(mode, petScale);
   elements.previewBody.textContent = preview.body;
-  elements.previewFooter.textContent = preview.footer;
+  elements.previewFooter.textContent = footerLabel(preview.footer, device);
   elements.previewBody.style.display = preview.body ? 'block' : 'none';
   elements.previewFooter.style.display = preview.footer ? 'block' : 'none';
 }
@@ -395,6 +488,16 @@ function previewContent(mode, petScale) {
     body: petScale >= 8 ? '' : `${elements.petName.value || 'Pet'}\n${elements.petState.value}`,
     footer: petScale >= 8 ? '' : 'A poll  B pet  C idle'
   };
+}
+
+function footerLabel(value, device) {
+  if (!value) {
+    return '';
+  }
+  if (device === 'gray') {
+    return value.replace('A ', 'A btn ').replace('B ', 'B btn ').replace('C ', 'C btn ');
+  }
+  return value;
 }
 
 function escapeHtml(value) {
@@ -475,10 +578,25 @@ function wireForms() {
 }
 
 function wireActions() {
-  [elements.petScale, elements.uiTextScale, elements.bodyTextScale, elements.animationFps, elements.motionStepMs].forEach((control) => {
+  [
+    elements.petScale,
+    elements.uiTextScale,
+    elements.bodyTextScale,
+    elements.animationFps,
+    elements.motionStepMs,
+    elements.petBgColor,
+    elements.petBgAlpha,
+    elements.textColor,
+    elements.textAlpha,
+    elements.textBgColor,
+    elements.textBgAlpha,
+    elements.beepOnAnswer
+  ].forEach((control) => {
     control.addEventListener('input', renderDisplayControls);
+    control.addEventListener('change', renderDisplayControls);
   });
   [
+    elements.previewDevice,
     elements.previewMode,
     elements.petName,
     elements.petState,
@@ -496,6 +614,15 @@ function wireActions() {
     control.addEventListener('change', renderM5Preview);
   });
   $('#refreshButton').addEventListener('click', refresh);
+  $('#reloadPetPackagesButton').addEventListener('click', () => {
+    loadPetPackages().catch(showError);
+  });
+  elements.petPackage.addEventListener('change', () => {
+    loadCurrentPetManifest().catch(showError);
+  });
+  elements.petPackagePath.addEventListener('change', () => {
+    loadCurrentPetManifest().catch(showError);
+  });
   $('#clearViewButton').addEventListener('click', render);
   $('#loadCommandsButton').addEventListener('click', refresh);
   $('#openCommandsButton').addEventListener('click', () => openModal(elements.commandModal));
@@ -544,7 +671,7 @@ wireForms();
 wireActions();
 renderDisplayControls();
 refresh();
-loadCurrentPetManifest();
+loadPetPackages();
 loadLatestSession();
 setInterval(refresh, 2500);
 setInterval(loadLatestSession, 5000);

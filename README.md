@@ -23,13 +23,15 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換し、Core2 向けには scale `1..8` ごとの高解像度 frame も生成する。
-- `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。Core2 は scale ごとの高解像度 frame を選び、GRAY は flash 余裕を優先して base frame 拡大へ fallback する。state に応じた色、frame animation、bounce を M5Stack 上で表示する。
-- pet surface は `M5Canvas` の off-screen Sprite に描画してから `pushSprite()` し、animation tick では pet surface だけを更新してちらつきを抑える。
+- `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。Core2 は scale ごとの高解像度 frame を選び、GRAY は flash 余裕を優先して vector fallback と large app partition で build gate を通す。state に応じた色、frame animation、bounce を M5Stack 上で表示する。
+- pet surface は `M5Canvas` の off-screen Sprite に描画してから `pushSprite()` し、animation tick では画面全体の黒塗りを避けてちらつきを抑える。
 - M5Stack 画面上部の `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストは描画せず、pet surface を優先表示する。
 - ペット表示面積は Dashboard または `codex:display` から `1..8` の8段階で動的に変更でき、`8` は pet を画面全体に近い面積で表示する最大設定として扱う。
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
-- Dashboard は side menu、event tabs、折りたたみ可能な section、focus tooltip、M5Stack 表示プレビュー、環境構築コマンド modal を持ち、送信前に現在の hatch-pet キャラ、pet 面積、文字サイズ、motion step の見え方を確認できる。
+- `display.settings_updated` は pet 背景、文字色、文字背景を RGBA で受け取り、Codex answer 到着時の beep 通知も切り替えられる。
+- Dashboard は side menu、event tabs、折りたたみ可能な section、focus tooltip、M5Stack 表示プレビュー、環境構築コマンド modal を持ち、送信前に現在の hatch-pet キャラ、pet 面積、文字サイズ、motion step、RGBA、Core2 / GRAY preview の見え方を確認できる。
+- Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
@@ -47,7 +49,7 @@ cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices y
 cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
 cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001

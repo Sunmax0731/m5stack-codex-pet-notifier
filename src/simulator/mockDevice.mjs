@@ -18,7 +18,11 @@ export class MockM5StackDevice {
       uiTextScale: 1,
       bodyTextScale: 1,
       animationFps: 12,
-      motionStepMs: 280
+      motionStepMs: 280,
+      petBackgroundRgba: { r: 5, g: 11, b: 20, a: 255 },
+      textColorRgba: { r: 255, g: 255, b: 255, a: 255 },
+      textBackgroundRgba: { r: 0, g: 0, b: 0, a: 178 },
+      beepOnAnswer: true
     };
     this.snapshots = [];
   }

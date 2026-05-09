@@ -52,6 +52,11 @@ try {
   assert.match(index, /M5Stack 表示プレビュー/);
   assert.match(index, /render FPS/);
   assert.match(index, /motion step/);
+  assert.match(index, /pet background/);
+  assert.match(index, /text background/);
+  assert.match(index, /Codex回答のビープ通知/);
+  assert.match(index, /previewDevice/);
+  assert.match(index, /petPackagePath/);
   assert.match(index, /data-tooltip/);
   assert.match(index, /section-toggle/);
   assert.match(index, /commandModal/);
@@ -64,11 +69,19 @@ try {
   assert.match(app, /\/codex\/session\/latest/);
   assert.match(app, /\/codex\/session\/publish/);
   assert.match(app, /\/pet\/current\/manifest/);
+  assert.match(app, /\/pet\/packages/);
   assert.match(app, /motionStepMs/);
+  assert.match(app, /petBackgroundRgba/);
+  assert.match(app, /textColorRgba/);
+  assert.match(app, /textBackgroundRgba/);
+  assert.match(app, /beepOnAnswer/);
+  assert.match(app, /previewDevice/);
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
   assert.match(css, /\.m5-screen/);
+  assert.match(css, /\.preview-stage/);
+  assert.match(css, /\.color-grid/);
 
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
@@ -78,7 +91,13 @@ try {
   assert.match(snapshot.commands.codexSessions, /codex:sessions/);
   assert.match(snapshot.commands.codexHook, /codex:hook/);
   assert.match(snapshot.commands.petAsset, /pet:asset/);
+  assert.match(snapshot.commands.petAssetAny, /pet:asset/);
   assert.match(snapshot.commands.codexDisplay, /codex:display/);
+  assert.match(snapshot.commands.codexDisplay, /--pet-bg/);
+
+  const petPackages = await getJson(`${baseUrl}/pet/packages`);
+  assert.equal(petPackages.ok, true);
+  assert.equal(Array.isArray(petPackages.packages), true);
 
   const petManifest = await getJson(`${baseUrl}/pet/current/manifest`);
   assert.equal(typeof petManifest.ok, 'boolean');
@@ -111,7 +130,11 @@ try {
     uiTextScale: 3,
     bodyTextScale: 4,
     animationFps: 12,
-    motionStepMs: 280
+    motionStepMs: 280,
+    petBackgroundRgba: { r: 8, g: 12, b: 20, a: 255 },
+    textColorRgba: { r: 255, g: 245, b: 210, a: 255 },
+    textBackgroundRgba: { r: 4, g: 8, b: 12, a: 180 },
+    beepOnAnswer: true
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
@@ -120,6 +143,10 @@ try {
   assert.equal(display.event.display.bodyTextScale, 4);
   assert.equal(display.event.display.animationFps, 12);
   assert.equal(display.event.display.motionStepMs, 280);
+  assert.deepEqual(display.event.display.petBackgroundRgba, { r: 8, g: 12, b: 20, a: 255 });
+  assert.deepEqual(display.event.display.textColorRgba, { r: 255, g: 245, b: 210, a: 255 });
+  assert.deepEqual(display.event.display.textBackgroundRgba, { r: 4, g: 8, b: 12, a: 180 });
+  assert.equal(display.event.display.beepOnAnswer, true);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -191,6 +218,7 @@ try {
       codexHookCommand: true,
       codexDisplayCommand: true,
       petAssetCommand: true,
+      arbitraryPetPackageEndpoint: true,
       latestSessionAnswerPanel: true,
       latestSessionAnswerEndpoint: true,
       latestSessionPublishEndpoint: true,
@@ -198,8 +226,12 @@ try {
       displaySettingsEightStepControls: true,
       displaySettingsAnimationFpsControl: true,
       displaySettingsMotionStepControl: true,
+      displaySettingsRgbaControls: true,
+      displaySettingsBeepControl: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
+      m5StackPreviewDeviceSwitch: true,
+      m5StackPreviewTwoColumnLayout: true,
       sideNavigation: true,
       sectionCollapseControls: true,
       commandModal: true,

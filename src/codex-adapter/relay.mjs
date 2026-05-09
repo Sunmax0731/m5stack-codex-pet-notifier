@@ -168,6 +168,10 @@ export async function buildEvent(command, args, options = {}) {
       bodyTextScale: args['body-text-scale'] ?? args.bodyTextScale,
       animationFps: args['animation-fps'] ?? args.animationFps,
       motionStepMs: args['motion-step-ms'] ?? args.motionStepMs,
+      petBackgroundRgba: args['pet-bg'] ?? args.petBg ?? args.petBackgroundRgba,
+      textColorRgba: args['text-color'] ?? args.textColor ?? args.textColorRgba,
+      textBackgroundRgba: args['text-bg'] ?? args.textBg ?? args.textBackgroundRgba,
+      beepOnAnswer: args['beep-on-answer'] ?? args.beepOnAnswer,
       eventId: args['event-id'] ?? args.eventId
     });
   }
@@ -308,7 +312,7 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
-    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280',
+    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true',
     '  decision --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" [--wait]',
     '  watch --file .\\dist\\codex-answer.txt',
     '',

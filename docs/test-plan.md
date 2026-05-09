@@ -46,12 +46,13 @@
 | Core2 Codex session auto relay | `codex:sessions` で最近の Codex session の最新やり取りを自動送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Core2 Codex hook relay | Codex Hooks または `codex:hook` 手動実行で最新やり取りを送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
-| Dashboard current pet preview | Dashboard preview が `/pet/current/manifest` の現在の hatch-pet spritesheet を表示する | `docs/gui-tools-manual-check.md` |
+| Dashboard current pet preview | Dashboard preview が `/pet/current/manifest` の現在の hatch-pet spritesheet を表示し、`/pet/packages` と path override で任意の local hatch-pet package を切り替えられる | `docs/gui-tools-manual-check.md` |
 | Codex decision request | `codex:decision` または Dashboard Decision tab から三択を送り、Core2 A/B/C 返信を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
-| Core2 display settings | Dashboard から pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化、pose 切替頻度変化を目視する | `docs/gui-tools-manual-check.md` |
+| Core2 display settings | Dashboard から pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms`、RGBA、beep を送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化、pose 切替頻度変化、色変更、answer beep を目視する | `docs/gui-tools-manual-check.md` |
+| Dashboard Core2 / GRAY preview | Dashboard の device preview を Core2 / GRAY で切り替え、320x240 layout、text overlay、2カラム配置を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/8`、`4/8`、`8/8` で低解像度 base frame のブロック拡大にならないことを目視する | `docs/gui-tools-manual-check.md` |
-| Core2 sprite-buffered pet redraw | pet animation 中に Answer / Choice / footer text が毎フレーム塗り直されず、pet surface の更新だけでちらつきが抑えられることを目視する | `docs/gui-tools-manual-check.md` |
+| Core2 sprite-buffered pet redraw | pet animation 中に画面全体の黒塗りや Answer / Choice / footer text の明滅がなく、ちらつきが抑えられることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

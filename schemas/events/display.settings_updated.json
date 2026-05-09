@@ -15,8 +15,25 @@
         "uiTextScale": { "type": "integer", "minimum": 1, "maximum": 8 },
         "bodyTextScale": { "type": "integer", "minimum": 1, "maximum": 8 },
         "animationFps": { "type": "integer", "minimum": 4, "maximum": 20 },
-        "motionStepMs": { "type": "integer", "minimum": 120, "maximum": 800 }
+        "motionStepMs": { "type": "integer", "minimum": 120, "maximum": 800 },
+        "petBackgroundRgba": { "$ref": "#/$defs/rgba" },
+        "textColorRgba": { "$ref": "#/$defs/rgba" },
+        "textBackgroundRgba": { "$ref": "#/$defs/rgba" },
+        "beepOnAnswer": { "type": "boolean" }
       }
+    }
+  },
+  "$defs": {
+    "rgba": {
+      "type": "object",
+      "required": ["r", "g", "b", "a"],
+      "properties": {
+        "r": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "g": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "b": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "a": { "type": "integer", "minimum": 0, "maximum": 255 }
+      },
+      "additionalProperties": false
     }
   }
 }

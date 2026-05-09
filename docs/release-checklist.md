@@ -33,7 +33,7 @@
 - [x] 日本語回答を UTF-8 境界で page / line 分割し、日本語フォントで表示できる。
 - [x] ボタン返信が Host Bridge へ届く。
 - [x] firmware が pet avatar animation を表示できる。
-- [x] firmware が pet surface を `M5Canvas` Sprite buffer へ描画し、animation tick では pet surface だけを更新できる。
+- [x] firmware が pet surface を `M5Canvas` Sprite buffer へ描画し、animation tick では画面全体の黒塗りを避けて本文 overlay を安定表示できる。
 - [x] firmware が固定ヘッダーテキストを表示せず、pet surface を優先表示できる。
 - [x] firmware が `display.settings_updated` による pet 表示倍率、text size、render FPS、motion step の変更を処理できる。
 - [x] `display.settings_updated` が pet 表示面積と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で扱える。
