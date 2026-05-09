@@ -24,13 +24,13 @@ try {
   assert.equal(replay.ok, true);
 
   const screens = [];
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < 5; index += 1) {
     const polled = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
     assert.equal(polled.ok, true);
     assert.ok(polled.event);
     screens.push(polled.event.type);
   }
-  assert.deepEqual(screens, ['pet.updated', 'notification.created', 'answer.completed', 'prompt.choice_requested']);
+  assert.deepEqual(screens, ['pet.updated', 'display.settings_updated', 'notification.created', 'answer.completed', 'prompt.choice_requested']);
 
   const reply = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
     type: 'device.reply_selected',
@@ -57,7 +57,7 @@ try {
 
   const health = await getJson(`${baseUrl}/health`);
   assert.equal(health.ok, true);
-  assert.equal(health.outboundEvents, 4);
+  assert.equal(health.outboundEvents, 5);
   assert.equal(health.inboundEvents, 1);
   assert.equal(health.securityRejections, 2);
   console.log('bridge smoke passed');

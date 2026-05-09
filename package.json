@@ -15,6 +15,7 @@
     "codex:choice": "node src/codex-adapter/relay.mjs choice",
     "codex:notification": "node src/codex-adapter/relay.mjs notification",
     "codex:pet": "node src/codex-adapter/relay.mjs pet",
+    "codex:display": "node src/codex-adapter/relay.mjs display",
     "codex:watch": "node src/codex-adapter/relay.mjs watch",
     "codex:sessions": "node src/codex-adapter/sessionWatcher.mjs",
     "codex:hook": "node src/codex-adapter/hookRelay.mjs",

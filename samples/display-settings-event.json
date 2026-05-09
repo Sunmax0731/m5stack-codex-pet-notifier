@@ -1,0 +1,10 @@
+{
+  "type": "display.settings_updated",
+  "eventId": "evt-display-001",
+  "createdAt": "2026-05-09T00:00:05+09:00",
+  "display": {
+    "petScale": 2,
+    "uiTextScale": 1,
+    "bodyTextScale": 1
+  }
+}

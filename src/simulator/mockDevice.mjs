@@ -13,6 +13,11 @@ export class MockM5StackDevice {
     this.answerPages = [];
     this.currentPage = 0;
     this.currentChoiceRequest = null;
+    this.displaySettings = {
+      petScale: 2,
+      uiTextScale: 1,
+      bodyTextScale: 1
+    };
     this.snapshots = [];
   }
 
@@ -44,6 +49,9 @@ export class MockM5StackDevice {
     if (event.type === 'prompt.choice_requested') {
       this.currentChoiceRequest = event;
       this.screen = 'Choice';
+    }
+    if (event.type === 'display.settings_updated') {
+      this.displaySettings = event.display;
     }
     this.recordSnapshot(event.type);
   }
@@ -102,7 +110,8 @@ export class MockM5StackDevice {
       petId: this.pet?.id ?? null,
       unread: this.unread,
       answerPages: this.answerPages.length,
-      currentPage: this.currentPage
+      currentPage: this.currentPage,
+      displaySettings: this.displaySettings
     });
   }
 }

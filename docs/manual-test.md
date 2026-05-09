@@ -34,6 +34,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 header の pet avatar が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
+| C2-20 | Dashboard の `Display` tab で pet display scale を `2x`、text scale を任意に変更して送る | Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示され、UI / body text size が反映される | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -52,6 +53,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-10 | `Display` tab で pet display scale、UI text scale、body text scale を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る | `dashboard:smoke` 済み。実機目視はユーザー手動 |
 
 ## 記録項目
 
@@ -88,6 +90,7 @@ Codex relay:
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 2 --ui-text-scale 1 --body-text-scale 1
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
 cmd.exe /d /s /c npm run codex:sessions -- --phase final

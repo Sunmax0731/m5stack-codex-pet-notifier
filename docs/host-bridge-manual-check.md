@@ -74,6 +74,7 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8080/codex/replay-samples -
 Serial で確認するログ:
 
 - `host_event type=pet.updated`
+- `host_event type=display.settings_updated`
 - `host_event type=notification.created`
 - `host_event type=answer.completed`
 - `host_event type=prompt.choice_requested`
@@ -81,6 +82,7 @@ Serial で確認するログ:
 M5Stack 画面で確認する状態:
 
 - Idle / Pet updated
+- Display settings applied
 - Notification
 - Answer
 - Choice

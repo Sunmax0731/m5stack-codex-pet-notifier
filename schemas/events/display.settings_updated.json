@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "display.settings_updated",
+  "type": "object",
+  "required": ["type", "eventId", "createdAt", "display"],
+  "properties": {
+    "type": { "const": "display.settings_updated" },
+    "eventId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "minLength": 1 },
+    "display": {
+      "type": "object",
+      "required": ["petScale", "uiTextScale", "bodyTextScale"],
+      "properties": {
+        "petScale": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "uiTextScale": { "type": "integer", "minimum": 1, "maximum": 2 },
+        "bodyTextScale": { "type": "integer", "minimum": 1, "maximum": 2 }
+      }
+    }
+  }
+}

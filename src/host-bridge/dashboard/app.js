@@ -26,6 +26,12 @@ const elements = {
   sessionPhase: $('#sessionPhase'),
   sessionAnswer: $('#sessionAnswer'),
   sessionUser: $('#sessionUser'),
+  petScale: $('#petScale'),
+  uiTextScale: $('#uiTextScale'),
+  bodyTextScale: $('#bodyTextScale'),
+  petScaleValue: $('#petScaleValue'),
+  uiTextScaleValue: $('#uiTextScaleValue'),
+  bodyTextScaleValue: $('#bodyTextScaleValue'),
   commandList: $('#commandList')
 };
 
@@ -174,6 +180,21 @@ function formatDetails(details = {}) {
   )).join('<br>');
 }
 
+function displaySettingsPayload() {
+  return {
+    deviceId: deviceId(),
+    petScale: Number(elements.petScale.value),
+    uiTextScale: Number(elements.uiTextScale.value),
+    bodyTextScale: Number(elements.bodyTextScale.value)
+  };
+}
+
+function renderDisplayControls() {
+  elements.petScaleValue.textContent = `${elements.petScale.value}x`;
+  elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}x`;
+  elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}x`;
+}
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;',
@@ -238,6 +259,11 @@ function wireForms() {
     }).catch(showError);
   });
 
+  $('#displayForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitJson('/codex/display', displaySettingsPayload()).catch(showError);
+  });
+
   $('#notificationForm').addEventListener('submit', (event) => {
     event.preventDefault();
     submitJson('/codex/notification', {
@@ -250,6 +276,9 @@ function wireForms() {
 }
 
 function wireActions() {
+  [elements.petScale, elements.uiTextScale, elements.bodyTextScale].forEach((control) => {
+    control.addEventListener('input', renderDisplayControls);
+  });
   $('#refreshButton').addEventListener('click', refresh);
   $('#clearViewButton').addEventListener('click', render);
   $('#loadCommandsButton').addEventListener('click', refresh);
@@ -269,6 +298,7 @@ function showError(error) {
 wireTabs();
 wireForms();
 wireActions();
+renderDisplayControls();
 refresh();
 loadLatestSession();
 setInterval(refresh, 2500);

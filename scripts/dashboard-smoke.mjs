@@ -64,6 +64,7 @@ try {
   assert.match(snapshot.commands.codexSessions, /codex:sessions/);
   assert.match(snapshot.commands.codexHook, /codex:hook/);
   assert.match(snapshot.commands.petAsset, /pet:asset/);
+  assert.match(snapshot.commands.codexDisplay, /codex:display/);
 
   const pair = await postJson(`${baseUrl}/pair`, { deviceId, pairingCode: productProfile.defaultPairingCode });
   assert.equal(pair.ok, true);
@@ -84,6 +85,16 @@ try {
   const polledSessionAnswer = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
   assert.equal(polledSessionAnswer.event.type, 'answer.completed');
   assert.match(polledSessionAnswer.event.body, /Dashboard に最近の Codex 回答/);
+
+  const display = await postJson(`${baseUrl}/codex/display`, {
+    deviceId,
+    petScale: 2,
+    uiTextScale: 1,
+    bodyTextScale: 1
+  });
+  assert.equal(display.ok, true);
+  assert.equal(display.event.type, 'display.settings_updated');
+  assert.equal(display.event.display.petScale, 2);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -107,6 +118,8 @@ try {
   assert.equal(choice.ok, true);
   assert.equal(choice.event.type, 'prompt.choice_requested');
 
+  const polledDisplay = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
+  assert.equal(polledDisplay.event.type, 'display.settings_updated');
   const polledPet = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
   assert.equal(polledPet.event.type, 'pet.updated');
   const polledChoice = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
@@ -139,10 +152,12 @@ try {
       debugSnapshot: true,
       codexSessionCommand: true,
       codexHookCommand: true,
+      codexDisplayCommand: true,
       petAssetCommand: true,
       latestSessionAnswerPanel: true,
       latestSessionAnswerEndpoint: true,
       latestSessionPublishEndpoint: true,
+      displaySettingsEndpoint: true,
       petEndpoint: true,
       choiceEndpoint: true,
       inboundReplySummary: true

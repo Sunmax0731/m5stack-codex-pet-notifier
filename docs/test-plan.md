@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | schema validation | sample payload と代表シナリオが event schema に合格または期待どおり拒否される | `dist/validation-result.json` |
 | host bridge auth | token なし、token 誤り、正しい token を検証する | `happy-path.securityBoundary` |
-| event routing | pet、notification、answer、choice が device session へ届く | `happy-path.validEvents` |
+| event routing | pet、display、notification、answer、choice が device session へ届く | `happy-path.validEvents` |
 | reply routing | A/B/C 返信が requestEventId 付きで host へ戻る | `happy-path.replyCount` |
 | scroll model | 長文回答の分割、位置、末尾判定を検証する | `mixed-batch.scrollPages` |
 | device profile | Core2 / GRAY の入力割り当て差分を検証する | `profileCovered` |
@@ -15,7 +15,7 @@
 | Codex session smoke | local session JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として queue / poll できることを検証する | `scripts/codex-session-smoke.mjs`、`dist/codex-session-smoke-result.json` |
 | Codex hook relay smoke | hook process 相当の one-shot relay が state file で重複を抑止することを検証する | `scripts/codex-session-smoke.mjs` |
 | clipboard UTF-8 relay smoke | 日本語 clipboard 本文を `answer.completed` として壊さず送れることを検証する | `scripts/codex-relay-smoke.mjs` |
-| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/choice`、`/codex/pet`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
+| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/choice`、`/codex/pet`、`/codex/display`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | firmware pet animation source gate | firmware が pet avatar animation を含むことを検証する | `scripts/validate.mjs` |
@@ -47,6 +47,7 @@
 | Core2 Codex hook relay | Codex Hooks または `codex:hook` 手動実行で最新やり取りを送信し、Core2 の Answer 画面を確認する | `docs/codex-relay-manual-check.md` |
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
+| Core2 display settings | Dashboard から pet display scale と text scale を送り、Core2 の pet 表示面積と文字サイズの変化を目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

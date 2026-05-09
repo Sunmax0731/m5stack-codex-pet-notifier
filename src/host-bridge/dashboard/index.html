@@ -59,6 +59,7 @@
             <button class="tab active" type="button" data-tab="answer">Answer</button>
             <button class="tab" type="button" data-tab="choice">Choice</button>
             <button class="tab" type="button" data-tab="pet">Pet</button>
+            <button class="tab" type="button" data-tab="display">Display</button>
             <button class="tab" type="button" data-tab="notification">Notify</button>
           </div>
 
@@ -117,6 +118,24 @@
               <input id="petSprite" value="host://pet/codex-default">
             </label>
             <button type="submit">Pet 更新を送信</button>
+          </form>
+
+          <form id="displayForm" class="tab-panel">
+            <div class="display-controls">
+              <label class="field range-field">
+                <span>pet display scale <strong id="petScaleValue">2x</strong></span>
+                <input id="petScale" type="range" min="1" max="2" step="1" value="2">
+              </label>
+              <label class="field range-field">
+                <span>UI text scale <strong id="uiTextScaleValue">1x</strong></span>
+                <input id="uiTextScale" type="range" min="1" max="2" step="1" value="1">
+              </label>
+              <label class="field range-field">
+                <span>body text scale <strong id="bodyTextScaleValue">1x</strong></span>
+                <input id="bodyTextScale" type="range" min="1" max="2" step="1" value="1">
+              </label>
+            </div>
+            <button type="submit">表示設定を送信</button>
           </form>
 
           <form id="notificationForm" class="tab-panel">

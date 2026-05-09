@@ -72,8 +72,29 @@ export function createPetEvent(options = {}) {
   };
 }
 
+export function createDisplaySettingsEvent(options = {}) {
+  return {
+    type: 'display.settings_updated',
+    eventId: options.eventId ?? generatedId('evt-display'),
+    createdAt: options.createdAt ?? new Date().toISOString(),
+    display: {
+      petScale: clampInteger(options.petScale, 1, 2, 2),
+      uiTextScale: clampInteger(options.uiTextScale, 1, 2, 1),
+      bodyTextScale: clampInteger(options.bodyTextScale, 1, 2, 1)
+    }
+  };
+}
+
 function firstLine(value) {
   return value.split(/\r?\n/).find((line) => line.trim().length > 0) ?? 'Codex answer';
+}
+
+function clampInteger(value, min, max, fallback) {
+  const parsed = Number(value ?? fallback);
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+  return Math.max(min, Math.min(max, Math.round(parsed)));
 }
 
 function normalizeChoices(value) {

@@ -28,6 +28,7 @@
 | `POST` | `/codex/notification` | 通知本文から `notification.created` を生成して queue する |
 | `POST` | `/codex/choice` | 確認依頼から `prompt.choice_requested` を生成して queue する |
 | `POST` | `/codex/pet` | pet name / state / spriteRef から `pet.updated` を生成して queue する |
+| `POST` | `/codex/display` | pet 表示倍率と text size から `display.settings_updated` を生成して queue する |
 | `GET` | `/codex/session/latest` | local Codex session JSONL から最新 assistant 回答を Dashboard 表示用に返す |
 | `POST` | `/codex/session/publish` | 最新 Codex session の user / assistant やり取りを `answer.completed` として queue する |
 | `POST` | `/codex/replay-samples` | sample event 一式を queue する |
@@ -44,6 +45,7 @@
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
+| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
 | `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen` |
@@ -93,6 +95,7 @@
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Choice / Pet / Notification はそれぞれ `/codex/answer`、`/codex/choice`、`/codex/pet`、`/codex/notification` を使う。
+- Display は `/codex/display` を使い、pet 表示倍率、UI text size、body text size を M5Stack へ送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
 - command panel は `codex:sessions` を表示し、Codex 最新 session 自動送信の起動コマンドを確認できる。
 - ABC 返信ワークフローでは、Choice 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
@@ -101,6 +104,9 @@
 ## Pet Animation
 
 - firmware は header に pet avatar を描画する。
+- pet avatar は既定で幅2倍・高さ2倍に拡大し、従来比4倍の表示面積を使う。
+- `display.settings_updated.display.petScale` は `1` または `2` を受け付け、Dashboard から動的に変更できる。
+- `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1` または `2` を受け付け、header / footer と本文の text size を個別に変更できる。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。

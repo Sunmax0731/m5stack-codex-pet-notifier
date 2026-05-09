@@ -37,6 +37,7 @@ http://127.0.0.1:8080/
 - 状態確認に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
+- `Display` tab があり、pet display scale、UI text scale、body text scale を変更できる。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
 - `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
@@ -72,6 +73,22 @@ Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして
 - Core2 ヘッダーの pet avatar の背景色または表示状態が変わる。
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
+
+## 4.1 Display 設定
+
+Dashboard の `Display` tab を開き、次を送信します。
+
+- `pet display scale`: `2x`
+- `UI text scale`: `1x` または `2x`
+- `body text scale`: `1x` または `2x`
+
+期待結果:
+
+- Dashboard の send result が `ok=true`。
+- outbound に `display.settings_updated` が出る。
+- Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示される。
+- `UI text scale` を変更すると header / footer の文字サイズが変わる。
+- `body text scale` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
 
 ## 5. Codex session 自動送信
 
@@ -131,7 +148,7 @@ Dashboard の `sample replay` を押します。
 
 期待結果:
 
-- `pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` が outbound に追加される。
+- `pet.updated`、`display.settings_updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` が outbound に追加される。
 - Core2 が順に event を poll し、最終的に Choice 画面へ遷移する。
 
 ## 8. セキュリティ境界確認

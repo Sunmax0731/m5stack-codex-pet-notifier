@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import {
   createAnswerEvent,
   createChoiceEvent,
+  createDisplaySettingsEvent,
   createNotificationEvent,
   createPetEvent
 } from '../codex-adapter/eventFactory.mjs';
@@ -19,7 +20,8 @@ const hostToDeviceTypes = new Set([
   'pet.updated',
   'notification.created',
   'answer.completed',
-  'prompt.choice_requested'
+  'prompt.choice_requested',
+  'display.settings_updated'
 ]);
 const deviceToHostTypes = new Set([
   'device.reply_selected',
@@ -114,6 +116,7 @@ export class LanHostBridge {
   replaySamples(options = {}) {
     const sampleNames = options.samples ?? [
       'pet-update-event.json',
+      'display-settings-event.json',
       'notification-event.json',
       'answer-completed-event.json',
       'choice-request-event.json'
@@ -265,6 +268,12 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
       if (request.method === 'POST' && url.pathname === '/codex/pet') {
         const body = await readJsonBody(request);
         const event = createPetEvent(body.event ?? body);
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event });
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/display') {
+        const body = await readJsonBody(request);
+        const event = createDisplaySettingsEvent(body.event ?? body);
         const result = bridge.publish(event, { deviceId: body.deviceId });
         return sendJson(response, 200, { ...result, event });
       }
@@ -435,6 +444,7 @@ function buildDebugCommands() {
     codexSessions: 'cmd.exe /d /s /c npm run codex:sessions -- --phase any',
     codexHook: 'cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
+    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 2 --ui-text-scale 1 --body-text-scale 1',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
   };

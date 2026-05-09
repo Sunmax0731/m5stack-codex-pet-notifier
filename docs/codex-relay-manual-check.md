@@ -128,6 +128,18 @@ cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 - Core2 header の pet avatar が state に応じて色または表情を変える。
 - pet avatar が blink / bounce / tail animation を継続する。
 
+## 8. Display relay
+
+```powershell
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 2 --ui-text-scale 1 --body-text-scale 1
+```
+
+期待結果:
+
+- `/events` の outbound に `display.settings_updated` が出る。
+- Core2 header の pet avatar が幅2倍・高さ2倍の4倍面積で表示される。
+- text scale を `2` に変更した場合は header / footer または本文の文字サイズが大きくなる。
+
 ## 確認コマンド
 
 ```powershell

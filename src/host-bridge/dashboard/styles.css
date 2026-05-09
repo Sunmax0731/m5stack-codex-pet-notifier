@@ -259,6 +259,21 @@ textarea {
   gap: 10px;
 }
 
+.display-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.range-field strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+input[type="range"] {
+  padding: 0;
+  accent-color: var(--accent);
+}
+
 .result,
 .reply-box,
 .command,

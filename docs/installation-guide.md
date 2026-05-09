@@ -81,7 +81,7 @@ Dashboard:
 http://127.0.0.1:8080/
 ```
 
-Dashboard では health、event log、debug command、Answer / Choice / Pet / Notification 送信、ABC 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。
+Dashboard では health、event log、debug command、Answer / Choice / Pet / Display / Notification 送信、ABC 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。`Display` tab では pet 表示倍率と text size を実機へ送信できます。
 
 別の PowerShell で sample event を送信します。
 

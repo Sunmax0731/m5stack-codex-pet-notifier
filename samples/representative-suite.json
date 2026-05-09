@@ -7,6 +7,7 @@
       "authProbe": true,
       "events": [
         { "sample": "pet-update-event.json" },
+        { "sample": "display-settings-event.json" },
         { "sample": "notification-event.json" },
         { "sample": "answer-completed-event.json" },
         { "sample": "choice-request-event.json" }
@@ -14,7 +15,7 @@
       "actions": ["scroll-down", "select-yes", "pet-interact", "heartbeat"],
       "expected": {
         "status": "passed",
-        "validEvents": 4,
+        "validEvents": 5,
         "invalidEvents": 0,
         "warningCount": 1,
         "replyCount": 1,

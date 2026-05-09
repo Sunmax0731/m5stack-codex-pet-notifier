@@ -4,6 +4,7 @@
   "transport": "lan-local-http-mock",
   "samples": [
     "pet-update-event.json",
+    "display-settings-event.json",
     "notification-event.json",
     "answer-completed-event.json",
     "choice-request-event.json",

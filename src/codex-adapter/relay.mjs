@@ -5,6 +5,7 @@ import { productProfile } from '../core/product-profile.mjs';
 import {
   createAnswerEvent,
   createChoiceEvent,
+  createDisplaySettingsEvent,
   createNotificationEvent,
   createPetEvent
 } from './eventFactory.mjs';
@@ -97,6 +98,14 @@ export async function buildEvent(command, args, options = {}) {
       state: args.state,
       spriteRef: args.sprite ?? args.spriteRef,
       fallbackState: args.fallback
+    });
+  }
+  if (command === 'display') {
+    return createDisplaySettingsEvent({
+      petScale: args['pet-scale'] ?? args.petScale,
+      uiTextScale: args['ui-text-scale'] ?? args.uiTextScale,
+      bodyTextScale: args['body-text-scale'] ?? args.bodyTextScale,
+      eventId: args['event-id'] ?? args.eventId
     });
   }
   throw new Error(`unknown relay command: ${command}`);
@@ -223,6 +232,7 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
+    '  display --pet-scale 2 --ui-text-scale 1 --body-text-scale 1',
     '  watch --file .\\dist\\codex-answer.txt',
     '',
     'Common options: --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',

@@ -37,6 +37,7 @@ for (const required of productProfile.requiredDocs) {
 for (const required of [
   'package.json',
   'schemas/events/pet.updated.json',
+  'schemas/events/display.settings_updated.json',
   'src/host-adapter/localLanBridge.mjs',
   'src/host-bridge/server.mjs',
   'src/codex-adapter/relay.mjs',
@@ -67,6 +68,9 @@ assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page tex
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
 assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
+assert(firmwareSource.includes('petDisplayScale = 2'), 'firmware must default to a 2x pet display scale');
+assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
+assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
 assert(firmwareSource.includes('pet_asset.local.h'), 'firmware must support an ignored local hatch-pet asset header');
 assert(firmwareSource.includes('HAS_LOCAL_PET_ASSET'), 'firmware must gate local hatch-pet assets behind a compile-time flag');
 
@@ -90,6 +94,7 @@ assert(fs.existsSync('docs/codex-hooks.example.json'), 'Codex hooks example must
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');
 assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must expose a pet update endpoint');
+assert(bridgeSource.includes("url.pathname === '/codex/display'"), 'Host Bridge must expose a display settings endpoint');
 assert(bridgeSource.includes("url.pathname === '/codex/session/latest'"), 'Host Bridge must expose a latest Codex session endpoint for the GUI');
 assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host Bridge must expose a latest Codex session publish endpoint for the GUI');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
@@ -97,8 +102,11 @@ assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sani
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
 assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
+assert(dashboardIndexSource.includes('pet display scale'), 'Dashboard must expose pet display area controls');
+assert(dashboardIndexSource.includes('body text scale'), 'Dashboard must expose body text size controls');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
+assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

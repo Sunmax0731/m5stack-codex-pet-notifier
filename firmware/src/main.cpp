@@ -47,6 +47,8 @@ constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 320;
 constexpr int ANSWER_CHARS_PER_PAGE = 90;
 constexpr int BODY_TEXT_WIDTH = 304;
 constexpr int BODY_LINE_HEIGHT = 18;
+constexpr int BASE_HEADER_HEIGHT = 58;
+constexpr int BASE_FOOTER_HEIGHT = 24;
 
 String authToken;
 ScreenState screenState = SCREEN_PAIRING;
@@ -70,6 +72,9 @@ uint32_t lastStatus = 0;
 uint32_t lastTouchEvent = 0;
 uint32_t lastPetFrame = 0;
 uint32_t petReactUntil = 0;
+int petDisplayScale = 2;
+int uiTextScale = 1;
+int bodyTextScale = 1;
 
 void pollHost();
 void sendPetInteraction(const char* interaction);
@@ -98,9 +103,73 @@ void markDraw() {
   needsRedraw = true;
 }
 
-void applyDisplayFont() {
+int clampDisplayScale(int value) {
+  return max(1, min(2, value));
+}
+
+void applyDisplayFont(int scale = 1) {
   M5.Display.setFont(&fonts::efontJA_12);
-  M5.Display.setTextSize(1);
+  M5.Display.setTextSize(clampDisplayScale(scale));
+}
+
+void applyUiFont() {
+  applyDisplayFont(uiTextScale);
+}
+
+void applyBodyFont() {
+  applyDisplayFont(bodyTextScale);
+}
+
+int petAssetWidth() {
+#if HAS_LOCAL_PET_ASSET
+  return PET_ASSET_FRAME_WIDTH;
+#else
+  return 58;
+#endif
+}
+
+int petAssetHeight() {
+#if HAS_LOCAL_PET_ASSET
+  return PET_ASSET_FRAME_HEIGHT;
+#else
+  return 52;
+#endif
+}
+
+int petBoxWidth() {
+  return (petAssetWidth() + 10) * petDisplayScale;
+}
+
+int petBoxHeight() {
+  return (petAssetHeight() + 10) * petDisplayScale;
+}
+
+int headerHeight() {
+  return max(BASE_HEADER_HEIGHT, petBoxHeight() + 12);
+}
+
+int footerHeight() {
+  return BASE_FOOTER_HEIGHT * uiTextScale;
+}
+
+int footerTop() {
+  return M5.Display.height() - footerHeight();
+}
+
+int contentTop() {
+  return headerHeight() + 10;
+}
+
+int bodyLineHeight() {
+  return BODY_LINE_HEIGHT * bodyTextScale;
+}
+
+int maxBodyLinesFrom(int y) {
+  return max(1, (footerTop() - y - 4) / bodyLineHeight());
+}
+
+int answerCharsPerPage() {
+  return max(36, ANSWER_CHARS_PER_PAGE / bodyTextScale);
 }
 
 int utf8CharBytes(const String& value, int index) {
@@ -262,14 +331,14 @@ uint16_t petAccentColor() {
   return TFT_SKYBLUE;
 }
 
-void drawLocalPetAsset(int x, int y) {
+void drawLocalPetAsset(int x, int y, int scale) {
 #if HAS_LOCAL_PET_ASSET
   const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
   for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
     for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
       const uint16_t color = pgm_read_word(&PET_ASSET_FRAMES[frameIndex][row * PET_ASSET_FRAME_WIDTH + col]);
       if (color != PET_ASSET_TRANSPARENT) {
-        M5.Display.drawPixel(x + col, y + row, color);
+        M5.Display.fillRect(x + col * scale, y + row * scale, scale, scale, color);
       }
     }
   }
@@ -285,47 +354,49 @@ void drawVectorPetAvatar(int x, int y) {
   const String state = renderedPetState();
   const uint16_t accent = petAccentColor();
   const uint16_t shadow = TFT_DARKGREY;
-  const int bodyY = y + 10 + bounce;
+  const int s = petDisplayScale;
+  const int bodyY = y + (10 + bounce) * s;
 
-  M5.Display.fillEllipse(x + 26, y + 45, 22, 4, shadow);
-  M5.Display.fillTriangle(x + 9, bodyY + 4, x + 16, bodyY - 8, x + 22, bodyY + 7, accent);
-  M5.Display.fillTriangle(x + 31, bodyY + 7, x + 39, bodyY - 8, x + 45, bodyY + 6, accent);
-  M5.Display.fillRoundRect(x + 6, bodyY + 4, 42, 32, 12, accent);
-  M5.Display.drawRoundRect(x + 6, bodyY + 4, 42, 32, 12, TFT_WHITE);
+  M5.Display.fillEllipse(x + 26 * s, y + 45 * s, 22 * s, 4 * s, shadow);
+  M5.Display.fillTriangle(x + 9 * s, bodyY + 4 * s, x + 16 * s, bodyY - 8 * s, x + 22 * s, bodyY + 7 * s, accent);
+  M5.Display.fillTriangle(x + 31 * s, bodyY + 7 * s, x + 39 * s, bodyY - 8 * s, x + 45 * s, bodyY + 6 * s, accent);
+  M5.Display.fillRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, accent);
+  M5.Display.drawRoundRect(x + 6 * s, bodyY + 4 * s, 42 * s, 32 * s, 12 * s, TFT_WHITE);
 
   const int tail = petFrame % 6 < 3 ? 0 : 3;
-  M5.Display.fillCircle(x + 50 + tail, bodyY + 23, 4, accent);
+  M5.Display.fillCircle(x + (50 + tail) * s, bodyY + 23 * s, 4 * s, accent);
 
   if (blink) {
-    M5.Display.drawFastHLine(x + 18, bodyY + 18, 6, TFT_BLACK);
-    M5.Display.drawFastHLine(x + 32, bodyY + 18, 6, TFT_BLACK);
+    M5.Display.drawFastHLine(x + 18 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
+    M5.Display.drawFastHLine(x + 32 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
   } else {
-    M5.Display.fillCircle(x + 21, bodyY + 18, 3, TFT_BLACK);
-    M5.Display.fillCircle(x + 35, bodyY + 18, 3, TFT_BLACK);
+    M5.Display.fillCircle(x + 21 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
+    M5.Display.fillCircle(x + 35 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
   }
 
   if (state == "reacting" || state == "celebrate") {
-    M5.Display.drawArc(x + 28, bodyY + 23, 8, 5, 15, 165, TFT_BLACK);
+    M5.Display.drawArc(x + 28 * s, bodyY + 23 * s, 8 * s, 5 * s, 15, 165, TFT_BLACK);
   } else if (state == "review") {
-    M5.Display.drawFastHLine(x + 24, bodyY + 26, 10, TFT_BLACK);
+    M5.Display.drawFastHLine(x + 24 * s, bodyY + 26 * s, 10 * s, TFT_BLACK);
   } else {
-    M5.Display.drawPixel(x + 27, bodyY + 26, TFT_BLACK);
-    M5.Display.drawPixel(x + 28, bodyY + 26, TFT_BLACK);
+    M5.Display.fillRect(x + 27 * s, bodyY + 26 * s, s, s, TFT_BLACK);
+    M5.Display.fillRect(x + 28 * s, bodyY + 26 * s, s, s, TFT_BLACK);
   }
 }
 
 void drawPetAvatar(int x, int y) {
 #if HAS_LOCAL_PET_ASSET
   const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
-  M5.Display.fillRoundRect(x + 6, y + 7, 46, 46, 10, petAccentColor());
-  M5.Display.drawRoundRect(x + 6, y + 7, 46, 46, 10, TFT_WHITE);
-  drawLocalPetAsset(x + 11, y + 10 + bounce);
+  const int s = petDisplayScale;
+  M5.Display.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
+  M5.Display.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);
+  drawLocalPetAsset(x + 5 * s, y + (5 + bounce) * s, s);
 #else
   drawVectorPetAvatar(x, y);
 #endif
 }
 
-String pageText(const String& value, int page, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
+String pageText(const String& value, int page, int charsPerPage) {
   int start = page * charsPerPage;
   if (start >= utf8CodepointCount(value)) {
     return "";
@@ -333,29 +404,32 @@ String pageText(const String& value, int page, int charsPerPage = ANSWER_CHARS_P
   return utf8SliceByCodepoints(value, start, charsPerPage);
 }
 
-int pageCount(const String& value, int charsPerPage = ANSWER_CHARS_PER_PAGE) {
+int pageCount(const String& value, int charsPerPage) {
   const int codepoints = utf8CodepointCount(value);
   return max(1, (codepoints + charsPerPage - 1) / charsPerPage);
 }
 
 void drawHeader() {
-  M5.Display.fillRect(0, 0, 320, 58, TFT_DARKGREY);
+  const int h = headerHeight();
+  const int petX = M5.Display.width() - petBoxWidth() - 44;
+  M5.Display.fillRect(0, 0, 320, h, TFT_DARKGREY);
   M5.Display.setTextColor(TFT_WHITE, TFT_DARKGREY);
-  applyDisplayFont();
-  drawLinePx(petName, 8, 8, 190);
-  drawLinePx(String("state: ") + renderedPetState() + " / " + profile.name, 8, 34, 190);
-  drawPetAvatar(205, 4);
+  applyUiFont();
+  drawLinePx(petName, 8, 8, max(96, petX - 16));
+  drawLinePx(String("state: ") + renderedPetState() + " / " + profile.name, 8, 34 * uiTextScale, max(96, petX - 16));
+  drawPetAvatar(petX, 6);
   drawLinePx((WiFi.status() == WL_CONNECTED ? "LAN" : "NO LAN"), 272, 8, 46);
-  drawLinePx(String("U:") + unreadCount, 272, 34, 46);
+  drawLinePx(String("U:") + unreadCount, 272, 34 * uiTextScale, 46);
 }
 
 void drawFooter(const char* a, const char* b, const char* c) {
-  M5.Display.fillRect(0, 216, 320, 24, TFT_NAVY);
+  const int y = footerTop();
+  M5.Display.fillRect(0, y, 320, footerHeight(), TFT_NAVY);
   M5.Display.setTextColor(TFT_WHITE, TFT_NAVY);
-  applyDisplayFont();
-  M5.Display.drawString(a, 14, 224);
-  M5.Display.drawString(b, 132, 224);
-  M5.Display.drawString(c, 242, 224);
+  applyUiFont();
+  M5.Display.drawString(a, 14, y + 8);
+  M5.Display.drawString(b, 132, y + 8);
+  M5.Display.drawString(c, 242, y + 8);
 }
 
 void drawScreen() {
@@ -366,52 +440,60 @@ void drawScreen() {
   M5.Display.fillScreen(TFT_BLACK);
   drawHeader();
   M5.Display.setTextColor(TFT_WHITE, TFT_BLACK);
-  applyDisplayFont();
+  applyUiFont();
+  const int y0 = contentTop();
+  const int uiLine = BODY_LINE_HEIGHT * uiTextScale;
 
   if (screenState == SCREEN_PAIRING) {
-    drawLine("Pairing with Host Bridge", 8, 76, 36);
-    drawLine(String(HOST_BRIDGE_HOST) + ":" + HOST_BRIDGE_PORT, 8, 96, 36);
-    drawLine(authToken.length() ? "paired" : "waiting token", 8, 116, 36);
+    drawLine("Pairing with Host Bridge", 8, y0, 36);
+    drawLine(String(HOST_BRIDGE_HOST) + ":" + HOST_BRIDGE_PORT, 8, y0 + uiLine, 36);
+    drawLine(authToken.length() ? "paired" : "waiting token", 8, y0 + uiLine * 2, 36);
     drawFooter("A poll", "B pet", "C idle");
     return;
   }
 
   if (screenState == SCREEN_IDLE) {
-    drawLine("Idle", 8, 76, 36);
-    drawLine(title.length() ? title : "Waiting for Codex event", 8, 96, 36);
-    drawLine(body.length() ? body : "Use Host Bridge replay.", 8, 116, 36);
+    drawLine("Idle", 8, y0, 36);
+    drawLine(title.length() ? title : "Waiting for Codex event", 8, y0 + uiLine, 36);
+    drawLine(body.length() ? body : "Use Host Bridge replay.", 8, y0 + uiLine * 2, 36);
     drawFooter("A prev", "B pet", "C next");
     return;
   }
 
   if (screenState == SCREEN_NOTIFICATION) {
-    drawLine("Notification", 8, 68, 36);
-    drawLine(title, 8, 90, 42);
-    drawWrappedBlock(body, 8, 114, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 5);
+    drawLine("Notification", 8, y0, 36);
+    drawLine(title, 8, y0 + uiLine, 42);
+    applyBodyFont();
+    const int bodyY = y0 + uiLine * 2 + 6;
+    drawWrappedBlock(body, 8, bodyY, BODY_TEXT_WIDTH, bodyLineHeight(), maxBodyLinesFrom(bodyY));
     drawFooter("A ack", "B pet", "C idle");
     return;
   }
 
   if (screenState == SCREEN_ANSWER) {
-    drawLine(String("Answer page ") + (answerPage + 1) + "/" + pageCount(body), 8, 68, 36);
-    drawLine(summary, 8, 88, 42);
-    drawWrappedBlock(pageText(body, answerPage), 8, 112, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 5);
+    const int charsPerPage = answerCharsPerPage();
+    answerPage = min(answerPage, pageCount(body, charsPerPage) - 1);
+    drawLine(String("Answer page ") + (answerPage + 1) + "/" + pageCount(body, charsPerPage), 8, y0, 36);
+    drawLine(summary, 8, y0 + uiLine, 42);
+    applyBodyFont();
+    const int bodyY = y0 + uiLine * 2 + 6;
+    drawWrappedBlock(pageText(body, answerPage, charsPerPage), 8, bodyY, BODY_TEXT_WIDTH, bodyLineHeight(), maxBodyLinesFrom(bodyY));
     drawFooter("A up", "B idle", "C down");
     return;
   }
 
   if (screenState == SCREEN_CHOICE) {
-    drawLine("Choice requested", 8, 68, 36);
-    drawWrappedBlock(title, 8, 88, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT, 2);
+    drawLine("Choice requested", 8, y0, 36);
+    drawWrappedBlock(title, 8, y0 + uiLine, BODY_TEXT_WIDTH, BODY_LINE_HEIGHT * uiTextScale, 2);
     for (int i = 0; i < choiceCount; ++i) {
-      drawLine(String(static_cast<char>('A' + i)) + ": " + choiceLabels[i], 8, 128 + i * 24, 42);
+      drawLine(String(static_cast<char>('A' + i)) + ": " + choiceLabels[i], 8, y0 + uiLine * 3 + i * 24 * uiTextScale, 42);
     }
     drawFooter("A send", "B send", "C send");
     return;
   }
 
-  drawLine("Error", 8, 76, 36);
-  drawLine(lastError, 8, 96, 42);
+  drawLine("Error", 8, y0, 36);
+  drawLine(lastError, 8, y0 + uiLine, 42);
   drawFooter("A retry", "B pet", "C idle");
 }
 
@@ -552,7 +634,7 @@ void handleFooterTouch(int x) {
     } else if (index == 1) {
       screenState = SCREEN_IDLE;
     } else {
-      answerPage = min(pageCount(body) - 1, answerPage + 1);
+      answerPage = min(pageCount(body, answerCharsPerPage()) - 1, answerPage + 1);
     }
     Serial.printf("touch_answer_nav index=%d page=%d\n", index, answerPage);
     markDraw();
@@ -616,6 +698,11 @@ void handleHostEvent(JsonVariant event) {
       choiceCount += 1;
     }
     screenState = SCREEN_CHOICE;
+  } else if (type == "display.settings_updated") {
+    petDisplayScale = clampDisplayScale(event["display"]["petScale"] | petDisplayScale);
+    uiTextScale = clampDisplayScale(event["display"]["uiTextScale"] | uiTextScale);
+    bodyTextScale = clampDisplayScale(event["display"]["bodyTextScale"] | bodyTextScale);
+    answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
   } else {
     lastError = String("unknown event: ") + type;
     screenState = SCREEN_ERROR;
@@ -741,7 +828,7 @@ void handleButtons() {
     if (screenState == SCREEN_CHOICE) {
       sendReply(2);
     } else if (screenState == SCREEN_ANSWER) {
-      answerPage = min(pageCount(body) - 1, answerPage + 1);
+      answerPage = min(pageCount(body, answerCharsPerPage()) - 1, answerPage + 1);
       markDraw();
     } else {
       screenState = SCREEN_IDLE;
@@ -761,21 +848,21 @@ void handleTouch() {
   auto detail = M5.Touch.getDetail();
   if (detail.wasReleased() && millis() - lastTouchEvent > 600) {
     lastTouchEvent = millis();
-    if (detail.y >= 206) {
+    if (detail.y >= footerTop()) {
       handleFooterTouch(detail.x);
-    } else if (screenState == SCREEN_CHOICE && detail.y >= 108) {
-      const int row = min(choiceCount - 1, max(0, (detail.y - 108) / 24));
+    } else if (screenState == SCREEN_CHOICE && detail.y >= contentTop() + BODY_LINE_HEIGHT * uiTextScale * 3) {
+      const int row = min(choiceCount - 1, max(0, (detail.y - (contentTop() + BODY_LINE_HEIGHT * uiTextScale * 3)) / (24 * uiTextScale)));
       Serial.printf("touch_choice_row index=%d\n", row);
       sendReply(row, "touch-row");
     } else if (screenState == SCREEN_ANSWER && abs(detail.deltaY()) > 20) {
       if (detail.deltaY() < 0) {
-        answerPage = min(pageCount(body) - 1, answerPage + 1);
+        answerPage = min(pageCount(body, answerCharsPerPage()) - 1, answerPage + 1);
       } else {
         answerPage = max(0, answerPage - 1);
       }
       Serial.printf("touch_answer_swipe page=%d\n", answerPage);
       markDraw();
-    } else if (detail.y < 100) {
+    } else if (detail.y < headerHeight()) {
       sendPetInteraction("touch");
     }
   }
