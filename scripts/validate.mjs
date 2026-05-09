@@ -50,6 +50,7 @@ for (const required of [
   'scripts/codex-relay-smoke.mjs',
   'scripts/codex-session-smoke.mjs',
   'scripts/dashboard-smoke.mjs',
+  'tools/upload-firmware.ps1',
   'tools/generate-pet-firmware-asset.py',
   'src/host-bridge/dashboard/index.html',
   'src/host-bridge/dashboard/app.js',
@@ -102,6 +103,12 @@ assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset g
 assert(petAssetGeneratorSource.includes('Image.Resampling.LANCZOS'), 'pet asset generator must resample scale-specific frames from source cells');
 assert(petAssetGeneratorSource.includes('detect_frame_count'), 'pet asset generator must auto-detect non-empty animation frames');
 
+const uploadFirmwareSource = fs.readFileSync('tools/upload-firmware.ps1', 'utf8');
+assert(uploadFirmwareSource.includes('Get-CimInstance Win32_SerialPort'), 'firmware upload helper must inspect serial ports');
+assert(uploadFirmwareSource.includes('VID_10C4'), 'firmware upload helper must prefer CP210x USB serial devices');
+assert(uploadFirmwareSource.includes("PNPDeviceID -match '^USB\\\\'"), 'firmware upload helper must not fall back to non-USB serial ports');
+assert(uploadFirmwareSource.includes('run -d $firmwareRoot'), 'firmware upload helper must run PlatformIO from the repo root with -d firmware');
+
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
 assert(relaySource.includes("Buffer.from(result.stdout.trim(), 'base64').toString('utf8')"), 'clipboard relay must restore UTF-8 from Base64');
@@ -128,6 +135,7 @@ assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host
 assert(bridgeSource.includes("url.pathname === '/pet/packages'"), 'Host Bridge must expose local pet package metadata for dashboard preview');
 assert(bridgeSource.includes('/pet/current/manifest'), 'Host Bridge must expose the current local pet manifest for dashboard preview');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
+assert(bridgeSource.includes('firmware:upload:core2'), 'Host Bridge debug commands must expose auto-detected Core2 upload');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');

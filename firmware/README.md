@@ -1,6 +1,6 @@
 # Firmware Scaffold
 
-M5Unified を前提にした M5Stack Core2 / GRAY 向け firmware scaffold です。閉鎖アルファでは protocol と device profile の境界を確認するための最小実装に留めます。現在の main では Core2 target を `COM4` へ upload し、2.4GHz Wi-Fi 接続を serial log で確認済みです。
+M5Unified を前提にした M5Stack Core2 / GRAY 向け firmware scaffold です。閉鎖アルファでは protocol と device profile の境界を確認するための最小実装に留めます。現在の main では Core2 target を USB serial 自動検出で upload し、2.4GHz Wi-Fi 接続を serial log で確認対象にします。過去証跡では `COM4` で upload 済みです。
 
 ## Targets
 

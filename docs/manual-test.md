@@ -15,7 +15,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
-| C2-01 | firmware を Core2 target で build / flash する | 起動画面は固定ヘッダーテキストを表示せず、pet surface と状態画面が出る | 実施済み。`COM4` upload 成功 |
+| C2-01 | firmware を Core2 target で build / flash する | 起動画面は固定ヘッダーテキストを表示せず、pet surface と状態画面が出る | 実施済み。過去証跡では `COM4` upload 成功、現行手順は USB serial 自動検出 |
 | C2-02 | 2.4GHz Wi-Fi へ接続する | serial log に `wifi_connected` と device IP が出る | 実施済み。`wifi_status connected`、local IP は redacted |
 | C2-03 | Host Bridge へ pairing する | serial log に `pair_ok` が出る | 実施済み。Host Bridge health で paired device を確認 |
 | C2-04 | `notification.created` を送る | 通知画面へ遷移し、serial log に host event が出る | 実施済み。serial で host event を確認 |
@@ -116,8 +116,7 @@ firmware:
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
-cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
 repo root から実行する場合:
@@ -125,13 +124,13 @@ repo root から実行する場合:
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
 ## Codex実施ログ要約
 
 - Build: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
-- Upload: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
+- Upload: `cmd.exe /d /s /c npm run firmware:upload:core2`
 - Japanese display source gate: `scripts/validate.mjs` で `fonts::efontJA_12` と UTF-8 code point 境界のページングを確認する。
 - Serial evidence: `wifi_connected`、`pair_ok`、Host Bridge sample event を確認対象にする。
 - Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。

@@ -22,6 +22,7 @@
     "codex:sessions": "node src/codex-adapter/sessionWatcher.mjs",
     "codex:hook": "node src/codex-adapter/hookRelay.mjs",
     "pet:asset": "python tools/generate-pet-firmware-asset.py",
+    "firmware:upload:core2": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/upload-firmware.ps1 -Environment m5stack-core2",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
     "closed-alpha:guard": "node tools/closed-alpha-guard.mjs",
     "demo": "node src/cli/index.mjs demo"

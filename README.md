@@ -54,6 +54,7 @@ cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
@@ -78,14 +79,22 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+cd ..
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
-repo root から実行する場合は `-d firmware` を付けます。
+upload helper は repo root から実行します。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
+cmd.exe /d /s /c npm run firmware:upload:core2
+```
+
+USB serial の COM 番号は Windows の接続状況で変わります。自動検出が外れた場合は次のように明示します。
+
+```powershell
+Get-CimInstance Win32_SerialPort | Select-Object DeviceID,Name
+cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 ```
 
 `D:\AI\secure\ssid.txt` は Git に入れません。M5Stack/ESP32 は 2.4GHz Wi-Fi のみ対応するため、5GHz SSID が記載されている場合は device scan で見つかった対応 2.4GHz SSID を `firmware/include/wifi_config.local.h` に設定します。この local header は `.gitignore` 対象です。

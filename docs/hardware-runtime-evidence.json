@@ -4,7 +4,7 @@
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
-    "serialPort": "COM4",
+    "serialPort": "COM3",
     "usbDescription": "Silicon Labs CP210x USB to UART Bridge",
     "target": "m5stack-core2",
     "chip": "ESP32-D0WDQ6-V3",
@@ -15,7 +15,7 @@
     "commands": [
       "pio run -e m5stack-core2",
       "pio run -e m5stack-gray",
-      "pio run -e m5stack-core2 -t upload --upload-port COM4",
+      "npm run firmware:upload:core2",
       "npm run dashboard:smoke",
       "npm run codex:sessions -- --once --phase any",
       "npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001",
@@ -214,7 +214,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, and display setting controls. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded through the USB serial auto-detection helper. On the latest check the helper selected COM3 (Silicon Labs CP210x USB to UART Bridge). The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, and display setting controls. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",

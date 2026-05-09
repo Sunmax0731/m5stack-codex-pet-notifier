@@ -37,7 +37,7 @@
 | --- | --- | --- |
 | Core2 build | PlatformIO Core2 target を build する | `pio run -e m5stack-core2` |
 | GRAY build | PlatformIO GRAY target を build する | `pio run -e m5stack-gray` |
-| Core2 upload | USB 接続された Core2 へ firmware を書き込む | `pio run -e m5stack-core2 -t upload --upload-port COM4` |
+| Core2 upload | USB 接続された Core2 へ firmware を書き込む | `npm run firmware:upload:core2` |
 | Core2 LAN | 2.4GHz Wi-Fi、pairing、Host Bridge sample poll を serial log で確認する | `docs/hardware-runtime-evidence.json` |
 | Core2 re-pairing | Host Bridge 再起動後に invalid token を検出し、再pairingへ戻る | `docs/hardware-runtime-evidence.json` |
 | Core2 Codex answer | `npm run codex:answer` で Core2 に Answer を表示する | `docs/hardware-runtime-evidence.json` |

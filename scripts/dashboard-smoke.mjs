@@ -94,6 +94,7 @@ try {
   assert.match(snapshot.commands.petAssetAny, /pet:asset/);
   assert.match(snapshot.commands.codexDisplay, /codex:display/);
   assert.match(snapshot.commands.codexDisplay, /--pet-bg/);
+  assert.match(snapshot.commands.core2Upload, /firmware:upload:core2/);
 
   const petPackages = await getJson(`${baseUrl}/pet/packages`);
   assert.equal(petPackages.ok, true);

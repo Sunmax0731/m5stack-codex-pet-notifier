@@ -26,7 +26,7 @@ QCDS は Quality、Cost、Delivery、Satisfaction として評価します。gra
 - `cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h`
 - `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
 - `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray`
-- `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
+- `cmd.exe /d /s /c npm run firmware:upload:core2`
 - `docs/qcds-strict-metrics.json`
 - `docs/manual-test.md`
 - `docs/host-bridge-manual-check.md`

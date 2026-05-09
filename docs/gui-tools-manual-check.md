@@ -15,7 +15,7 @@ Pet asset 生成:
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
 ## 1. Host Bridge と Dashboard を起動する

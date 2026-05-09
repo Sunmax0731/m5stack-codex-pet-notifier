@@ -6,7 +6,7 @@
 - `npm test` で runtime gate、representative suite、QCDS guard が通る。
 - release notes、manual test、security/privacy、traceability、competitive benchmark が揃っている。
 - docs ZIP を生成できる。
-- Core2 target を `COM4` の M5Stack へ upload し、2.4GHz Wi-Fi 接続を serial log で確認済み。
+- Core2 target を USB serial 自動検出 helper で M5Stack へ upload し、2.4GHz Wi-Fi 接続を serial log で確認対象にしている。最新確認では `COM3` を検出して upload 成功、過去証跡では `COM4` でも upload 済み。
 
 ## Gap
 

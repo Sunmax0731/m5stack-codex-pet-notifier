@@ -48,15 +48,16 @@ http://127.0.0.1:8080/
 ## 3. Firmware upload
 
 ```powershell
-cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run firmware:upload:core2
 ```
 
-repo root から実行する場合:
+自動検出が外れた場合:
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4
+Get-CimInstance Win32_SerialPort | Select-Object DeviceID,Name
+cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 ```
 
 Serial で確認するログ:
