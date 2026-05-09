@@ -1,104 +1,105 @@
 {
   "ok": true,
-  "startedAt": "2026-05-09T19:22:16.467Z",
-  "checkedAt": "2026-05-09T19:22:16.467Z",
+  "startedAt": "2026-05-09T19:30:22.467Z",
+  "checkedAt": "2026-05-09T19:30:22.467Z",
   "attempts": 1,
   "browserSettings": {
     "url": "http://127.0.0.1:8080/",
-    "capturedAt": "2026-05-09T19:22:16.467Z",
-    "source": "Dashboard-equivalent /codex/display payload after Core2 firmware upload; the Dashboard uses the same endpoint for display settings.",
+    "capturedAt": "2026-05-09T19:30:22.467Z",
+    "source": "Dashboard-equivalent /codex/display payload after Core2 firmware upload, followed by answer.completed to verify the fullscreen text panel path.",
     "display": {
       "petScale": 6,
-      "uiTextScale": 2,
-      "bodyTextScale": 2,
+      "uiTextScale": 1,
+      "bodyTextScale": 1,
       "animationFps": 12,
       "motionStepMs": 520,
-      "petOffsetX": -24,
-      "petOffsetY": 18,
+      "petOffsetX": -12,
+      "petOffsetY": 16,
       "screenBackgroundRgba": {
-        "r": 18,
-        "g": 52,
-        "b": 86,
+        "r": 60,
+        "g": 0,
+        "b": 0,
         "a": 255
       },
       "petBackgroundRgba": {
-        "r": 200,
+        "r": 0,
         "g": 20,
-        "b": 90,
-        "a": 180
-      },
-      "textColorRgba": {
-        "r": 250,
-        "g": 250,
         "b": 80,
         "a": 255
       },
+      "textColorRgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
       "textBackgroundRgba": {
-        "r": 20,
-        "g": 180,
-        "b": 40,
-        "a": 220
+        "r": 0,
+        "g": 110,
+        "b": 30,
+        "a": 255
       },
       "textBorderEnabled": true,
       "textBorderRgba": {
         "r": 255,
         "g": 255,
-        "b": 255,
-        "a": 200
+        "b": 0,
+        "a": 255
       },
       "beepOnAnswer": true,
       "visualProbe": true
     }
   },
   "outboundEvent": {
-    "eventId": "evt-display-sync-codex-1778354477370",
+    "eventId": "evt-display-text-panel-1778354972941",
     "type": "display.settings_updated"
   },
   "deviceHeartbeat": {
-    "eventId": "evt-heartbeat-110163",
+    "eventId": "evt-heartbeat-70076",
     "type": "device.heartbeat",
+    "screen": "Answer",
     "display": {
       "petScale": 6,
-      "uiTextScale": 2,
-      "bodyTextScale": 2,
+      "uiTextScale": 1,
+      "bodyTextScale": 1,
       "animationFps": 12,
       "motionStepMs": 520,
-      "petOffsetX": -24,
-      "petOffsetY": 18,
+      "petOffsetX": -12,
+      "petOffsetY": 16,
       "textBorderEnabled": true,
       "beepOnAnswer": true,
       "visualProbe": true,
       "applyCount": 1,
-      "lastEventId": "evt-display-sync-codex-1778354477370",
+      "lastEventId": "evt-display-text-panel-1778354972941",
       "screenBackgroundRgba": {
-        "r": 18,
-        "g": 52,
-        "b": 86,
+        "r": 60,
+        "g": 0,
+        "b": 0,
         "a": 255
       },
       "petBackgroundRgba": {
-        "r": 200,
+        "r": 0,
         "g": 20,
-        "b": 90,
-        "a": 180
-      },
-      "textColorRgba": {
-        "r": 250,
-        "g": 250,
         "b": 80,
         "a": 255
       },
+      "textColorRgba": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 255
+      },
       "textBackgroundRgba": {
-        "r": 20,
-        "g": 180,
-        "b": 40,
-        "a": 220
+        "r": 0,
+        "g": 110,
+        "b": 30,
+        "a": 255
       },
       "textBorderRgba": {
         "r": 255,
         "g": 255,
-        "b": 255,
-        "a": 200
+        "b": 0,
+        "a": 255
       }
     }
   },
@@ -238,13 +239,13 @@
       "match": true
     },
     "uiTextScale": {
-      "expected": 2,
-      "actual": 2,
+      "expected": 1,
+      "actual": 1,
       "match": true
     },
     "bodyTextScale": {
-      "expected": 2,
-      "actual": 2,
+      "expected": 1,
+      "actual": 1,
       "match": true
     },
     "animationFps": {
@@ -258,72 +259,72 @@
       "match": true
     },
     "petOffsetX": {
-      "expected": -24,
-      "actual": -24,
+      "expected": -12,
+      "actual": -12,
       "match": true
     },
     "petOffsetY": {
-      "expected": 18,
-      "actual": 18,
+      "expected": 16,
+      "actual": 16,
       "match": true
     },
     "screenBackgroundRgba": {
       "expected": {
-        "r": 18,
-        "g": 52,
-        "b": 86,
+        "r": 60,
+        "g": 0,
+        "b": 0,
         "a": 255
       },
       "actual": {
-        "r": 18,
-        "g": 52,
-        "b": 86,
+        "r": 60,
+        "g": 0,
+        "b": 0,
         "a": 255
       },
       "match": true
     },
     "petBackgroundRgba": {
       "expected": {
-        "r": 200,
+        "r": 0,
         "g": 20,
-        "b": 90,
-        "a": 180
+        "b": 80,
+        "a": 255
       },
       "actual": {
-        "r": 200,
+        "r": 0,
         "g": 20,
-        "b": 90,
-        "a": 180
+        "b": 80,
+        "a": 255
       },
       "match": true
     },
     "textColorRgba": {
       "expected": {
-        "r": 250,
-        "g": 250,
-        "b": 80,
+        "r": 255,
+        "g": 255,
+        "b": 255,
         "a": 255
       },
       "actual": {
-        "r": 250,
-        "g": 250,
-        "b": 80,
+        "r": 255,
+        "g": 255,
+        "b": 255,
         "a": 255
       },
       "match": true
     },
     "textBackgroundRgba": {
       "expected": {
-        "r": 20,
-        "g": 180,
-        "b": 40,
-        "a": 220
+        "r": 0,
+        "g": 110,
+        "b": 30,
+        "a": 255
       },
       "actual": {
-        "r": 20,
-        "g": 180,
-        "b": 40,
-        "a": 220
+        "r": 0,
+        "g": 110,
+        "b": 30,
+        "a": 255
       },
       "match": true
     },
@@ -336,14 +337,14 @@
       "expected": {
         "r": 255,
         "g": 255,
-        "b": 255,
-        "a": 200
+        "b": 0,
+        "a": 255
       },
       "actual": {
         "r": 255,
         "g": 255,
-        "b": 255,
-        "a": 200
+        "b": 0,
+        "a": 255
       },
       "match": true
     },
@@ -357,5 +358,11 @@
       "actual": true,
       "match": true
     }
+  },
+  "visualExpectation": {
+    "screenBackground": "dark red LCD background",
+    "petBackground": "blue pet transparent-pixel background",
+    "textBackground": "green Answer text panel independent from screen background",
+    "textBorder": "yellow border around the text panel and footer"
   }
 }

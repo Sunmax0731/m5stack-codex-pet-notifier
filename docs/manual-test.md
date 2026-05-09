@@ -42,7 +42,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-25 | `cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"` を実行し、Core2 の A/B/C を押す | Core2 が Decision / Choice 画面へ遷移し、選択後に Host Bridge inbound へ `device.reply_selected` が出る | 準備済み。ユーザー手動 |
 | C2-26 | `cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000` を実行し、Core2 の A/B/C を押す | command result に `reply.ok=true` と選択された `choiceId` が返り、Codex 側で次の作業判断に使える | 準備済み。ユーザー手動 |
 | C2-27 | Dashboard または `codex:display` で `beepOnAnswer=true` を送信してから `answer.completed` を送る | Core2 が Answer 画面へ遷移し、短い beep 音が鳴る。`beepOnAnswer=false` の場合は鳴らない | 準備済み。ユーザー手動 |
-| C2-28 | Dashboard または `codex:display` で `screen background`、`pet background`、`text background` をそれぞれ異なる色にして送る | LCD 全体の背景、pet 透明ピクセル背面、本文パネル / footer 背景がそれぞれ別設定として見える。黒のまま残る文字背景がない | 準備済み。ユーザー手動 |
+| C2-28 | Dashboard または `codex:display` で `screen background`、`pet background`、`text background` をそれぞれ異なる色にして送る。pet display area は `6/8` 以上にして Answer または Choice 画面で確認する | LCD 全体の背景、pet 透明ピクセル背面、本文パネル / footer 背景がそれぞれ別設定として見える。pet fullscreen layout でも本文パネルが text background 色で描かれ、画面背景に同期しない。黒のまま残る文字背景がない | 準備済み。ユーザー手動 |
 | C2-29 | Dashboard または `codex:display` で `pet X/Y offset` を `-80`、`80`、大きな負値 / 正値に変えて送る | pet が上下左右へ移動し、値によって画面外にはみ出して頭や一部だけが見える | 準備済み。ユーザー手動 |
 | C2-30 | Dashboard または `codex:display` で `text border` を有効化し、色 / alpha を変える | Answer / Decision / Notification の本文パネルと footer に枠線が出る。無効化すると枠線が消える | 準備済み。ユーザー手動 |
 

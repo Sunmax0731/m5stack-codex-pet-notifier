@@ -95,6 +95,7 @@ assert(firmwareSource.includes('petSprite.pushSprite(petX, petY)'), 'firmware mu
 assert(firmwareSource.includes('drawPetAvatarTo(petSprite, 0, 0)'), 'firmware pet sprite must use local sprite coordinates to avoid redrawing the full header area');
 assert(firmwareSource.includes('screenBackgroundColor()'), 'firmware must separate full-screen background color from pet background color');
 assert(firmwareSource.includes('blendRgbaOver(textBackgroundRgba, TFT_BLACK)'), 'firmware text background must not implicitly inherit the screen background color');
+assert(firmwareSource.includes('screenState != SCREEN_IDLE || !petFullscreenMode()'), 'firmware must draw the text background panel even when the pet uses a fullscreen layout');
 assert(firmwareSource.includes('petDrawX') && firmwareSource.includes('petOffsetX'), 'firmware must allow horizontal pet offset beyond the screen edge');
 assert(firmwareSource.includes('petDrawY') && firmwareSource.includes('petOffsetY'), 'firmware must allow vertical pet offset beyond the screen edge');
 assert(firmwareSource.includes('drawTextPanel'), 'firmware must apply text background and border consistently to text panels');

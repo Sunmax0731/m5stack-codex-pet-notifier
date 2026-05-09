@@ -1003,12 +1003,11 @@ void drawScreenContentOverlay(bool includeFooter) {
   applyUiFont();
   const int y0 = contentTop();
   const int uiLine = BODY_LINE_HEIGHT * uiTextScale;
-  if (!petFullscreenMode()) {
-    const int overlayY = max(0, y0 - 6);
-    const int overlayHeight = max(0, footerTop() - overlayY);
-    if (overlayHeight > 0) {
-      drawTextPanel(4, overlayY, M5.Display.width() - 8, overlayHeight, 6);
-    }
+  const bool shouldDrawContentPanel = screenState != SCREEN_IDLE || !petFullscreenMode();
+  const int overlayY = max(0, y0 - 6);
+  const int overlayHeight = max(0, footerTop() - overlayY);
+  if (shouldDrawContentPanel && overlayHeight > 0) {
+    drawTextPanel(4, overlayY, M5.Display.width() - 8, overlayHeight, 6);
   }
   M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
 

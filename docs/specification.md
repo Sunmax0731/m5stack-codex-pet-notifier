@@ -128,7 +128,7 @@
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
 - Dashboard は side menu、環境構築コマンド modal、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / GRAY 表示を確認できる。表示パラメータは `変更を自動送信` がonならデバウンス付きで実機へ送信し、offなら `表示設定を送信` button で手動送信する。プレビューは1ペインで全幅表示し、最近の Codex 回答とイベントログは左右ペインで維持する。各項目の説明は `?` icon click で開く help popover とし、theme は既定で OS に追従しつつ light / dark を手動選択できる。label は既定日本語で、English へ切り替えできる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
-- firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。text background は screen background に暗黙同期せず、設定色と alpha を text panel の塗りとして反映する。
+- firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。text background は screen background に暗黙同期せず、pet fullscreen layout の Answer / Decision / Notification でも本文パネルを描画して設定色と alpha を text panel の塗りとして反映する。
 - firmware は pet avatar を `M5Canvas` の off-screen Sprite に描画し、pet box だけを `pushSprite()` で転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。
