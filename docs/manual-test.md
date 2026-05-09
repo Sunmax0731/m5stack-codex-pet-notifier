@@ -21,7 +21,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-05 | `answer.completed` で長文を送る | Answer 画面へ遷移する | 実施済み。serial で host event を確認 |
 | C2-06 | `prompt.choice_requested` を送る | Choice 画面へ遷移する | 実施済み。serial で `screen=Choice` を確認 |
 | C2-07 | A/B/C 相当入力を押す | `device.reply_selected` が Host Bridge inbound に出る | 実施済み。A 押下後に `device.reply_selected` を確認 |
-| C2-08 | Codex relay で返答本文を送る | Core2 が Answer 画面に遷移し本文を表示する | Codex確認対象 |
+| C2-08 | Codex relay で返答本文を送る | Core2 が Answer 画面に遷移し本文を表示する | 実施済み。ユーザー目視で意図どおりの表示を確認 |
 | C2-09 | pet 領域を tap する | pet 反応が表示され、`device.pet_interacted` が送られる | ユーザー手動 |
 | C2-10 | Answer 画面で swipe または footer touch を行う | 本文ページが上下に移動する | ユーザー手動 |
 | C2-11 | Choice 画面で row tap または footer touch を行う | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
@@ -78,6 +78,6 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t up
 - Build: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2`
 - Upload: `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4`
 - Serial evidence: `wifi_connected`、`pair_ok`、Host Bridge sample event を確認対象にする。
-- Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認対象にする。
+- Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
 - 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。

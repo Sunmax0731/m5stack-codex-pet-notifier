@@ -48,9 +48,11 @@
     "route": "/codex/event",
     "answerCompletedObserved": true,
     "core2AnswerScreenObserved": true,
+    "core2VisualConfirmationByUser": true,
     "outboundEventObserved": true,
     "observedEventType": "answer.completed",
-    "bodyPersistedInEvidence": false
+    "bodyPersistedInEvidence": false,
+    "evidence": "User confirmed the Core2 displayed the Codex relay answer as intended after running npm run codex:answer."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
