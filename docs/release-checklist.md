@@ -25,7 +25,7 @@
 - [x] Dashboard と CLI が `/codex/decision`、`/codex/choice`、`/codex/pet` を送信でき、CLI は `device.reply_selected` を待てる。
 - [x] Dashboard が `/codex/session/latest` と `/codex/session/publish` で最新 Codex 回答を表示/送信できる。
 - [x] Dashboard が `/pet/current/manifest` と `/pet/current/spritesheet.webp` で現在の pet を preview できる。
-- [x] Dashboard が `/codex/display` で pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信できる。
+- [x] Dashboard が `/codex/display` で pet display area を `1..32`、text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信できる。
 - [x] Dashboard の command modal が tab とパラメータフォームを持ち、localhost allowlist command だけを実行できる。
 - [x] Host Bridge を hidden background process として起動する `bridge:start:bg` がある。
 - [x] Dashboard の command modal から Host Bridge を background restart できる。
@@ -39,7 +39,7 @@
 - [x] firmware が pet avatar box を `M5Canvas` Sprite buffer へ描画し、animation tick では画面全体の黒塗りを避けて本文 overlay を安定表示できる。
 - [x] firmware が固定ヘッダーテキストを表示せず、pet surface を優先表示できる。
 - [x] firmware が `display.settings_updated` による pet 表示倍率、text size、render FPS、motion step の変更を処理できる。
-- [x] `display.settings_updated` が pet 表示面積と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で扱える。
+- [x] `display.settings_updated` が pet 表示面積を `1..32`、text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で扱える。
 - [x] firmware が hatch-pet local asset を優先表示し、未生成時は fallback avatar を表示できる。
 - [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
 
@@ -60,7 +60,7 @@
 - [ ] Core2 実機で Codex session auto relay を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Codex hook relay を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、render FPS / motion step 変更を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Sprite buffer により pet animation 中の画面全体、本文、footer のちらつきが抑えられていることを目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。

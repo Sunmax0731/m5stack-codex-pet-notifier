@@ -118,6 +118,7 @@ const elements = {
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
   previewPet: $('#previewPet'),
+  resetPetPositionButton: $('#resetPetPositionButton'),
   previewBody: $('#previewBody'),
   previewFooter: $('#previewFooter'),
   previewDeviceReadout: $('#previewDeviceReadout'),
@@ -191,6 +192,7 @@ const labels = {
     motionStep: 'アニメ間隔',
     petOffsetX: 'ペットX位置',
     petOffsetY: 'ペットY位置',
+    resetPetPosition: '位置リセット',
     screenBackground: '画面背景',
     petBackground: 'ペット背景',
     textColor: '文字色',
@@ -283,6 +285,7 @@ const labels = {
     motionStep: 'motion step',
     petOffsetX: 'pet X offset',
     petOffsetY: 'pet Y offset',
+    resetPetPosition: 'Reset position',
     screenBackground: 'screen background',
     petBackground: 'pet background',
     textColor: 'text color',
@@ -1123,6 +1126,9 @@ function rgbaCss(value) {
 }
 
 function rgbaOverBlackCss(value) {
+  if (value.a <= 0) {
+    return 'transparent';
+  }
   const alpha = value.a / 255;
   const r = Math.round(value.r * alpha);
   const g = Math.round(value.g * alpha);
@@ -1251,7 +1257,7 @@ function petPayload() {
 }
 
 function renderDisplayControls() {
-  elements.petScaleValue.textContent = `${elements.petScale.value}/8`;
+  elements.petScaleValue.textContent = `${elements.petScale.value}/32`;
   elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}/8`;
   elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
   elements.animationFpsValue.textContent = `${elements.animationFps.value} fps`;
@@ -1309,7 +1315,7 @@ function renderM5Preview() {
   const textColor = rgbaFromControls(elements.textColor, elements.textAlpha);
   const textBackground = rgbaFromControls(elements.textBgColor, elements.textBgAlpha);
   const textBorder = rgbaFromControls(elements.textBorderColor, elements.textBorderAlpha);
-  const petHeight = Math.round(42 + ((petScale - 1) / 7) * 178);
+  const petHeight = petPreviewHeight(petScale);
   const manifest = state.petManifest;
   const aspect = manifest?.ok ? manifest.frameWidth / manifest.frameHeight : 1;
   const petWidth = Math.round(petHeight * aspect);
@@ -1331,7 +1337,7 @@ function renderM5Preview() {
   elements.m5Preview.style.setProperty('--overlay-border', rgbaCss(textBorder));
   elements.m5Preview.style.setProperty('--overlay-border-width', elements.textBorderEnabled.checked ? '1px' : '0px');
   elements.previewDeviceReadout.textContent = device === 'gray' ? 'GRAY / 320x240 / buttons' : 'Core2 / 320x240 / touch';
-  elements.previewPetReadout.textContent = `${petScale}/8`;
+  elements.previewPetReadout.textContent = `${petScale}/32`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
   elements.previewFpsReadout.textContent = `${animationFps} fps`;
@@ -1356,6 +1362,13 @@ function renderM5Preview() {
   elements.previewFooter.innerHTML = footerHtml(preview.footer, device);
   elements.previewBody.style.display = preview.body ? 'block' : 'none';
   elements.previewFooter.style.display = preview.footer?.length ? 'flex' : 'none';
+}
+
+function petPreviewHeight(petScale) {
+  if (petScale <= 8) {
+    return Math.round(42 + ((petScale - 1) / 7) * 178);
+  }
+  return Math.round(220 + ((petScale - 8) / 24) * 660);
 }
 
 function assetUrl(value) {
@@ -1480,6 +1493,56 @@ function wireSideNav() {
 
 function wireForms() {}
 
+function clampControlValue(control, value) {
+  const min = Number(control.min);
+  const max = Number(control.max);
+  const step = Number(control.step || 1);
+  const clamped = Math.max(min, Math.min(max, value));
+  return Math.round(clamped / step) * step;
+}
+
+function setPetOffset(x, y) {
+  elements.petOffsetX.value = String(clampControlValue(elements.petOffsetX, x));
+  elements.petOffsetY.value = String(clampControlValue(elements.petOffsetY, y));
+  renderDisplayControls();
+  scheduleAutoDisplaySync();
+}
+
+function resetPetPosition() {
+  setPetOffset(0, 0);
+}
+
+function wirePreviewPetDrag() {
+  let drag = null;
+  elements.previewPet.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    elements.previewPet.setPointerCapture(event.pointerId);
+    elements.previewPet.classList.add('dragging');
+    drag = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: Number(elements.petOffsetX.value),
+      offsetY: Number(elements.petOffsetY.value)
+    };
+  });
+  elements.previewPet.addEventListener('pointermove', (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+    setPetOffset(drag.offsetX + event.clientX - drag.startX, drag.offsetY + event.clientY - drag.startY);
+  });
+  const endDrag = (event) => {
+    if (!drag || drag.pointerId !== event.pointerId) {
+      return;
+    }
+    elements.previewPet.classList.remove('dragging');
+    drag = null;
+  };
+  elements.previewPet.addEventListener('pointerup', endDrag);
+  elements.previewPet.addEventListener('pointercancel', endDrag);
+}
+
 function wireActions() {
   [
     elements.petScale,
@@ -1597,6 +1660,7 @@ function wireActions() {
   $('#sendDisplayButton').addEventListener('click', () => {
     publishDisplaySettings().catch(showError);
   });
+  elements.resetPetPositionButton.addEventListener('click', resetPetPosition);
   $$('[data-rgba-toggle]').forEach((button) => {
     button.addEventListener('click', (event) => {
       event.preventDefault();
@@ -1647,6 +1711,7 @@ wireTabs();
 wireSideNav();
 wireForms();
 wireActions();
+wirePreviewPetDrag();
 renderDisplayControls();
 refresh();
 loadPetPackages();

@@ -211,7 +211,7 @@ try {
 
   const display = await postJson(`${baseUrl}/codex/display`, {
     deviceId,
-    petScale: 8,
+    petScale: 32,
     uiTextScale: 3,
     bodyTextScale: 4,
     animationFps: 12,
@@ -220,8 +220,8 @@ try {
     petBackgroundRgba: { r: 8, g: 12, b: 20, a: 255 },
     textColorRgba: { r: 255, g: 245, b: 210, a: 255 },
     textBackgroundRgba: { r: 4, g: 8, b: 12, a: 180 },
-    petOffsetX: -40,
-    petOffsetY: 24,
+    petOffsetX: -800,
+    petOffsetY: 320,
     textBorderEnabled: true,
     textBorderRgba: { r: 120, g: 200, b: 255, a: 255 },
     beepOnAnswer: true,
@@ -229,7 +229,7 @@ try {
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
-  assert.equal(display.event.display.petScale, 8);
+  assert.equal(display.event.display.petScale, 32);
   assert.equal(display.event.display.uiTextScale, 3);
   assert.equal(display.event.display.bodyTextScale, 4);
   assert.equal(display.event.display.animationFps, 12);
@@ -238,8 +238,8 @@ try {
   assert.deepEqual(display.event.display.petBackgroundRgba, { r: 8, g: 12, b: 20, a: 255 });
   assert.deepEqual(display.event.display.textColorRgba, { r: 255, g: 245, b: 210, a: 255 });
   assert.deepEqual(display.event.display.textBackgroundRgba, { r: 4, g: 8, b: 12, a: 180 });
-  assert.equal(display.event.display.petOffsetX, -40);
-  assert.equal(display.event.display.petOffsetY, 24);
+  assert.equal(display.event.display.petOffsetX, -800);
+  assert.equal(display.event.display.petOffsetY, 320);
   assert.equal(display.event.display.textBorderEnabled, true);
   assert.deepEqual(display.event.display.textBorderRgba, { r: 120, g: 200, b: 255, a: 255 });
   assert.equal(display.event.display.beepOnAnswer, true);
@@ -320,13 +320,13 @@ try {
     wifiRssi: -45,
     screen: 'Idle',
     display: {
-      petScale: 8,
+      petScale: 32,
       uiTextScale: 3,
       bodyTextScale: 4,
       animationFps: 12,
       motionStepMs: 280,
-      petOffsetX: -40,
-      petOffsetY: 24,
+      petOffsetX: -800,
+      petOffsetY: 320,
       screenBackgroundRgba: { r: 2, g: 4, b: 8, a: 255 },
       petBackgroundRgba: { r: 8, g: 12, b: 20, a: 255 },
       textColorRgba: { r: 255, g: 245, b: 210, a: 255 },
@@ -346,11 +346,11 @@ try {
   assert.equal(latestReply.details.choiceId, 'yes');
   assert.equal(latestReply.details.input, 'button-a');
   const latestHeartbeat = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-heartbeat');
-  assert.equal(latestHeartbeat.details.display.petScale, 8);
-  assert.equal(latestHeartbeat.details.display.petOffsetX, -40);
+  assert.equal(latestHeartbeat.details.display.petScale, 32);
+  assert.equal(latestHeartbeat.details.display.petOffsetX, -800);
   assert.deepEqual(latestHeartbeat.details.display.screenBackgroundRgba, { r: 2, g: 4, b: 8, a: 255 });
   const latestDisplayOutbound = events.outbound.find((entry) => entry.eventId === display.event.eventId);
-  assert.equal(latestDisplayOutbound.details.display.petScale, 8);
+  assert.equal(latestDisplayOutbound.details.display.petScale, 32);
   assert.deepEqual(latestDisplayOutbound.details.display.textBorderRgba, { r: 120, g: 200, b: 255, a: 255 });
 
   const runtime = await getJson(`${baseUrl}/debug/runtime`);

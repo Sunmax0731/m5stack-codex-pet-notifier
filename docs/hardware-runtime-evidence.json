@@ -195,7 +195,7 @@
     ],
     "defaultPetScale": 2,
     "defaultDisplayAreaMultiplier": 4,
-    "displayScaleRange": "1..8",
+    "displayScaleRange": "1..32",
     "maxPetScale": 8,
     "fixedHeaderTextRemoved": true,
     "spriteBufferedRendering": true,
@@ -245,7 +245,8 @@
       "display.settings_updated",
       "animationFps=12",
       "motionStepMs=280",
-      "petScale=8 fallback event queued and consumed"
+      "petScale=32 fallback event queued and consumed",
+      "Core2 heartbeat returned petScale=32, petOffsetX=-640, petOffsetY=360, and textBackgroundRgba.a=0 for evt-display-1778357419379-d8dd8cbc"
     ]
   },
   "manualPhysicalInput": {
@@ -262,7 +263,7 @@
     "Codex session auto relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Codex hook relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Dashboard latest Codex answer publish visual confirmation on Core2 is prepared but still requires user manual check",
-    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, text size, render FPS, motion step, and text-over-pet layout is prepared but still requires user manual check",
+    "Dashboard Display settings heartbeat sync for petScale=32, pet drag offset values, and transparent text background alpha=0 is passed; final visual confirmation for fixed header removal, text-only alpha=0 rendering, render FPS, motion step, and text-over-pet layout still requires user manual check",
     "Dashboard current pet preview and physical Core2 layout match are prepared but still require user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",

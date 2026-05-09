@@ -89,7 +89,7 @@ Dashboard:
 http://127.0.0.1:8080/
 ```
 
-Dashboard では health、event log、Answer / Decision / Notification 送信、Decision 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。状態確認は sidebar に常時表示し、side menu はプレビュー、最近の回答、ログの作業領域を切り替えます。`M5Stack 表示プレビュー` では現在の hatch-pet キャラ、pet 表示面積と text size `1..8`、render FPS `4..20`、motion step `120..800ms` を送信前に確認できます。`変更を自動送信` がonの場合は表示パラメータ変更後に自動で実機へ送信され、offの場合は `表示設定を送信` で手動送信します。環境構築と debug command は sidebar の modal から確認し、タブ内のフォームでパラメータを変更して localhost から実行できます。sidebar には Bridge の foreground / background、pid、uptime が表示されます。
+Dashboard では health、event log、Answer / Decision / Notification 送信、Decision 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。状態確認は sidebar に常時表示し、side menu はプレビュー、最近の回答、ログの作業領域を切り替えます。`M5Stack 表示プレビュー` では現在の hatch-pet キャラ、pet 表示面積 `1..32`、text size `1..8`、render FPS `4..20`、motion step `120..800ms` を送信前に確認できます。pet はプレビュー上でドラッグして X/Y 位置を調整し、位置リセットで `0,0` に戻せます。`変更を自動送信` がonの場合は表示パラメータ変更後に自動で実機へ送信され、offの場合は `表示設定を送信` で手動送信します。環境構築と debug command は sidebar の modal から確認し、タブ内のフォームでパラメータを変更して localhost から実行できます。sidebar には Bridge の foreground / background、pid、uptime が表示されます。
 
 Windows では repo root の `start-dashboard.bat` をダブルクリックすると、background Bridge 起動と Dashboard 表示をまとめて実行できます。Dashboard の送信フォームは `環境構築コマンド` modal に統合され、`M5Stack 表示プレビュー` から screen / pet / text / border RGBA、pet X/Y offset、text border 表示を送信できます。Dashboard は既定でOS themeに追従し、label は日本語/Englishを切り替えできます。
 

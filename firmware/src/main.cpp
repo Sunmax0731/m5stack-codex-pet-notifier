@@ -56,7 +56,8 @@ constexpr int BODY_TEXT_WIDTH = 304;
 constexpr int BODY_LINE_HEIGHT = 18;
 constexpr int BASE_FOOTER_HEIGHT = 24;
 constexpr int DISPLAY_SCALE_MIN = 1;
-constexpr int DISPLAY_SCALE_MAX = 8;
+constexpr int DISPLAY_SCALE_FULLSCREEN = 8;
+constexpr int DISPLAY_SCALE_MAX = 32;
 constexpr int MIN_PET_SURFACE_HEIGHT = 52;
 
 String authToken;
@@ -167,11 +168,13 @@ int clampMotionStepMs(int value) {
 }
 
 int clampPetOffsetX(int value) {
-  return max(-M5.Display.width(), min(M5.Display.width(), value));
+  const int limit = M5.Display.width() * 4;
+  return max(-limit, min(limit, value));
 }
 
 int clampPetOffsetY(int value) {
-  return max(-M5.Display.height(), min(M5.Display.height(), value));
+  const int limit = M5.Display.height() * 4;
+  return max(-limit, min(limit, value));
 }
 
 uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
@@ -217,12 +220,26 @@ uint16_t textPanelFillColor() {
   return textBackgroundColor();
 }
 
+bool textPanelFillVisible() {
+  return textBackgroundRgba.a > 0;
+}
+
 uint16_t textBorderColor() {
   return blendRgbaOver(textBorderRgba, textPanelFillColor());
 }
 
 uint16_t textForegroundColor() {
   return blendRgbaOver(textColorRgba, textPanelFillColor());
+}
+
+void applyTextColors() {
+  const uint16_t foreground = textForegroundColor();
+  if (textPanelFillVisible()) {
+    M5.Display.setTextColor(foreground, textPanelFillColor());
+  } else {
+    // M5GFX skips glyph background fill when foreground and background match.
+    M5.Display.setTextColor(foreground, foreground);
+  }
 }
 
 uint8_t readColorChannel(JsonVariant source, const char* key, uint8_t fallback) {
@@ -419,6 +436,14 @@ int petScaleLevelIndex() {
 #endif
 }
 
+int petScaleSpecificMultiplier() {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  return max(1, (petDisplayScale + PET_ASSET_SCALE_LEVELS - 1) / PET_ASSET_SCALE_LEVELS);
+#else
+  return 1;
+#endif
+}
+
 int petAssetWidth() {
 #if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
   if (hasScaleSpecificPetAsset()) {
@@ -438,11 +463,11 @@ int petAssetHeight() {
 }
 
 int petBoxPadding() {
-  return petDisplayScale >= DISPLAY_SCALE_MAX ? 0 : 10;
+  return petDisplayScale >= DISPLAY_SCALE_FULLSCREEN ? 0 : 10;
 }
 
 bool petFullscreenMode() {
-  return petDisplayScale >= DISPLAY_SCALE_MAX && screenState == SCREEN_IDLE;
+  return petDisplayScale >= DISPLAY_SCALE_FULLSCREEN && screenState == SCREEN_IDLE;
 }
 
 int petSurfaceHeight() {
@@ -450,25 +475,21 @@ int petSurfaceHeight() {
 }
 
 int petPixelScale() {
-  const int areaWidth = M5.Display.width();
-  const int areaHeight = max(1, petSurfaceHeight() - 8);
-  const int baseWidth = petBaseAssetWidth() + petBoxPadding();
-  const int baseHeight = petBaseAssetHeight() + petBoxPadding();
-  const int scaleByWidth = max(1, areaWidth / max(1, baseWidth));
-  const int scaleByHeight = max(1, areaHeight / max(1, baseHeight));
-  return max(1, min(DISPLAY_SCALE_MAX, min(scaleByWidth, scaleByHeight)));
+  return max(1, petDisplayScale);
 }
 
 int petAssetRenderScale() {
-  return hasScaleSpecificPetAsset() ? 1 : petPixelScale();
+  return hasScaleSpecificPetAsset() ? petScaleSpecificMultiplier() : petPixelScale();
 }
 
 int petBoxWidth() {
-  return petAssetWidth() + petBoxPadding() * petAssetRenderScale();
+  const int s = petAssetRenderScale();
+  return petAssetWidth() * s + petBoxPadding() * s;
 }
 
 int petBoxHeight() {
-  return petAssetHeight() + petBoxPadding() * petAssetRenderScale();
+  const int s = petAssetRenderScale();
+  return petAssetHeight() * s + petBoxPadding() * s;
 }
 
 int headerHeight() {
@@ -564,7 +585,7 @@ void drawDisplayProbe() {
   drawTextPanel(0, h - bandHeight, w, bandHeight, 0);
   M5.Display.drawRect(0, 0, w, h, textBorderEnabled ? textBorderColor() : TFT_WHITE);
   applyDisplayFont(1);
-  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
+  applyTextColors();
   const int panelY = max(bandHeight + 4, h / 2 - 34);
   drawTextPanel(6, panelY, w - 12, min(78, h - panelY - bandHeight - 4), 6);
   M5.Display.drawString("display applied", 12, panelY + 8);
@@ -740,7 +761,7 @@ uint16_t petAccentColor() {
 }
 
 template <typename Target>
-void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y) {
+void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y, int scale) {
 #if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
   const int levelIndex = petScaleLevelIndex();
   const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
@@ -754,7 +775,11 @@ void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y) {
       const uint16_t color = pgm_read_word(&PET_ASSET_SCALED_PIXELS[offset + row * width + col]);
       if (color == PET_ASSET_TRANSPARENT) {
         if (runStart >= 0) {
-          target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+          if (scale <= 1) {
+            target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+          } else {
+            target.fillRect(x + runStart * scale, y + row * scale, (col - runStart) * scale, scale, runColor);
+          }
           runStart = -1;
         }
         continue;
@@ -763,30 +788,39 @@ void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y) {
         runStart = col;
         runColor = color;
       } else if (color != runColor) {
-        target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+        if (scale <= 1) {
+          target.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+        } else {
+          target.fillRect(x + runStart * scale, y + row * scale, (col - runStart) * scale, scale, runColor);
+        }
         runStart = col;
         runColor = color;
       }
     }
     if (runStart >= 0) {
-      target.drawFastHLine(x + runStart, y + row, width - runStart, runColor);
+      if (scale <= 1) {
+        target.drawFastHLine(x + runStart, y + row, width - runStart, runColor);
+      } else {
+        target.fillRect(x + runStart * scale, y + row * scale, (width - runStart) * scale, scale, runColor);
+      }
     }
   }
 #else
   (void)x;
   (void)y;
+  (void)scale;
 #endif
 }
 
 void drawScaleSpecificLocalPetAsset(int x, int y) {
-  drawScaleSpecificLocalPetAssetTo(M5.Display, x, y);
+  drawScaleSpecificLocalPetAssetTo(M5.Display, x, y, petScaleSpecificMultiplier());
 }
 
 template <typename Target>
 void drawLocalPetAssetTo(Target& target, int x, int y, int scale) {
 #if HAS_LOCAL_PET_ASSET
   if (hasScaleSpecificPetAsset()) {
-    drawScaleSpecificLocalPetAssetTo(target, x, y);
+    drawScaleSpecificLocalPetAssetTo(target, x, y, scale);
     return;
   }
   const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
@@ -905,14 +939,19 @@ void drawTextPanel(int x, int y, int width, int height, int radius) {
   if (height <= 0 || width <= 0) {
     return;
   }
+  const bool fillVisible = textPanelFillVisible();
   const uint16_t fill = textPanelFillColor();
   if (radius > 0) {
-    M5.Display.fillRoundRect(x, y, width, height, radius, fill);
+    if (fillVisible) {
+      M5.Display.fillRoundRect(x, y, width, height, radius, fill);
+    }
     if (textBorderEnabled && textBorderRgba.a > 0) {
       M5.Display.drawRoundRect(x, y, width, height, radius, textBorderColor());
     }
   } else {
-    M5.Display.fillRect(x, y, width, height, fill);
+    if (fillVisible) {
+      M5.Display.fillRect(x, y, width, height, fill);
+    }
     if (textBorderEnabled && textBorderRgba.a > 0) {
       M5.Display.drawRect(x, y, width, height, textBorderColor());
     }
@@ -981,7 +1020,7 @@ void drawFooter(const char* a, const char* b, const char* c) {
   }
   const int y = footerTop();
   drawTextPanel(0, y, M5.Display.width(), footerHeight(), 0);
-  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
+  applyTextColors();
   applyUiFont();
   const int third = M5.Display.width() / 3;
   drawFooterLabel(a, 0, third, y + 8, 0);
@@ -1009,7 +1048,7 @@ void drawScreenContentOverlay(bool includeFooter) {
   if (shouldDrawContentPanel && overlayHeight > 0) {
     drawTextPanel(4, overlayY, M5.Display.width() - 8, overlayHeight, 6);
   }
-  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
+  applyTextColors();
 
   if (screenState == SCREEN_PAIRING) {
     drawLine("Pairing with Host Bridge", 8, y0, 36);

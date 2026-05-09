@@ -784,6 +784,26 @@ input[type="range"] {
   background-color: var(--pet-bg, #050b14);
   transform: translate(-50%, -54%);
   will-change: background-position;
+  cursor: grab;
+  touch-action: none;
+  z-index: 1;
+}
+
+.preview-pet.dragging {
+  cursor: grabbing;
+}
+
+.preview-reset-position {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 4;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.48);
+  color: #fff;
+  font-size: 11px;
 }
 
 .preview-pet.sprite-pet {

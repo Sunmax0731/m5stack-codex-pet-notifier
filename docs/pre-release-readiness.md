@@ -21,7 +21,7 @@
 - Dashboard Display endpoint と pet 表示倍率 / text size / render FPS / motion step controls。
 - Dashboard current pet preview、tooltip、section collapse、setup command modal。
 - Core2 hatch-pet asset animation の firmware 対応と upload。
-- Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` render、`120..800ms` motion step、dynamic display settings の firmware 対応。
+- Core2 固定ヘッダーテキスト削除、pet `1..32` 表示面積、`4..20fps` render、`120..800ms` motion step、dynamic display settings の firmware 対応。
 - Core2 scale-specific pet asset frame selection。
 - Core2 Sprite buffer による pet surface redraw と本文 overlay の安定表示。
 - Dashboard side menu、状態確認sidebar、全幅M5Stack 表示プレビュー、最近の回答 / イベントログの左右ペイン。
@@ -40,7 +40,7 @@
 - Codex session auto relay の Core2 実機目視確認。
 - Codex hook relay の Core2 実機目視確認。
 - Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
-- Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、render FPS / motion step 変更の Core2 実機目視確認。
+- Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更の Core2 実機目視確認。
 - Current pet preview と実機 layout の一致、文字 overlay、tooltip、section collapse、command modal のユーザー目視確認。
 - Sprite buffer による pet animation ちらつき抑制の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。

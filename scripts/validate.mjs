@@ -95,13 +95,14 @@ assert(firmwareSource.includes('petSprite.pushSprite(petX, petY)'), 'firmware mu
 assert(firmwareSource.includes('drawPetAvatarTo(petSprite, 0, 0)'), 'firmware pet sprite must use local sprite coordinates to avoid redrawing the full header area');
 assert(firmwareSource.includes('screenBackgroundColor()'), 'firmware must separate full-screen background color from pet background color');
 assert(firmwareSource.includes('blendRgbaOver(textBackgroundRgba, TFT_BLACK)'), 'firmware text background must not implicitly inherit the screen background color');
-assert(firmwareSource.includes('return textBackgroundColor();'), 'firmware text panel fill must not fall back to the screen background when text alpha is 0');
+assert(firmwareSource.includes('textPanelFillVisible()'), 'firmware text panel fill must support transparent text background at alpha 0');
+assert(firmwareSource.includes('M5.Display.setTextColor(foreground, foreground);'), 'firmware must draw text without a background when text alpha is 0');
 assert(firmwareSource.includes('screenState != SCREEN_IDLE || !petFullscreenMode()'), 'firmware must draw the text background panel even when the pet uses a fullscreen layout');
 assert(firmwareSource.includes('petDrawX') && firmwareSource.includes('petOffsetX'), 'firmware must allow horizontal pet offset beyond the screen edge');
 assert(firmwareSource.includes('petDrawY') && firmwareSource.includes('petOffsetY'), 'firmware must allow vertical pet offset beyond the screen edge');
 assert(firmwareSource.includes('drawTextPanel'), 'firmware must apply text background and border consistently to text panels');
 assert(!firmwareSource.includes('M5.Display.drawFastHLine(x + runStart'), 'scale-specific pet asset drawing must target the sprite canvas instead of drawing directly to the display');
-assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 8-step display scaling');
+assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 32'), 'firmware must support 32-step pet display scaling');
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
 assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
@@ -238,7 +239,8 @@ assert(dashboardAppSource.includes('screenBackgroundRgba'), 'Dashboard must publ
 assert(dashboardAppSource.includes('petBackgroundRgba'), 'Dashboard must publish pet background RGBA in display settings');
 assert(dashboardAppSource.includes('textColorRgba'), 'Dashboard must publish text color RGBA in display settings');
 assert(dashboardAppSource.includes('textBackgroundRgba'), 'Dashboard must publish text background RGBA in display settings');
-assert(dashboardAppSource.includes('rgbaOverBlackCss(textBackground)'), 'Dashboard preview must match firmware text background composition over black');
+assert(dashboardAppSource.includes('rgbaOverBlackCss(textBackground)'), 'Dashboard preview must keep text background transparent when alpha is 0');
+assert(dashboardAppSource.includes('wirePreviewPetDrag'), 'Dashboard preview must support drag-based pet positioning');
 assert(dashboardAppSource.includes('petOffsetX'), 'Dashboard must publish horizontal pet offset in display settings');
 assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertical pet offset in display settings');
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');

@@ -1,0 +1,79 @@
+{
+  "capturedAt": "2026-05-10T05:10:00+09:00",
+  "bridge": {
+    "url": "http://127.0.0.1:8080",
+    "version": "0.1.0-alpha.10",
+    "pid": 47796,
+    "background": true
+  },
+  "firmware": {
+    "environment": "m5stack-core2",
+    "uploadPort": "COM4",
+    "uploadStatus": "success"
+  },
+  "displaySettingsEvent": {
+    "eventId": "evt-display-1778357419379-d8dd8cbc",
+    "validation": "passed",
+    "requested": {
+      "petScale": 32,
+      "petOffsetX": -640,
+      "petOffsetY": 360,
+      "screenBackgroundRgba": {
+        "r": 38,
+        "g": 50,
+        "b": 56,
+        "a": 255
+      },
+      "petBackgroundRgba": {
+        "r": 255,
+        "g": 0,
+        "b": 255,
+        "a": 255
+      },
+      "textBackgroundRgba": {
+        "r": 0,
+        "g": 200,
+        "b": 100,
+        "a": 0
+      },
+      "textBorderEnabled": false
+    }
+  },
+  "deviceHeartbeat": {
+    "eventId": "evt-heartbeat-160066",
+    "screen": "Idle",
+    "display": {
+      "lastEventId": "evt-display-1778357419379-d8dd8cbc",
+      "applyCount": 1,
+      "petScale": 32,
+      "petOffsetX": -640,
+      "petOffsetY": 360,
+      "screenBackgroundRgba": {
+        "r": 38,
+        "g": 50,
+        "b": 56,
+        "a": 255
+      },
+      "petBackgroundRgba": {
+        "r": 255,
+        "g": 0,
+        "b": 255,
+        "a": 255
+      },
+      "textBackgroundRgba": {
+        "r": 0,
+        "g": 200,
+        "b": 100,
+        "a": 0
+      }
+    }
+  },
+  "result": {
+    "synced": true,
+    "notes": [
+      "Bridge validation accepted petScale=32 and expanded pet offset ranges.",
+      "Core2 heartbeat returned the same pet position, scale, screen background, pet background, and text background alpha=0 values.",
+      "Firmware draws no text panel fill when textBackgroundRgba.a is 0 and disables M5GFX glyph background fill by setting foreground and background text colors to the same value."
+    ]
+  }
+}

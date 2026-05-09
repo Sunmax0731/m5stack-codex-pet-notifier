@@ -87,7 +87,7 @@ export function createDisplaySettingsEvent(options = {}) {
 
 function normalizeDisplaySettings(options = {}) {
   return {
-    petScale: clampInteger(options.petScale, 1, 8, 2),
+    petScale: clampInteger(options.petScale, 1, 32, 2),
     uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
     bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
     animationFps: clampInteger(options.animationFps, 4, 20, 12),
@@ -116,8 +116,8 @@ function normalizeDisplaySettings(options = {}) {
       b: 0,
       a: 178
     }),
-    petOffsetX: clampInteger(options.petOffsetX ?? options.petX, -320, 320, 0),
-    petOffsetY: clampInteger(options.petOffsetY ?? options.petY, -240, 240, 0),
+    petOffsetX: clampInteger(options.petOffsetX ?? options.petX, -1280, 1280, 0),
+    petOffsetY: clampInteger(options.petOffsetY ?? options.petY, -960, 960, 0),
     textBorderEnabled: normalizeBoolean(options.textBorderEnabled ?? options.textBorder, false),
     textBorderRgba: normalizeRgba(options.textBorderRgba ?? options.textBorderColor, {
       r: 255,
