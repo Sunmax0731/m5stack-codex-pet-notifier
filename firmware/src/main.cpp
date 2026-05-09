@@ -214,7 +214,7 @@ uint16_t textBackgroundColor() {
 }
 
 uint16_t textPanelFillColor() {
-  return textBackgroundRgba.a > 0 ? textBackgroundColor() : screenBackgroundColor();
+  return textBackgroundColor();
 }
 
 uint16_t textBorderColor() {

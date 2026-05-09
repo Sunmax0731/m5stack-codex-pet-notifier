@@ -1,30 +1,30 @@
 {
   "ok": true,
-  "startedAt": "2026-05-09T19:30:22.467Z",
-  "checkedAt": "2026-05-09T19:30:22.467Z",
+  "startedAt": "2026-05-09T19:40:10.243Z",
+  "checkedAt": "2026-05-09T19:40:10.243Z",
   "attempts": 1,
   "browserSettings": {
     "url": "http://127.0.0.1:8080/",
-    "capturedAt": "2026-05-09T19:30:22.467Z",
-    "source": "Dashboard-equivalent /codex/display payload after Core2 firmware upload, followed by answer.completed to verify the fullscreen text panel path.",
+    "capturedAt": "2026-05-09T19:40:10.243Z",
+    "source": "Dashboard-equivalent /codex/display payload after Core2 firmware upload. This specifically checks textBackgroundRgba alpha=0 no longer falls back to screenBackgroundRgba.",
     "display": {
-      "petScale": 6,
+      "petScale": 8,
       "uiTextScale": 1,
       "bodyTextScale": 1,
       "animationFps": 12,
       "motionStepMs": 520,
-      "petOffsetX": -12,
-      "petOffsetY": 16,
+      "petOffsetX": 0,
+      "petOffsetY": 44,
       "screenBackgroundRgba": {
-        "r": 60,
+        "r": 255,
         "g": 0,
         "b": 0,
         "a": 255
       },
       "petBackgroundRgba": {
         "r": 0,
-        "g": 20,
-        "b": 80,
+        "g": 30,
+        "b": 100,
         "a": 255
       },
       "textColorRgba": {
@@ -35,9 +35,9 @@
       },
       "textBackgroundRgba": {
         "r": 0,
-        "g": 110,
-        "b": 30,
-        "a": 255
+        "g": 180,
+        "b": 40,
+        "a": 0
       },
       "textBorderEnabled": true,
       "textBorderRgba": {
@@ -51,36 +51,36 @@
     }
   },
   "outboundEvent": {
-    "eventId": "evt-display-text-panel-1778354972941",
+    "eventId": "evt-display-text-alpha0-1778355551571",
     "type": "display.settings_updated"
   },
   "deviceHeartbeat": {
-    "eventId": "evt-heartbeat-70076",
+    "eventId": "evt-heartbeat-80424",
     "type": "device.heartbeat",
     "screen": "Answer",
     "display": {
-      "petScale": 6,
+      "petScale": 8,
       "uiTextScale": 1,
       "bodyTextScale": 1,
       "animationFps": 12,
       "motionStepMs": 520,
-      "petOffsetX": -12,
-      "petOffsetY": 16,
+      "petOffsetX": 0,
+      "petOffsetY": 44,
       "textBorderEnabled": true,
       "beepOnAnswer": true,
       "visualProbe": true,
       "applyCount": 1,
-      "lastEventId": "evt-display-text-panel-1778354972941",
+      "lastEventId": "evt-display-text-alpha0-1778355551571",
       "screenBackgroundRgba": {
-        "r": 60,
+        "r": 255,
         "g": 0,
         "b": 0,
         "a": 255
       },
       "petBackgroundRgba": {
         "r": 0,
-        "g": 20,
-        "b": 80,
+        "g": 30,
+        "b": 100,
         "a": 255
       },
       "textColorRgba": {
@@ -91,9 +91,9 @@
       },
       "textBackgroundRgba": {
         "r": 0,
-        "g": 110,
-        "b": 30,
-        "a": 255
+        "g": 180,
+        "b": 40,
+        "a": 0
       },
       "textBorderRgba": {
         "r": 255,
@@ -234,8 +234,8 @@
   },
   "comparison": {
     "petScale": {
-      "expected": 6,
-      "actual": 6,
+      "expected": 8,
+      "actual": 8,
       "match": true
     },
     "uiTextScale": {
@@ -259,24 +259,24 @@
       "match": true
     },
     "petOffsetX": {
-      "expected": -12,
-      "actual": -12,
+      "expected": 0,
+      "actual": 0,
       "match": true
     },
     "petOffsetY": {
-      "expected": 16,
-      "actual": 16,
+      "expected": 44,
+      "actual": 44,
       "match": true
     },
     "screenBackgroundRgba": {
       "expected": {
-        "r": 60,
+        "r": 255,
         "g": 0,
         "b": 0,
         "a": 255
       },
       "actual": {
-        "r": 60,
+        "r": 255,
         "g": 0,
         "b": 0,
         "a": 255
@@ -286,14 +286,14 @@
     "petBackgroundRgba": {
       "expected": {
         "r": 0,
-        "g": 20,
-        "b": 80,
+        "g": 30,
+        "b": 100,
         "a": 255
       },
       "actual": {
         "r": 0,
-        "g": 20,
-        "b": 80,
+        "g": 30,
+        "b": 100,
         "a": 255
       },
       "match": true
@@ -316,15 +316,15 @@
     "textBackgroundRgba": {
       "expected": {
         "r": 0,
-        "g": 110,
-        "b": 30,
-        "a": 255
+        "g": 180,
+        "b": 40,
+        "a": 0
       },
       "actual": {
         "r": 0,
-        "g": 110,
-        "b": 30,
-        "a": 255
+        "g": 180,
+        "b": 40,
+        "a": 0
       },
       "match": true
     },
@@ -360,9 +360,20 @@
     }
   },
   "visualExpectation": {
-    "screenBackground": "dark red LCD background",
+    "screenBackground": "red LCD background",
     "petBackground": "blue pet transparent-pixel background",
-    "textBackground": "green Answer text panel independent from screen background",
+    "textBackgroundRaw": {
+      "r": 0,
+      "g": 180,
+      "b": 40,
+      "a": 0
+    },
+    "textPanelEffectiveRgb": {
+      "r": 0,
+      "g": 0,
+      "b": 0
+    },
+    "textPanelRule": "text background alpha is composited over black on firmware and dashboard preview, never over screen background",
     "textBorder": "yellow border around the text panel and footer"
   }
 }

@@ -95,6 +95,7 @@ assert(firmwareSource.includes('petSprite.pushSprite(petX, petY)'), 'firmware mu
 assert(firmwareSource.includes('drawPetAvatarTo(petSprite, 0, 0)'), 'firmware pet sprite must use local sprite coordinates to avoid redrawing the full header area');
 assert(firmwareSource.includes('screenBackgroundColor()'), 'firmware must separate full-screen background color from pet background color');
 assert(firmwareSource.includes('blendRgbaOver(textBackgroundRgba, TFT_BLACK)'), 'firmware text background must not implicitly inherit the screen background color');
+assert(firmwareSource.includes('return textBackgroundColor();'), 'firmware text panel fill must not fall back to the screen background when text alpha is 0');
 assert(firmwareSource.includes('screenState != SCREEN_IDLE || !petFullscreenMode()'), 'firmware must draw the text background panel even when the pet uses a fullscreen layout');
 assert(firmwareSource.includes('petDrawX') && firmwareSource.includes('petOffsetX'), 'firmware must allow horizontal pet offset beyond the screen edge');
 assert(firmwareSource.includes('petDrawY') && firmwareSource.includes('petOffsetY'), 'firmware must allow vertical pet offset beyond the screen edge');
@@ -237,6 +238,7 @@ assert(dashboardAppSource.includes('screenBackgroundRgba'), 'Dashboard must publ
 assert(dashboardAppSource.includes('petBackgroundRgba'), 'Dashboard must publish pet background RGBA in display settings');
 assert(dashboardAppSource.includes('textColorRgba'), 'Dashboard must publish text color RGBA in display settings');
 assert(dashboardAppSource.includes('textBackgroundRgba'), 'Dashboard must publish text background RGBA in display settings');
+assert(dashboardAppSource.includes('rgbaOverBlackCss(textBackground)'), 'Dashboard preview must match firmware text background composition over black');
 assert(dashboardAppSource.includes('petOffsetX'), 'Dashboard must publish horizontal pet offset in display settings');
 assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertical pet offset in display settings');
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');

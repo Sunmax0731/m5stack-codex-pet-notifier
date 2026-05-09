@@ -1122,6 +1122,14 @@ function rgbaCss(value) {
   return `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a / 255})`;
 }
 
+function rgbaOverBlackCss(value) {
+  const alpha = value.a / 255;
+  const r = Math.round(value.r * alpha);
+  const g = Math.round(value.g * alpha);
+  const b = Math.round(value.b * alpha);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 function rgbaLabel(colorInput, alphaInput) {
   return `${colorInput.value} / ${alphaInput.value}`;
 }
@@ -1319,7 +1327,7 @@ function renderM5Preview() {
   elements.m5Preview.style.setProperty('--screen-bg', rgbaCss(screenBackground));
   elements.m5Preview.style.setProperty('--pet-bg', rgbaCss(petBackground));
   elements.m5Preview.style.setProperty('--overlay-text', rgbaCss(textColor));
-  elements.m5Preview.style.setProperty('--overlay-bg', rgbaCss(textBackground));
+  elements.m5Preview.style.setProperty('--overlay-bg', rgbaOverBlackCss(textBackground));
   elements.m5Preview.style.setProperty('--overlay-border', rgbaCss(textBorder));
   elements.m5Preview.style.setProperty('--overlay-border-width', elements.textBorderEnabled.checked ? '1px' : '0px');
   elements.previewDeviceReadout.textContent = device === 'gray' ? 'GRAY / 320x240 / buttons' : 'Core2 / 320x240 / touch';
