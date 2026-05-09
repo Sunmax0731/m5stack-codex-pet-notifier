@@ -975,7 +975,12 @@ function compareDisplaySettings(expected = {}, actual = {}) {
 
 function latestOutboundDisplayEvent() {
   const outbound = state.events?.outbound ?? [];
-  const entry = [...outbound].reverse().find((item) => item.details?.display);
+  const targetIds = displayTargetDeviceIds();
+  const reversed = [...outbound].reverse();
+  const entry = reversed.find((item) => (
+    item.details?.display
+    && (!targetIds.length || targetIds.includes(item.deviceId))
+  )) ?? reversed.find((item) => item.details?.display);
   if (!entry) {
     return null;
   }
@@ -987,14 +992,20 @@ function latestOutboundDisplayEvent() {
   };
 }
 
-function latestHeartbeatDisplayEvent() {
-  const currentDeviceId = deviceId();
+function displayTargetDeviceIds(expected = null) {
+  const ids = [
+    expected?.deviceId,
+    deviceId(),
+    ...(state.health?.pairedDevices ?? []).map((device) => device.deviceId)
+  ].filter(Boolean);
+  return [...new Set(ids)];
+}
+
+function latestHeartbeatDisplayEvent(expected = null) {
+  const targetIds = displayTargetDeviceIds(expected);
   const inbound = state.events?.inbound ?? [];
-  return [...inbound].reverse().find((entry) => (
-    entry.type === 'device.heartbeat'
-    && entry.deviceId === currentDeviceId
-    && entry.details?.display
-  )) ?? null;
+  const heartbeats = [...inbound].reverse().filter((entry) => entry.type === 'device.heartbeat' && entry.details?.display);
+  return heartbeats.find((entry) => targetIds.includes(entry.deviceId)) ?? heartbeats[0] ?? null;
 }
 
 function latestExpectedDisplayEvent() {
@@ -1042,7 +1053,7 @@ function renderDisplaySyncStatus() {
     return;
   }
   const expected = latestExpectedDisplayEvent();
-  const heartbeat = latestHeartbeatDisplayEvent();
+  const heartbeat = latestHeartbeatDisplayEvent(expected);
   const currentPayload = displaySettingsPayload();
   let status = 'idle';
   let labelKey = 'displaySyncIdle';

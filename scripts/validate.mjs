@@ -241,6 +241,7 @@ assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answ
 assert(dashboardAppSource.includes('visualProbe'), 'Dashboard must publish display apply visual probe setting');
 assert(dashboardAppSource.includes('renderDisplaySyncStatus'), 'Dashboard must compare sent display settings with device heartbeat');
 assert(dashboardAppSource.includes('compareDisplaySettings'), 'Dashboard must compute display setting sync mismatches');
+assert(dashboardAppSource.includes('displayTargetDeviceIds'), 'Dashboard must use paired device heartbeats for display sync when the debug device field is stale');
 assert(dashboardAppSource.includes('scheduleAutoDisplaySync'), 'Dashboard must debounce and auto-send display setting changes');
 assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
 assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');

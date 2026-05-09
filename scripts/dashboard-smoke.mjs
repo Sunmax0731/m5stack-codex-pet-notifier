@@ -118,6 +118,8 @@ try {
   assert.match(app, /visualProbe/);
   assert.match(app, /renderDisplaySyncStatus/);
   assert.match(app, /compareDisplaySettings/);
+  assert.match(app, /displayTargetDeviceIds/);
+  assert.match(app, /heartbeats\[0\]/);
   assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
