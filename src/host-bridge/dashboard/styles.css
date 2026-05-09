@@ -1128,7 +1128,8 @@ input[type="range"] {
 
 .display-sync-card.sync-pending,
 .display-sync-card.sync-no-heartbeat,
-.display-sync-card.sync-dirty {
+.display-sync-card.sync-dirty,
+.display-sync-card.sync-screen-error {
   border-left-color: var(--amber);
 }
 

@@ -77,6 +77,7 @@ int choiceCount = 0;
 int unreadCount = 0;
 int answerPage = 0;
 String lastError = "";
+bool lastErrorRecoverable = false;
 bool needsRedraw = true;
 bool needsPetRedraw = true;
 uint8_t petFrame = 0;
@@ -467,6 +468,11 @@ void writePetDiagnostics(JsonObject target) {
   target["mood"] = renderedPetMood();
   target["lastInteraction"] = lastInteraction;
   target["interactionCount"] = interactionCount;
+}
+
+void clearDeviceError() {
+  lastError = "";
+  lastErrorRecoverable = false;
 }
 
 uint32_t petAnimationIntervalMs() {
@@ -1345,11 +1351,21 @@ bool pairDevice() {
 }
 
 void setError(const String& message) {
+  lastErrorRecoverable = false;
   lastError = message;
   screenState = SCREEN_ERROR;
   petMood = "alert";
   markDraw();
   Serial.printf("device_error %s\n", message.c_str());
+}
+
+void setRecoverablePollError(const String& message) {
+  lastErrorRecoverable = true;
+  lastError = message;
+  screenState = SCREEN_ERROR;
+  petMood = "worried";
+  markDraw();
+  Serial.printf("device_poll_recoverable_error %s\n", message.c_str());
 }
 
 void sendDeviceEvent(JsonDocument& doc) {
@@ -1372,6 +1388,10 @@ void sendHeartbeat() {
   doc["battery"] = 100;
   doc["wifiRssi"] = WiFi.RSSI();
   doc["screen"] = screenName();
+  if (lastError.length()) {
+    doc["lastError"] = lastError;
+    doc["errorRecoverable"] = lastErrorRecoverable;
+  }
   writeDisplayDiagnostics(doc["display"].to<JsonObject>());
   writePetDiagnostics(doc["pet"].to<JsonObject>());
   sendDeviceEvent(doc);
@@ -1498,6 +1518,7 @@ void handleHostEvent(JsonVariant event) {
   Serial.printf("host_event type=%s\n", type.c_str());
 
   if (type == "pet.updated") {
+    clearDeviceError();
     petName = String(event["pet"]["name"] | "Codex Pet");
     petState = String(event["pet"]["state"] | "idle");
     petMood = normalizePetMood(String(event["pet"]["mood"] | ""), moodFromState(petState));
@@ -1511,12 +1532,14 @@ void handleHostEvent(JsonVariant event) {
     }
     screenState = SCREEN_IDLE;
   } else if (type == "notification.created") {
+    clearDeviceError();
     title = String(event["title"] | "Notification");
     body = String(event["body"] | "");
     petMood = "surprised";
     unreadCount += 1;
     screenState = SCREEN_NOTIFICATION;
   } else if (type == "answer.completed") {
+    clearDeviceError();
     summary = String(event["summary"] | "Answer completed");
     body = String(event["body"] | "");
     petMood = "happy";
@@ -1524,6 +1547,7 @@ void handleHostEvent(JsonVariant event) {
     screenState = SCREEN_ANSWER;
     notifyAnswerBeep();
   } else if (type == "prompt.choice_requested") {
+    clearDeviceError();
     title = String(event["prompt"] | "Choose");
     petMood = "confused";
     currentRequestEventId = String(event["eventId"] | "");
@@ -1546,7 +1570,7 @@ void handleHostEvent(JsonVariant event) {
       }
     }
     if (screenState == SCREEN_ERROR) {
-      lastError = "";
+      clearDeviceError();
       petMood = moodFromState(petState);
       screenState = SCREEN_IDLE;
     }
@@ -1564,12 +1588,12 @@ void pollHost() {
   }
   String response;
   if (!httpGetJson(queryPath("/device/poll"), response)) {
-    setError(lastError);
+    setRecoverablePollError(lastError);
     return;
   }
   JsonDocument doc;
   if (deserializeJson(doc, response)) {
-    setError("poll json error");
+    setRecoverablePollError("poll json error");
     return;
   }
   if (!doc["ok"]) {
@@ -1582,11 +1606,16 @@ void pollHost() {
       markDraw();
       return;
     }
-    setError(String("poll failed: ") + reason);
+    setRecoverablePollError(String("poll failed: ") + reason);
     return;
   }
   if (!doc["event"].isNull()) {
     handleHostEvent(doc["event"]);
+  } else if (screenState == SCREEN_ERROR && lastErrorRecoverable) {
+    clearDeviceError();
+    petMood = moodFromState(petState);
+    screenState = SCREEN_IDLE;
+    markDraw();
   }
 }
 

@@ -11,6 +11,8 @@
     "battery": { "type": "integer", "minimum": 0, "maximum": 100 },
     "wifiRssi": { "type": "integer", "minimum": -100, "maximum": 0 },
     "screen": { "type": "string", "minLength": 1 },
+    "lastError": { "type": "string" },
+    "errorRecoverable": { "type": "boolean" },
     "display": {
       "type": "object",
       "properties": {

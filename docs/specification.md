@@ -55,7 +55,7 @@
 | `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.screenBackgroundRgba`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.petOffsetX`, `display.petOffsetY`, `display.textBorderEnabled`, `display.textBorderRgba`, `display.beepOnAnswer`, `display.visualProbe` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `gesture`, `target`, `screen`, `page`, `mood`, `deviceId` |
-| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.beepOnAnswer`、`display.visualProbe`、`display.applyCount`、`display.lastEventId`、`pet.mood`、`pet.lastInteraction`、`pet.interactionCount` |
+| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `lastError`、`errorRecoverable`、`display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.beepOnAnswer`、`display.visualProbe`、`display.applyCount`、`display.lastEventId`、`pet.mood`、`pet.lastInteraction`、`pet.interactionCount` |
 
 ## 画面状態
 

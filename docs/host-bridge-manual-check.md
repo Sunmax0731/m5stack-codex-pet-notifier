@@ -107,7 +107,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 - inbound に `device.reply_selected` が出る。
 - Dashboard の `環境構築コマンド` modal にある `Decision 返信` に choiceId / requestEventId / input が出る。
 - pet tap または B 長押し後、inbound に `device.pet_interacted` が出る。
-- 10 秒程度待つと inbound に `device.heartbeat` が出る。Display settings 送信後は details の `display.applyCount`、`display.lastEventId`、`display.petScale`、`display.petOffsetX/Y`、`display.*Rgba` で実機に適用された値を確認できる。
+- 10 秒程度待つと inbound に `device.heartbeat` が出る。Display settings 送信後は details の `display.applyCount`、`display.lastEventId`、`display.petScale`、`display.petOffsetX/Y`、`display.*Rgba` で実機に適用された値を確認できる。`screen=Error` の場合は `lastError` と `errorRecoverable` を確認し、回復可能な poll 失敗は次の正常 poll で `Idle` へ戻る。
 
 ## 今回対象外
 

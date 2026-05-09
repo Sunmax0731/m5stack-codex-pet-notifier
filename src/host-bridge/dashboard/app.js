@@ -27,6 +27,7 @@ const state = {
   autoDisplaySyncTimer: null,
   autoDisplaySyncInFlight: false,
   displaySync: null,
+  displayControlsHydrated: false,
   language: localStorage.getItem('m5pet-language') || 'ja',
   themeMode: localStorage.getItem('m5pet-theme') || 'system'
 };
@@ -186,6 +187,7 @@ const labels = {
     displaySyncDirty: '未送信の変更あり',
     displaySyncPending: '反映待ち',
     displaySyncApplied: '反映済み',
+    displaySyncScreenError: '反映済み / 実機Error',
     displaySyncMismatch: '差分あり',
     displaySyncNoHeartbeat: 'heartbeat待ち',
     currentPet: '現在のペット',
@@ -282,6 +284,7 @@ const labels = {
     displaySyncDirty: 'Unsaved changes',
     displaySyncPending: 'Waiting apply',
     displaySyncApplied: 'Applied',
+    displaySyncScreenError: 'Applied / device error',
     displaySyncMismatch: 'Mismatch',
     displaySyncNoHeartbeat: 'Waiting heartbeat',
     currentPet: 'current pet',
@@ -753,6 +756,7 @@ function render() {
   if (!health || !events) {
     return;
   }
+  hydrateDisplayControlsFromLatestHeartbeat();
 
   elements.bridgeLine.textContent = `${health.product} ${health.version} / paired ${health.pairedDevices.length}`;
   if (state.apiBaseWarning) {
@@ -1063,6 +1067,68 @@ function latestExpectedDisplayEvent() {
   return latestOutboundDisplayEvent() ?? state.displaySync;
 }
 
+function rgbaToHex(value) {
+  const channel = (name) => Number(value?.[name] ?? 0).toString(16).padStart(2, '0');
+  return `#${channel('r')}${channel('g')}${channel('b')}`;
+}
+
+function setControlValue(control, value) {
+  if (control && value !== undefined && value !== null) {
+    control.value = String(value);
+  }
+}
+
+function setRgbaControls(colorControl, alphaControl, value) {
+  if (!value || typeof value !== 'object') {
+    return;
+  }
+  setControlValue(colorControl, rgbaToHex(value));
+  setControlValue(alphaControl, value.a);
+}
+
+function hydrateDisplayControlsFromLatestHeartbeat() {
+  if (state.displayControlsHydrated) {
+    return;
+  }
+  const heartbeat = latestHeartbeatDisplayEvent();
+  const display = heartbeat?.details?.display;
+  if (!display) {
+    return;
+  }
+  setControlValue(elements.petScale, display.petScale);
+  setControlValue(elements.uiTextScale, display.uiTextScale);
+  setControlValue(elements.bodyTextScale, display.bodyTextScale);
+  setControlValue(elements.animationFps, display.animationFps);
+  setControlValue(elements.motionStepMs, display.motionStepMs);
+  setControlValue(elements.petOffsetX, display.petOffsetX);
+  setControlValue(elements.petOffsetY, display.petOffsetY);
+  setRgbaControls(elements.screenBgColor, elements.screenBgAlpha, display.screenBackgroundRgba);
+  setRgbaControls(elements.petBgColor, elements.petBgAlpha, display.petBackgroundRgba);
+  setRgbaControls(elements.textColor, elements.textAlpha, display.textColorRgba);
+  setRgbaControls(elements.textBgColor, elements.textBgAlpha, display.textBackgroundRgba);
+  setRgbaControls(elements.textBorderColor, elements.textBorderAlpha, display.textBorderRgba);
+  if (typeof display.textBorderEnabled === 'boolean') {
+    elements.textBorderEnabled.checked = display.textBorderEnabled;
+  }
+  if (typeof display.beepOnAnswer === 'boolean') {
+    elements.beepOnAnswer.checked = display.beepOnAnswer;
+  }
+  if (typeof display.visualProbe === 'boolean') {
+    elements.visualProbe.checked = display.visualProbe;
+  }
+  if (display.lastEventId) {
+    state.displaySync = {
+      eventId: display.lastEventId,
+      type: 'device.heartbeat',
+      display,
+      sentAt: null,
+      source: 'heartbeat'
+    };
+  }
+  state.displayControlsHydrated = true;
+  renderDisplayControls();
+}
+
 function rememberDisplaySyncResult(result, fallbackPayload = null, fallbackEvent = null) {
   const event = result?.event ?? fallbackEvent;
   const display = event?.display ?? fallbackPayload;
@@ -1083,20 +1149,26 @@ function displaySyncDetail(status, expected, heartbeat, comparison) {
   const expectedId = expected?.eventId ?? '-';
   const heartbeatId = heartbeat?.eventId ?? '-';
   const applyCount = heartbeat?.details?.display?.applyCount ?? '-';
+  const heartbeatScreen = heartbeat?.details?.screen ?? '-';
+  const heartbeatError = heartbeat?.details?.lastError;
+  const errorSuffixEn = heartbeatError ? ` Last error: ${heartbeatError}` : '';
+  const errorSuffixJa = heartbeatError ? ` 最終エラー: ${heartbeatError}` : '';
   if (state.language === 'en') {
     if (status === 'idle') return 'Send display settings to compare them with device heartbeat.';
     if (status === 'dirty') return `Current controls differ from ${expectedId}. Send display settings again.`;
     if (status === 'no-heartbeat') return `Sent ${expectedId}. Waiting for a device heartbeat.`;
     if (status === 'pending') return `Sent ${expectedId}. Latest heartbeat is ${heartbeatId}; device lastEventId has not caught up yet.`;
     if (status === 'mismatch') return `EventId matched, but fields differ: ${comparison.mismatches.join(', ')}`;
-    return `Matched ${expectedId} on heartbeat ${heartbeatId}. applyCount ${applyCount}.`;
+    if (status === 'screen-error') return `Display settings matched ${expectedId}, but device screen is Error on heartbeat ${heartbeatId}.${errorSuffixEn}`;
+    return `Matched ${expectedId} on heartbeat ${heartbeatId}. applyCount ${applyCount}. screen ${heartbeatScreen}.`;
   }
   if (status === 'idle') return '表示設定を送信すると、実機heartbeatとの一致状態を表示します。';
   if (status === 'dirty') return `現在のフォーム値は ${expectedId} と異なります。表示設定を再送信してください。`;
   if (status === 'no-heartbeat') return `${expectedId} を送信済みです。実機heartbeatを待っています。`;
   if (status === 'pending') return `${expectedId} を送信済みです。最新heartbeat ${heartbeatId} の lastEventId はまだ追いついていません。`;
   if (status === 'mismatch') return `eventId は一致しましたが、差分があります: ${comparison.mismatches.join(', ')}`;
-  return `${expectedId} が heartbeat ${heartbeatId} で一致しました。applyCount ${applyCount}。`;
+  if (status === 'screen-error') return `表示設定は ${expectedId} と一致していますが、heartbeat ${heartbeatId} の実機画面が Error です。${errorSuffixJa}`;
+  return `${expectedId} が heartbeat ${heartbeatId} で一致しました。applyCount ${applyCount}、screen ${heartbeatScreen}。`;
 }
 
 function renderDisplaySyncStatus() {
@@ -1126,6 +1198,10 @@ function renderDisplaySyncStatus() {
       comparison = compareDisplaySettings(expected.display, heartbeat.details.display);
       status = comparison.ok ? 'applied' : 'mismatch';
       labelKey = comparison.ok ? 'displaySyncApplied' : 'displaySyncMismatch';
+      if (comparison.ok && heartbeat.details?.screen === 'Error') {
+        status = 'screen-error';
+        labelKey = 'displaySyncScreenError';
+      }
     }
   }
 
@@ -1497,6 +1573,7 @@ function clampControlValue(control, value) {
 }
 
 function setPetOffset(x, y) {
+  state.displayControlsHydrated = true;
   elements.petOffsetX.value = String(clampControlValue(elements.petOffsetX, x));
   elements.petOffsetY.value = String(clampControlValue(elements.petOffsetY, y));
   renderDisplayControls();
@@ -1562,10 +1639,12 @@ function wireActions() {
     elements.visualProbe
   ].forEach((control) => {
     control.addEventListener('input', () => {
+      state.displayControlsHydrated = true;
       renderDisplayControls();
       scheduleAutoDisplaySync();
     });
     control.addEventListener('change', () => {
+      state.displayControlsHydrated = true;
       renderDisplayControls();
       scheduleAutoDisplaySync();
     });
