@@ -88,6 +88,8 @@ int uiTextScale = 1;
 int bodyTextScale = 1;
 int petAnimationFps = DEFAULT_PET_ANIMATION_FPS;
 int petMotionStepMs = DEFAULT_PET_MOTION_STEP_MS;
+int petOffsetX = 0;
+int petOffsetY = 0;
 
 struct RgbaColor {
   uint8_t r;
@@ -96,9 +98,12 @@ struct RgbaColor {
   uint8_t a;
 };
 
+RgbaColor screenBackgroundRgba{5, 11, 20, 255};
 RgbaColor petBackgroundRgba{5, 11, 20, 255};
 RgbaColor textColorRgba{255, 255, 255, 255};
 RgbaColor textBackgroundRgba{0, 0, 0, 178};
+RgbaColor textBorderRgba{255, 255, 255, 255};
+bool textBorderEnabled = false;
 bool beepOnAnswer = true;
 
 M5Canvas petSprite(&M5.Display);
@@ -154,6 +159,14 @@ int clampMotionStepMs(int value) {
   return max(MIN_PET_MOTION_STEP_MS, min(MAX_PET_MOTION_STEP_MS, value));
 }
 
+int clampPetOffsetX(int value) {
+  return max(-M5.Display.width(), min(M5.Display.width(), value));
+}
+
+int clampPetOffsetY(int value) {
+  return max(-M5.Display.height(), min(M5.Display.height(), value));
+}
+
 uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
@@ -181,16 +194,28 @@ uint16_t blendRgbaOver(RgbaColor color, uint16_t backdrop) {
   return rgb565(r, g, b);
 }
 
+uint16_t screenBackgroundColor() {
+  return blendRgbaOver(screenBackgroundRgba, TFT_BLACK);
+}
+
 uint16_t petBackgroundColor() {
-  return blendRgbaOver(petBackgroundRgba, TFT_BLACK);
+  return blendRgbaOver(petBackgroundRgba, screenBackgroundColor());
 }
 
 uint16_t textBackgroundColor() {
-  return blendRgbaOver(textBackgroundRgba, petBackgroundColor());
+  return blendRgbaOver(textBackgroundRgba, screenBackgroundColor());
+}
+
+uint16_t textPanelFillColor() {
+  return textBackgroundRgba.a > 0 ? textBackgroundColor() : screenBackgroundColor();
+}
+
+uint16_t textBorderColor() {
+  return blendRgbaOver(textBorderRgba, textPanelFillColor());
 }
 
 uint16_t textForegroundColor() {
-  return blendRgbaOver(textColorRgba, textBackgroundColor());
+  return blendRgbaOver(textColorRgba, textPanelFillColor());
 }
 
 uint8_t readColorChannel(JsonVariant source, const char* key, uint8_t fallback) {
@@ -452,9 +477,14 @@ void applyDisplaySettings(JsonVariant display) {
   bodyTextScale = clampDisplayScale(display["bodyTextScale"] | bodyTextScale);
   petAnimationFps = clampAnimationFps(display["animationFps"] | petAnimationFps);
   petMotionStepMs = clampMotionStepMs(display["motionStepMs"] | petMotionStepMs);
+  petOffsetX = clampPetOffsetX(display["petOffsetX"] | petOffsetX);
+  petOffsetY = clampPetOffsetY(display["petOffsetY"] | petOffsetY);
+  applyRgbaSetting(display["screenBackgroundRgba"], screenBackgroundRgba);
   applyRgbaSetting(display["petBackgroundRgba"], petBackgroundRgba);
   applyRgbaSetting(display["textColorRgba"], textColorRgba);
   applyRgbaSetting(display["textBackgroundRgba"], textBackgroundRgba);
+  textBorderEnabled = display["textBorderEnabled"] | textBorderEnabled;
+  applyRgbaSetting(display["textBorderRgba"], textBorderRgba);
   beepOnAnswer = display["beepOnAnswer"] | beepOnAnswer;
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
 }
@@ -763,22 +793,51 @@ bool ensurePetSprite(int width, int height) {
   return petSpriteReady;
 }
 
+int petDrawX(int width) {
+  return ((width - petBoxWidth()) / 2) + petOffsetX;
+}
+
+int petDrawY(int height) {
+  return ((height - petBoxHeight()) / 2) + petOffsetY;
+}
+
+void drawTextPanel(int x, int y, int width, int height, int radius) {
+  if (height <= 0 || width <= 0) {
+    return;
+  }
+  const uint16_t fill = textPanelFillColor();
+  if (radius > 0) {
+    M5.Display.fillRoundRect(x, y, width, height, radius, fill);
+    if (textBorderEnabled && textBorderRgba.a > 0) {
+      M5.Display.drawRoundRect(x, y, width, height, radius, textBorderColor());
+    }
+  } else {
+    M5.Display.fillRect(x, y, width, height, fill);
+    if (textBorderEnabled && textBorderRgba.a > 0) {
+      M5.Display.drawRect(x, y, width, height, textBorderColor());
+    }
+  }
+}
+
 void drawPetSurfaceSprite() {
   const int width = M5.Display.width();
   const int height = headerHeight();
-  const uint16_t background = petBackgroundColor();
+  const uint16_t screenBackground = screenBackgroundColor();
+  const uint16_t petBackground = petBackgroundColor();
   if (!ensurePetSprite(width, height)) {
-    M5.Display.fillRect(0, 0, width, height, background);
-    const int petX = max(0, (width - petBoxWidth()) / 2);
-    const int petY = max(0, (height - petBoxHeight()) / 2);
+    M5.Display.fillRect(0, 0, width, height, screenBackground);
+    const int petX = petDrawX(width);
+    const int petY = petDrawY(height);
+    M5.Display.fillRect(petX, petY, petBoxWidth(), petBoxHeight(), petBackground);
     drawPetAvatar(petX, petY);
     needsPetRedraw = false;
     return;
   }
 
-  petSprite.fillSprite(background);
-  const int petX = max(0, (width - petBoxWidth()) / 2);
-  const int petY = max(0, (height - petBoxHeight()) / 2);
+  petSprite.fillSprite(screenBackground);
+  const int petX = petDrawX(width);
+  const int petY = petDrawY(height);
+  petSprite.fillRect(petX, petY, petBoxWidth(), petBoxHeight(), petBackground);
   drawPetAvatarTo(petSprite, petX, petY);
   petSprite.pushSprite(0, 0);
   needsPetRedraw = false;
@@ -808,18 +867,29 @@ void drawHeader() {
   drawPetSurfaceSprite();
 }
 
+void drawFooterLabel(const char* label, int left, int width, int y, int align) {
+  int x = left + 8;
+  const int textWidth = M5.Display.textWidth(label);
+  if (align == 1) {
+    x = left + max(0, (width - textWidth) / 2);
+  } else if (align == 2) {
+    x = left + max(0, width - textWidth - 8);
+  }
+  M5.Display.drawString(label, x, y);
+}
+
 void drawFooter(const char* a, const char* b, const char* c) {
   if (footerHeight() <= 0) {
     return;
   }
   const int y = footerTop();
-  const uint16_t footerColor = textBackgroundColor();
-  M5.Display.fillRect(0, y, 320, footerHeight(), footerColor);
-  M5.Display.setTextColor(textForegroundColor(), footerColor);
+  drawTextPanel(0, y, M5.Display.width(), footerHeight(), 0);
+  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
   applyUiFont();
-  M5.Display.drawString(a, 14, y + 8);
-  M5.Display.drawString(b, 132, y + 8);
-  M5.Display.drawString(c, 242, y + 8);
+  const int third = M5.Display.width() / 3;
+  drawFooterLabel(a, 0, third, y + 8, 0);
+  drawFooterLabel(b, third, third, y + 8, 1);
+  drawFooterLabel(c, third * 2, M5.Display.width() - third * 2, y + 8, 2);
 }
 
 void drawScreen() {
@@ -827,7 +897,7 @@ void drawScreen() {
     return;
   }
   needsRedraw = false;
-  M5.Display.fillScreen(petBackgroundColor());
+  M5.Display.fillScreen(screenBackgroundColor());
   drawHeader();
   drawScreenContentOverlay(true);
 }
@@ -839,11 +909,11 @@ void drawScreenContentOverlay(bool includeFooter) {
   if (!petFullscreenMode()) {
     const int overlayY = max(0, y0 - 6);
     const int overlayHeight = max(0, footerTop() - overlayY);
-    if (overlayHeight > 0 && textBackgroundRgba.a > 0) {
-      M5.Display.fillRoundRect(4, overlayY, M5.Display.width() - 8, overlayHeight, 6, textBackgroundColor());
+    if (overlayHeight > 0) {
+      drawTextPanel(4, overlayY, M5.Display.width() - 8, overlayHeight, 6);
     }
   }
-  M5.Display.setTextColor(textForegroundColor());
+  M5.Display.setTextColor(textForegroundColor(), textPanelFillColor());
 
   if (screenState == SCREEN_PAIRING) {
     drawLine("Pairing with Host Bridge", 8, y0, 36);
@@ -1321,7 +1391,7 @@ void setup() {
   M5.begin(cfg);
   M5.Display.setRotation(1);
   M5.Speaker.setVolume(128);
-  M5.Display.fillScreen(petBackgroundColor());
+  M5.Display.fillScreen(screenBackgroundColor());
   applyLocalPetAssetName();
   connectWifi();
   if (WiFi.status() == WL_CONNECTED) {

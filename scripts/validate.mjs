@@ -36,6 +36,7 @@ for (const required of productProfile.requiredDocs) {
 }
 for (const required of [
   'package.json',
+  'start-dashboard.bat',
   'schemas/events/pet.updated.json',
   'schemas/events/display.settings_updated.json',
   'src/host-adapter/localLanBridge.mjs',
@@ -74,9 +75,14 @@ assert(firmwareSource.includes('DEFAULT_PET_MOTION_STEP_MS = 280'), 'firmware mu
 assert(firmwareSource.includes('petAnimationFps'), 'firmware must store runtime-configurable pet animation fps');
 assert(firmwareSource.includes('display["animationFps"]'), 'firmware must accept animation fps in display settings');
 assert(firmwareSource.includes('display["motionStepMs"]'), 'firmware must accept pet motion step timing in display settings');
+assert(firmwareSource.includes('display["screenBackgroundRgba"]'), 'firmware must accept screen background RGBA in display settings');
 assert(firmwareSource.includes('display["petBackgroundRgba"]'), 'firmware must accept pet background RGBA in display settings');
 assert(firmwareSource.includes('display["textColorRgba"]'), 'firmware must accept text color RGBA in display settings');
 assert(firmwareSource.includes('display["textBackgroundRgba"]'), 'firmware must accept text background RGBA in display settings');
+assert(firmwareSource.includes('display["petOffsetX"]'), 'firmware must accept pet X offset in display settings');
+assert(firmwareSource.includes('display["petOffsetY"]'), 'firmware must accept pet Y offset in display settings');
+assert(firmwareSource.includes('display["textBorderEnabled"]'), 'firmware must accept text border visibility in display settings');
+assert(firmwareSource.includes('display["textBorderRgba"]'), 'firmware must accept text border color in display settings');
 assert(firmwareSource.includes('display["beepOnAnswer"]'), 'firmware must accept answer beep setting in display settings');
 assert(firmwareSource.includes('M5.Speaker.tone'), 'firmware must beep when configured answer events arrive');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
@@ -85,6 +91,10 @@ assert(firmwareSource.includes('drawPetSurfaceSprite'), 'firmware must push the 
 assert(firmwareSource.includes('drawPetSurfaceIfNeeded'), 'firmware must redraw only the pet surface during animation ticks');
 assert(firmwareSource.includes('markPetDraw()'), 'firmware must separate pet animation redraw from full-screen redraw');
 assert(firmwareSource.includes('petSprite.pushSprite(0, 0)'), 'firmware must transfer the completed pet sprite to the display');
+assert(firmwareSource.includes('screenBackgroundColor()'), 'firmware must separate full-screen background color from pet background color');
+assert(firmwareSource.includes('petDrawX') && firmwareSource.includes('petOffsetX'), 'firmware must allow horizontal pet offset beyond the screen edge');
+assert(firmwareSource.includes('petDrawY') && firmwareSource.includes('petOffsetY'), 'firmware must allow vertical pet offset beyond the screen edge');
+assert(firmwareSource.includes('drawTextPanel'), 'firmware must apply text background and border consistently to text panels');
 assert(!firmwareSource.includes('M5.Display.drawFastHLine(x + runStart'), 'scale-specific pet asset drawing must target the sprite canvas instead of drawing directly to the display');
 assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 8-step display scaling');
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
@@ -116,6 +126,9 @@ const backgroundBridgeSource = fs.readFileSync('tools/start-bridge-background.mj
 assert(backgroundBridgeSource.includes('windowsHide: true'), 'background bridge launcher must hide the spawned server window on Windows');
 assert(backgroundBridgeSource.includes('detached: true'), 'background bridge launcher must detach the server process');
 assert(backgroundBridgeSource.includes('M5STACK_BRIDGE_BACKGROUND'), 'background bridge launcher must mark the child process as background mode');
+const dashboardBatchSource = fs.readFileSync('start-dashboard.bat', 'utf8');
+assert(dashboardBatchSource.includes('bridge:start:bg'), 'dashboard batch file must start the hidden background bridge');
+assert(dashboardBatchSource.includes('http://127.0.0.1:8080/'), 'dashboard batch file must open the local dashboard URL');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
@@ -162,8 +175,13 @@ assert(dashboardIndexSource.includes('pet display area'), 'Dashboard must expose
 assert(dashboardIndexSource.includes('body text size'), 'Dashboard must expose body text size controls');
 assert(dashboardIndexSource.includes('render FPS'), 'Dashboard must expose render fps controls');
 assert(dashboardIndexSource.includes('motion step'), 'Dashboard must expose pet motion step controls');
+assert(dashboardIndexSource.includes('screen background'), 'Dashboard must expose full-screen background color controls');
 assert(dashboardIndexSource.includes('pet background'), 'Dashboard must expose pet background color controls');
 assert(dashboardIndexSource.includes('text background'), 'Dashboard must expose text background color controls');
+assert(dashboardIndexSource.includes('pet X offset'), 'Dashboard must expose horizontal pet position controls');
+assert(dashboardIndexSource.includes('pet Y offset'), 'Dashboard must expose vertical pet position controls');
+assert(dashboardIndexSource.includes('text border'), 'Dashboard must expose text border color controls');
+assert(dashboardIndexSource.includes('テキスト枠を表示'), 'Dashboard must expose text border visibility controls');
 assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboard must expose answer beep controls');
 assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and GRAY preview switching');
 assert(dashboardIndexSource.includes('petPackagePath'), 'Dashboard must expose local pet package path override');
@@ -176,6 +194,8 @@ assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must
 assert(dashboardIndexSource.includes('commandModal'), 'Dashboard setup/debug commands must be shown in a modal');
 assert(dashboardIndexSource.includes('commandTabs'), 'Dashboard command modal must use tabs');
 assert(dashboardIndexSource.includes('runtimeState'), 'Dashboard sidebar must display bridge runtime status');
+assert(!dashboardIndexSource.includes('data-section="sendSection"'), 'Dashboard must merge the standalone sender section into Debug');
+assert(dashboardIndexSource.includes('debug-send-block'), 'Dashboard Debug panel must contain the outbound sender controls');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
@@ -184,9 +204,14 @@ assert(dashboardAppSource.includes('/pet/current/manifest'), 'Dashboard must loa
 assert(dashboardAppSource.includes('/pet/packages'), 'Dashboard must list local pet packages for preview');
 assert(dashboardAppSource.includes('animationFps'), 'Dashboard must publish animation fps in display settings');
 assert(dashboardAppSource.includes('motionStepMs'), 'Dashboard must publish pet motion step timing in display settings');
+assert(dashboardAppSource.includes('screenBackgroundRgba'), 'Dashboard must publish screen background RGBA in display settings');
 assert(dashboardAppSource.includes('petBackgroundRgba'), 'Dashboard must publish pet background RGBA in display settings');
 assert(dashboardAppSource.includes('textColorRgba'), 'Dashboard must publish text color RGBA in display settings');
 assert(dashboardAppSource.includes('textBackgroundRgba'), 'Dashboard must publish text background RGBA in display settings');
+assert(dashboardAppSource.includes('petOffsetX'), 'Dashboard must publish horizontal pet offset in display settings');
+assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertical pet offset in display settings');
+assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');
+assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');

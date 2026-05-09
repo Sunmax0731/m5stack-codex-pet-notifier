@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | Host Bridge pairing token | `src/host-adapter/localLanBridge.mjs` | `happy-path.unauthorizedRejected=1` |
 | LAN Host Bridge 起動 | `src/host-bridge/server.mjs` | `npm run bridge:smoke` |
-| Dashboard GUI | `src/host-bridge/dashboard/`、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run` | `npm run dashboard:smoke`、browser screenshot |
+| Dashboard GUI | `src/host-bridge/dashboard/`、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、Debug 統合送信フォーム | `npm run dashboard:smoke`、browser screenshot |
 | Codex 返答表示 | `src/codex-adapter/relay.mjs`、`/codex/answer`、`answer.completed` | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Codex 最近 session 自動送信 | `src/codex-adapter/sessionWatcher.mjs`、`npm run codex:sessions`、`answer.completed` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Dashboard 最新 Codex 回答表示 | `/codex/session/latest`、`/codex/session/publish`、`src/host-bridge/dashboard/` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
@@ -15,7 +15,8 @@
 | 実機 event polling | `firmware/src/main.cpp` | `docs/hardware-runtime-evidence.json` |
 | pet 更新表示 | `pet.updated` schema、`MockM5StackDevice.receive()` | `happy-path.validEvents=5` |
 | pet animation | `firmware/src/main.cpp` の `drawPetAvatar`、`DEFAULT_PET_ANIMATION_FPS`、`petAnimationFps`、`M5Canvas petSprite`、`drawPetSurfaceSprite`、`drawPetSurfaceIfNeeded` | `scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
-| pet 表示倍率 / text size / render FPS / motion step / RGBA | `display.settings_updated`、`/codex/display`、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` / `petAnimationFps` / `petMotionStepMs` / `parseRgbaString` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
+| pet 表示倍率 / pet X/Y offset / text size / render FPS / motion step / screen・pet・text・border RGBA | `display.settings_updated`、`/codex/display`、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` / `petOffsetX` / `petOffsetY` / `petAnimationFps` / `petMotionStepMs` / `parseRgbaString` / `drawTextPanel` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
+| ダブルクリック起動 | `start-dashboard.bat`、`npm run bridge:start:bg`、`tools/start-bridge-background.mjs` | `scripts/validate.mjs`、`docs/manual-test.md` |
 | background bridge 起動 | `tools/start-bridge-background.mjs`、`npm run bridge:start:bg`、`/debug/runtime` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
 | current pet preview | `/pet/current/manifest`、`/pet/current/spritesheet.webp`、Dashboard preview sprite renderer | `scripts/dashboard-smoke.mjs`、browser screenshot |
 | hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |

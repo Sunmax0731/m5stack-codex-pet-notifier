@@ -15,7 +15,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
-- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Choice / Pet / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグの代表コマンドはモーダル内のタブからパラメータを変えて実行できる。
+- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Debug 統合の Answer / Decision / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグの代表コマンドはモーダル内のタブからパラメータを変えて実行できる。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
 - `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。
@@ -29,8 +29,8 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - ペット表示面積は Dashboard または `codex:display` から `1..8` の8段階で動的に変更でき、`8` は pet を画面全体に近い面積で表示する最大設定として扱う。
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
-- `display.settings_updated` は pet 背景、文字色、文字背景を RGBA で受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
-- Dashboard は side menu、event tabs、折りたたみ可能な section、focus tooltip、2カラムのM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、文字サイズ、motion step、RGBA、Core2 / GRAY preview の見え方を確認できる。
+- `display.settings_updated` は画面全体の背景、pet 背景、文字色、文字背景、文字枠、pet X/Y offset を受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
+- Dashboard は side menu、event tabs、折りたたみ可能な section、focus tooltip、2カラムのM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。
 - Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
@@ -45,12 +45,13 @@ cmd.exe /d /s /c npm run bridge:smoke
 cmd.exe /d /s /c npm run dashboard:smoke
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080
+.\start-dashboard.bat
 cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
 cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
@@ -60,7 +61,7 @@ cmd.exe /d /s /c npm run firmware:upload:core2
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
 
-Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。
+Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。Windows では repo root の `start-dashboard.bat` をダブルクリックすると、background Bridge 起動と Dashboard 表示をまとめて実行できます。
 
 `codex:sessions` はローカルの Codex session log を読む opt-in adapter です。`--phase any` は進行中の最新メッセージも送ります。完了応答だけに絞る場合は `--phase final` を指定します。
 Dashboard の `最近の Codex 回答` panel は同じ session log から最新 assistant 回答を表示し、`M5Stackへ送信` で直前 user message と合わせて `answer.completed` として送信します。

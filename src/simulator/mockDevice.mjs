@@ -19,9 +19,14 @@ export class MockM5StackDevice {
       bodyTextScale: 1,
       animationFps: 12,
       motionStepMs: 280,
+      screenBackgroundRgba: { r: 5, g: 11, b: 20, a: 255 },
       petBackgroundRgba: { r: 5, g: 11, b: 20, a: 255 },
       textColorRgba: { r: 255, g: 255, b: 255, a: 255 },
       textBackgroundRgba: { r: 0, g: 0, b: 0, a: 178 },
+      petOffsetX: 0,
+      petOffsetY: 0,
+      textBorderEnabled: false,
+      textBorderRgba: { r: 255, g: 255, b: 255, a: 255 },
       beepOnAnswer: true
     };
     this.snapshots = [];

@@ -694,7 +694,7 @@ function buildDebugCommands() {
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
     codexDecision: 'cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"',
     codexDecisionWait: 'cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000',
-    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true',
+    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
   };
@@ -848,9 +848,14 @@ function buildDashboardCommandDefinitions(request) {
           { name: 'bodyTextScale', label: 'bodyTextScale', type: 'number', defaultValue: '2' },
           { name: 'animationFps', label: 'animationFps', type: 'number', defaultValue: '12' },
           { name: 'motionStepMs', label: 'motionStepMs', type: 'number', defaultValue: '280' },
+          { name: 'screenBg', label: 'screenBg', type: 'text', defaultValue: '#050b14ff' },
           { name: 'petBg', label: 'petBg', type: 'text', defaultValue: '#050b14ff' },
           { name: 'textColor', label: 'textColor', type: 'text', defaultValue: '#ffffffff' },
           { name: 'textBg', label: 'textBg', type: 'text', defaultValue: '#000000b2' },
+          { name: 'petOffsetX', label: 'petOffsetX', type: 'number', defaultValue: '0' },
+          { name: 'petOffsetY', label: 'petOffsetY', type: 'number', defaultValue: '0' },
+          { name: 'textBorderEnabled', label: 'textBorderEnabled', type: 'checkbox', defaultValue: false },
+          { name: 'textBorderColor', label: 'textBorderColor', type: 'text', defaultValue: '#ffffffff' },
           { name: 'beepOnAnswer', label: 'beepOnAnswer', type: 'checkbox', defaultValue: true }
         ]
       },
@@ -922,9 +927,14 @@ async function runDashboardCommand(commandId, params, request, bridge) {
         '--body-text-scale', values.bodyTextScale || '2',
         '--animation-fps', values.animationFps || '12',
         '--motion-step-ms', values.motionStepMs || '280',
+        '--screen-bg', values.screenBg || '#050b14ff',
         '--pet-bg', values.petBg || '#050b14ff',
         '--text-color', values.textColor || '#ffffffff',
         '--text-bg', values.textBg || '#000000b2',
+        '--pet-offset-x', values.petOffsetX || '0',
+        '--pet-offset-y', values.petOffsetY || '0',
+        '--text-border-enabled', String(values.textBorderEnabled ?? false),
+        '--text-border-color', values.textBorderColor || '#ffffffff',
         '--beep-on-answer', String(values.beepOnAnswer ?? true)
       ], { timeoutMs: 60000 });
     case 'codexSessions':

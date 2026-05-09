@@ -168,9 +168,14 @@ export async function buildEvent(command, args, options = {}) {
       bodyTextScale: args['body-text-scale'] ?? args.bodyTextScale,
       animationFps: args['animation-fps'] ?? args.animationFps,
       motionStepMs: args['motion-step-ms'] ?? args.motionStepMs,
+      screenBackgroundRgba: args['screen-bg'] ?? args.screenBg ?? args.screenBackgroundRgba,
       petBackgroundRgba: args['pet-bg'] ?? args.petBg ?? args.petBackgroundRgba,
       textColorRgba: args['text-color'] ?? args.textColor ?? args.textColorRgba,
       textBackgroundRgba: args['text-bg'] ?? args.textBg ?? args.textBackgroundRgba,
+      petOffsetX: args['pet-offset-x'] ?? args.petOffsetX ?? args.petX,
+      petOffsetY: args['pet-offset-y'] ?? args.petOffsetY ?? args.petY,
+      textBorderEnabled: args['text-border-enabled'] ?? args.textBorderEnabled ?? args.textBorder,
+      textBorderRgba: args['text-border-color'] ?? args.textBorderColor ?? args.textBorderRgba,
       beepOnAnswer: args['beep-on-answer'] ?? args.beepOnAnswer,
       eventId: args['event-id'] ?? args.eventId
     });
@@ -312,7 +317,7 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
-    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true',
+    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true',
     '  decision --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" [--wait]',
     '  watch --file .\\dist\\codex-answer.txt',
     '',

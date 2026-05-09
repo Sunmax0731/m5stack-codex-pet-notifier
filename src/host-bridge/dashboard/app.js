@@ -54,21 +54,32 @@ const elements = {
   bodyTextScale: $('#bodyTextScale'),
   animationFps: $('#animationFps'),
   motionStepMs: $('#motionStepMs'),
+  petOffsetX: $('#petOffsetX'),
+  petOffsetY: $('#petOffsetY'),
+  screenBgColor: $('#screenBgColor'),
+  screenBgAlpha: $('#screenBgAlpha'),
   petBgColor: $('#petBgColor'),
   petBgAlpha: $('#petBgAlpha'),
   textColor: $('#textColor'),
   textAlpha: $('#textAlpha'),
   textBgColor: $('#textBgColor'),
   textBgAlpha: $('#textBgAlpha'),
+  textBorderColor: $('#textBorderColor'),
+  textBorderAlpha: $('#textBorderAlpha'),
+  textBorderEnabled: $('#textBorderEnabled'),
   beepOnAnswer: $('#beepOnAnswer'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
   animationFpsValue: $('#animationFpsValue'),
   motionStepValue: $('#motionStepValue'),
+  petOffsetXValue: $('#petOffsetXValue'),
+  petOffsetYValue: $('#petOffsetYValue'),
+  screenBgValue: $('#screenBgValue'),
   petBgValue: $('#petBgValue'),
   textColorValue: $('#textColorValue'),
   textBgValue: $('#textBgValue'),
+  textBorderValue: $('#textBorderValue'),
   previewDevice: $('#previewDevice'),
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
@@ -517,9 +528,14 @@ function displaySettingsPayload() {
     bodyTextScale: Number(elements.bodyTextScale.value),
     animationFps: Number(elements.animationFps.value),
     motionStepMs: Number(elements.motionStepMs.value),
+    screenBackgroundRgba: rgbaFromControls(elements.screenBgColor, elements.screenBgAlpha),
     petBackgroundRgba: rgbaFromControls(elements.petBgColor, elements.petBgAlpha),
     textColorRgba: rgbaFromControls(elements.textColor, elements.textAlpha),
     textBackgroundRgba: rgbaFromControls(elements.textBgColor, elements.textBgAlpha),
+    petOffsetX: Number(elements.petOffsetX.value),
+    petOffsetY: Number(elements.petOffsetY.value),
+    textBorderEnabled: elements.textBorderEnabled.checked,
+    textBorderRgba: rgbaFromControls(elements.textBorderColor, elements.textBorderAlpha),
     beepOnAnswer: elements.beepOnAnswer.checked
   };
 }
@@ -556,9 +572,14 @@ function createDisplayFallbackPetEvent(payload) {
       bodyTextScale: payload.bodyTextScale,
       animationFps: payload.animationFps,
       motionStepMs: payload.motionStepMs,
+      screenBackgroundRgba: payload.screenBackgroundRgba,
       petBackgroundRgba: payload.petBackgroundRgba,
       textColorRgba: payload.textColorRgba,
       textBackgroundRgba: payload.textBackgroundRgba,
+      petOffsetX: payload.petOffsetX,
+      petOffsetY: payload.petOffsetY,
+      textBorderEnabled: payload.textBorderEnabled,
+      textBorderRgba: payload.textBorderRgba,
       beepOnAnswer: payload.beepOnAnswer
     }
   };
@@ -579,9 +600,13 @@ function renderDisplayControls() {
   elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
   elements.animationFpsValue.textContent = `${elements.animationFps.value} fps`;
   elements.motionStepValue.textContent = `${elements.motionStepMs.value} ms`;
+  elements.petOffsetXValue.textContent = `${elements.petOffsetX.value} px`;
+  elements.petOffsetYValue.textContent = `${elements.petOffsetY.value} px`;
+  elements.screenBgValue.textContent = rgbaLabel(elements.screenBgColor, elements.screenBgAlpha);
   elements.petBgValue.textContent = rgbaLabel(elements.petBgColor, elements.petBgAlpha);
   elements.textColorValue.textContent = rgbaLabel(elements.textColor, elements.textAlpha);
   elements.textBgValue.textContent = rgbaLabel(elements.textBgColor, elements.textBgAlpha);
+  elements.textBorderValue.textContent = rgbaLabel(elements.textBorderColor, elements.textBorderAlpha);
   renderM5Preview();
 }
 
@@ -613,11 +638,15 @@ function renderM5Preview() {
   const bodyTextScale = Number(elements.bodyTextScale.value);
   const animationFps = Number(elements.animationFps.value);
   const motionStepMs = Number(elements.motionStepMs.value);
+  const petOffsetX = Number(elements.petOffsetX.value);
+  const petOffsetY = Number(elements.petOffsetY.value);
   const mode = elements.previewMode.value;
   const device = elements.previewDevice.value;
+  const screenBackground = rgbaFromControls(elements.screenBgColor, elements.screenBgAlpha);
   const petBackground = rgbaFromControls(elements.petBgColor, elements.petBgAlpha);
   const textColor = rgbaFromControls(elements.textColor, elements.textAlpha);
   const textBackground = rgbaFromControls(elements.textBgColor, elements.textBgAlpha);
+  const textBorder = rgbaFromControls(elements.textBorderColor, elements.textBorderAlpha);
   const petHeight = Math.round(42 + ((petScale - 1) / 7) * 178);
   const manifest = state.petManifest;
   const aspect = manifest?.ok ? manifest.frameWidth / manifest.frameHeight : 1;
@@ -629,11 +658,16 @@ function renderM5Preview() {
   elements.m5Preview.dataset.device = device;
   elements.m5Preview.style.setProperty('--pet-width', `${petWidth}px`);
   elements.m5Preview.style.setProperty('--pet-height', `${petHeight}px`);
+  elements.m5Preview.style.setProperty('--pet-x', `${petOffsetX}px`);
+  elements.m5Preview.style.setProperty('--pet-y', `${petOffsetY}px`);
   elements.m5Preview.style.setProperty('--body-size', `${bodySize}px`);
   elements.m5Preview.style.setProperty('--ui-size', `${uiSize}px`);
+  elements.m5Preview.style.setProperty('--screen-bg', rgbaCss(screenBackground));
   elements.m5Preview.style.setProperty('--pet-bg', rgbaCss(petBackground));
   elements.m5Preview.style.setProperty('--overlay-text', rgbaCss(textColor));
   elements.m5Preview.style.setProperty('--overlay-bg', rgbaCss(textBackground));
+  elements.m5Preview.style.setProperty('--overlay-border', rgbaCss(textBorder));
+  elements.m5Preview.style.setProperty('--overlay-border-width', elements.textBorderEnabled.checked ? '1px' : '0px');
   elements.previewDeviceReadout.textContent = device === 'gray' ? 'GRAY / 320x240 / buttons' : 'Core2 / 320x240 / touch';
   elements.previewPetReadout.textContent = `${petScale}/8`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
@@ -657,9 +691,9 @@ function renderM5Preview() {
 
   const preview = previewContent(mode, petScale);
   elements.previewBody.textContent = preview.body;
-  elements.previewFooter.textContent = footerLabel(preview.footer, device);
+  elements.previewFooter.innerHTML = footerHtml(preview.footer, device);
   elements.previewBody.style.display = preview.body ? 'block' : 'none';
-  elements.previewFooter.style.display = preview.footer ? 'block' : 'none';
+  elements.previewFooter.style.display = preview.footer?.length ? 'flex' : 'none';
 }
 
 function assetUrl(value) {
@@ -704,35 +738,37 @@ function previewContent(mode, petScale) {
     const body = sessionText || $('#answerBody').value;
     return {
       body: `${$('#answerSummary').value}\n${body}`,
-      footer: 'A up    B idle    C down'
+      footer: ['A up', 'B idle', 'C down']
     };
   }
   if (mode === 'choice') {
     return {
       body: `${$('#choicePrompt').value}\nA: ${$('#choiceA').value}\nB: ${$('#choiceB').value}\nC: ${$('#choiceC').value}`,
-      footer: 'A send  B send  C send'
+      footer: ['A send', 'B send', 'C send']
     };
   }
   if (mode === 'notification') {
     return {
       body: `${$('#notificationTitle').value}\n${$('#notificationBody').value}`,
-      footer: 'A ack   B pet   C idle'
+      footer: ['A ack', 'B pet', 'C idle']
     };
   }
   return {
     body: petScale >= 8 ? '' : `${elements.petName.value || 'Pet'}\n${elements.petState.value}`,
-    footer: petScale >= 8 ? '' : 'A poll  B pet  C idle'
+    footer: petScale >= 8 ? [] : ['A poll', 'B pet', 'C idle']
   };
 }
 
-function footerLabel(value, device) {
-  if (!value) {
+function footerHtml(value, device) {
+  if (!value?.length) {
     return '';
   }
-  if (device === 'gray') {
-    return value.replace('A ', 'A btn ').replace('B ', 'B btn ').replace('C ', 'C btn ');
-  }
-  return value;
+  return value.map((label) => {
+    const text = device === 'gray'
+      ? label.replace('A ', 'A btn ').replace('B ', 'B btn ').replace('C ', 'C btn ')
+      : label;
+    return `<span>${escapeHtml(text)}</span>`;
+  }).join('');
 }
 
 function escapeHtml(value) {
@@ -819,12 +855,19 @@ function wireActions() {
     elements.bodyTextScale,
     elements.animationFps,
     elements.motionStepMs,
+    elements.petOffsetX,
+    elements.petOffsetY,
+    elements.screenBgColor,
+    elements.screenBgAlpha,
     elements.petBgColor,
     elements.petBgAlpha,
     elements.textColor,
     elements.textAlpha,
     elements.textBgColor,
     elements.textBgAlpha,
+    elements.textBorderColor,
+    elements.textBorderAlpha,
+    elements.textBorderEnabled,
     elements.beepOnAnswer
   ].forEach((control) => {
     control.addEventListener('input', renderDisplayControls);

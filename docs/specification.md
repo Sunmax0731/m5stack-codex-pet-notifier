@@ -29,7 +29,7 @@
 | `POST` | `/codex/choice` | 確認依頼から `prompt.choice_requested` を生成して queue する |
 | `POST` | `/codex/decision` | 正式リリース向けに Codex から M5Stack へ三択判断依頼を生成して queue する |
 | `POST` | `/codex/pet` | pet name / state / spriteRef から `pet.updated` を生成して queue する |
-| `POST` | `/codex/display` | pet 表示倍率、text size、render FPS、motion step、RGBA、beep から `display.settings_updated` を生成して queue する |
+| `POST` | `/codex/display` | pet 表示倍率、text size、render FPS、motion step、screen / pet / text / border RGBA、pet X/Y offset、beep から `display.settings_updated` を生成して queue する |
 | `GET` | `/pet/packages` | `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package metadata を Dashboard preview 用に返す |
 | `GET` | `/pet/current/manifest` | Dashboard preview 用に現在の local hatch-pet package の公開可能 metadata を返す |
 | `GET` | `/pet/current/spritesheet.webp` | Dashboard preview 用に現在の local hatch-pet spritesheet を返す。release asset には含めない |
@@ -52,7 +52,7 @@
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
-| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.beepOnAnswer` |
+| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.screenBackgroundRgba`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.petOffsetX`, `display.petOffsetY`, `display.textBorderEnabled`, `display.textBorderRgba`, `display.beepOnAnswer` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
 | `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen` |
@@ -103,7 +103,8 @@
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Decision / Notification はそれぞれ `/codex/answer`、`/codex/decision`、`/codex/notification` を使う。互換用に `/codex/choice` も残す。
-- Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、UI text size、body text size、pet render FPS、motion step、RGBA、answer beep を M5Stack へ送る。
+- Answer / Decision / Notification の送信フォームは Debug section に統合し、独立した送信 section は持たない。
+- Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、pet X/Y offset、UI text size、body text size、pet render FPS、motion step、screen / pet / text / border RGBA、answer beep を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
 - 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信`、`保守` の tab から allowlist 済み command を任意パラメータで実行できる。command 実行は localhost からの `/debug/commands/run` に限定する。
@@ -119,11 +120,14 @@
 - `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1..8` を受け付け、footer と本文の text size を個別に変更できる。
 - `display.settings_updated.display.animationFps` は `4..20` を受け付け、既定 `12fps` で pet surface redraw の上限を決める。
 - `display.settings_updated.display.motionStepMs` は `120..800` を受け付け、既定 `280ms` でキャラの pose / frame 切替間隔を決める。
-- `display.settings_updated.display.*Rgba` は `r/g/b/a=0..255` を受け付け、pet 背景、本文文字、本文背景に反映する。
+- `display.settings_updated.display.screenBackgroundRgba` は LCD 画面全体の背景に反映する。
+- `display.settings_updated.display.*Rgba` は `r/g/b/a=0..255` を受け付け、pet 背景、本文文字、本文背景、文字枠に反映する。
+- `display.settings_updated.display.petOffsetX` と `petOffsetY` はそれぞれ `-320..320`、`-240..240` を受け付け、pet を画面外にはみ出す位置まで動かせる。
+- `display.settings_updated.display.textBorderEnabled` は boolean を受け付け、文字パネルと footer の枠線を切り替える。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
-- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step、RGBA、Core2 / GRAY 表示を確認できる。プレビューは実機画面と readout を上段の2カラムに置き、設定 dock は下段で asset / current 情報と tuning controls の2カラムに分けて余白と縦方向の占有を抑える。
+- Dashboard は side menu、Debug 統合 event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / GRAY 表示を確認できる。プレビューは実機画面と readout を上段の2カラムに置き、設定 dock は下段で asset / current 情報と tuning controls の2カラムに分けて余白と縦方向の占有を抑える。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
-- firmware は `display.*Rgba` を object、hex string、channel array として受け取り、local hatch-pet asset の透明ピクセル部分には固定アクセント色ではなく pet background の合成色を表示する。
+- firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。
 - firmware は pet surface を `M5Canvas` の off-screen Sprite に描画し、`pushSprite()` で一括転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。

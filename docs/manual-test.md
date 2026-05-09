@@ -42,6 +42,9 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-25 | `cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"` を実行し、Core2 の A/B/C を押す | Core2 が Decision / Choice 画面へ遷移し、選択後に Host Bridge inbound へ `device.reply_selected` が出る | 準備済み。ユーザー手動 |
 | C2-26 | `cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000` を実行し、Core2 の A/B/C を押す | command result に `reply.ok=true` と選択された `choiceId` が返り、Codex 側で次の作業判断に使える | 準備済み。ユーザー手動 |
 | C2-27 | Dashboard または `codex:display` で `beepOnAnswer=true` を送信してから `answer.completed` を送る | Core2 が Answer 画面へ遷移し、短い beep 音が鳴る。`beepOnAnswer=false` の場合は鳴らない | 準備済み。ユーザー手動 |
+| C2-28 | Dashboard または `codex:display` で `screen background`、`pet background`、`text background` をそれぞれ異なる色にして送る | LCD 全体の背景、pet 透明ピクセル背面、本文パネル / footer 背景がそれぞれ別設定として見える。黒のまま残る文字背景がない | 準備済み。ユーザー手動 |
+| C2-29 | Dashboard または `codex:display` で `pet X/Y offset` を `-80`、`80`、大きな負値 / 正値に変えて送る | pet が上下左右へ移動し、値によって画面外にはみ出して頭や一部だけが見える | 準備済み。ユーザー手動 |
+| C2-30 | Dashboard または `codex:display` で `text border` を有効化し、色 / alpha を変える | Answer / Decision / Notification の本文パネルと footer に枠線が出る。無効化すると枠線が消える | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -60,14 +63,16 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-10 | `M5Stack 表示プレビュー` で pet display area、UI text size、body text size を `1..8`、render FPS を `4..20`、motion step を `120..800`、RGBA、beep を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。payload に `petBackgroundRgba`、`textColorRgba`、`textBackgroundRgba`、`beepOnAnswer` が入る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-11 | side menu で `状態`、`送信`、`プレビュー`、`Codex回答`、`ログ`、`デバッグ` へ移動する | 各 section に移動でき、現在選択した menu が強調表示される | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-10 | `M5Stack 表示プレビュー` で pet display area、UI text size、body text size を `1..8`、render FPS を `4..20`、motion step を `120..800`、screen / pet / text / border RGBA、pet X/Y offset、beep を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。payload に `screenBackgroundRgba`、`petBackgroundRgba`、`textColorRgba`、`textBackgroundRgba`、`petOffsetX`、`petOffsetY`、`textBorderEnabled`、`textBorderRgba`、`beepOnAnswer` が入る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-11 | side menu で `状態`、`プレビュー`、`Codex回答`、`ログ`、`デバッグ` へ移動する | 各 section に移動でき、現在選択した menu が強調表示される。独立した `送信` menu はなく、Answer / Decision / Notification は Debug section 内にある | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-12 | 各 section の `Hide` / `View` を押す | section body が折りたたみ / 再表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-13 | 主要 input / slider に focus する | 項目の意味を説明する tooltip hint が表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信`、`保守` のタブ付き command modal が開き、pet asset、Core2 upload、Codex relay、sample replay を任意パラメータで実行できる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-15 | `local hatch-pet asset` を別packageへ切り替える、または `asset path override` に `%USERPROFILE%\.codex\pets\Mira` を入れる | preview の `current pet` と simulated display が選択した package の spritesheet に切り替わる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-16 | `M5Stack 表示プレビュー` の `device` を Core2 / GRAY で切り替える | preview readout が `Core2 / 320x240 / touch` と `GRAY / 320x240 / buttons` で切り替わり、画面プレビュー、状態確認、イベントログ、デバッグが全幅表示にならない | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-17 | `cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080` で起動し、Dashboard sidebar を見る | PowerShell 画面を残さずHost Bridgeが動き、sidebarに `Bridge running / background`、pid、uptimeが表示される | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-18 | `start-dashboard.bat` をダブルクリックする | background Bridge が起動し、既定ブラウザで `http://127.0.0.1:8080/` が開く。失敗時は batch window にエラーが表示される | 準備済み。ユーザー手動 |
+| GUI-19 | Dashboard preview の Pet 画面で footer を見る | `A poll` が左、`B pet` が中央、`C idle` が右に表示され、実機 footer 位置と一致する | `dashboard:smoke` 済み。ユーザー目視 |
 
 ## 記録項目
 
@@ -84,6 +89,8 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ```
+
+Windows の通常確認では `start-dashboard.bat` をダブルクリックしても同じ Dashboard を開けます。
 
 Dashboard:
 

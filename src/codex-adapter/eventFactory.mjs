@@ -83,6 +83,12 @@ export function createDisplaySettingsEvent(options = {}) {
       bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
       animationFps: clampInteger(options.animationFps, 4, 20, 12),
       motionStepMs: clampInteger(options.motionStepMs, 120, 800, 280),
+      screenBackgroundRgba: normalizeRgba(options.screenBackgroundRgba ?? options.screenBg ?? options.screenBackground, {
+        r: 5,
+        g: 11,
+        b: 20,
+        a: 255
+      }),
       petBackgroundRgba: normalizeRgba(options.petBackgroundRgba ?? options.petBg ?? options.petBackground, {
         r: 5,
         g: 11,
@@ -100,6 +106,15 @@ export function createDisplaySettingsEvent(options = {}) {
         g: 0,
         b: 0,
         a: 178
+      }),
+      petOffsetX: clampInteger(options.petOffsetX ?? options.petX, -320, 320, 0),
+      petOffsetY: clampInteger(options.petOffsetY ?? options.petY, -240, 240, 0),
+      textBorderEnabled: normalizeBoolean(options.textBorderEnabled ?? options.textBorder, false),
+      textBorderRgba: normalizeRgba(options.textBorderRgba ?? options.textBorderColor, {
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255
       }),
       beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true)
     }

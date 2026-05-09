@@ -35,7 +35,7 @@ flowchart LR
 4. Device -> Host event は token 検証後に reply / interaction / heartbeat として受理する。
 5. Dashboard は `/events` と `/debug/snapshot` で redacted log を表示し、ABC 返信の `choiceId` と input を確認する。
 6. Dashboard は `/codex/session/latest` で local session の最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-7. Dashboard は `/pet/packages`、`/pet/current/manifest`、`/pet/current/spritesheet.webp` で local hatch-pet キャラを preview し、`/codex/display` で pet 表示倍率、text size、render FPS、motion step、RGBA、answer beep を `display.settings_updated` として送る。
+7. Dashboard は `/pet/packages`、`/pet/current/manifest`、`/pet/current/spritesheet.webp` で local hatch-pet キャラを preview し、`/codex/display` で pet 表示倍率、pet X/Y offset、text size、render FPS、motion step、screen / pet / text / border RGBA、text border 表示、answer beep を `display.settings_updated` として送る。
 8. Dashboard は `/debug/runtime` で Bridge のforeground / background状態を表示し、`/debug/commands/run` で localhost から allowlist された環境構築 / debug command だけを実行する。
 8. Dashboard または `codex:decision` は Codex 側から M5Stack へ三択判断を求め、A/B/C の返信を inbound event として受ける。
 9. 通知本文と回答本文は device 永続保存せず、画面状態だけを保持する。

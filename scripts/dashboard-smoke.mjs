@@ -52,8 +52,13 @@ try {
   assert.match(index, /M5Stack 表示プレビュー/);
   assert.match(index, /render FPS/);
   assert.match(index, /motion step/);
+  assert.match(index, /screen background/);
   assert.match(index, /pet background/);
   assert.match(index, /text background/);
+  assert.match(index, /pet X offset/);
+  assert.match(index, /pet Y offset/);
+  assert.match(index, /text border/);
+  assert.match(index, /テキスト枠を表示/);
   assert.match(index, /Codex回答のビープ通知/);
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
@@ -68,6 +73,8 @@ try {
   assert.match(index, /runtimeState/);
   assert.match(index, /環境構築コマンド/);
   assert.match(index, /max="8"/);
+  assert.doesNotMatch(index, /data-section="sendSection"/);
+  assert.match(index, /debug-send-block/);
 
   const app = await getText(`${baseUrl}/dashboard/app.js`);
   assert.match(app, /\/codex\/decision/);
@@ -82,9 +89,14 @@ try {
   assert.match(app, /apiUrl/);
   assert.match(app, /assetUrl/);
   assert.match(app, /motionStepMs/);
+  assert.match(app, /screenBackgroundRgba/);
   assert.match(app, /petBackgroundRgba/);
   assert.match(app, /textColorRgba/);
   assert.match(app, /textBackgroundRgba/);
+  assert.match(app, /petOffsetX/);
+  assert.match(app, /petOffsetY/);
+  assert.match(app, /textBorderEnabled/);
+  assert.match(app, /textBorderRgba/);
   assert.match(app, /beepOnAnswer/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
@@ -93,6 +105,9 @@ try {
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
   assert.match(css, /\.m5-screen/);
+  assert.match(css, /--screen-bg/);
+  assert.match(css, /--pet-x/);
+  assert.match(css, /--overlay-border/);
   assert.match(css, /\.preview-stage/);
   assert.match(css, /\.preview-settings-dock/);
   assert.match(css, /\.preview-column/);
@@ -116,7 +131,10 @@ try {
   assert.match(snapshot.commands.petAsset, /pet:asset/);
   assert.match(snapshot.commands.petAssetAny, /pet:asset/);
   assert.match(snapshot.commands.codexDisplay, /codex:display/);
+  assert.match(snapshot.commands.codexDisplay, /--screen-bg/);
   assert.match(snapshot.commands.codexDisplay, /--pet-bg/);
+  assert.match(snapshot.commands.codexDisplay, /--pet-offset-x/);
+  assert.match(snapshot.commands.codexDisplay, /--text-border-enabled/);
   assert.match(snapshot.commands.core2Upload, /firmware:upload:core2/);
 
   const petPackages = await getJson(`${baseUrl}/pet/packages`);
@@ -155,9 +173,14 @@ try {
     bodyTextScale: 4,
     animationFps: 12,
     motionStepMs: 280,
+    screenBackgroundRgba: { r: 2, g: 4, b: 8, a: 255 },
     petBackgroundRgba: { r: 8, g: 12, b: 20, a: 255 },
     textColorRgba: { r: 255, g: 245, b: 210, a: 255 },
     textBackgroundRgba: { r: 4, g: 8, b: 12, a: 180 },
+    petOffsetX: -40,
+    petOffsetY: 24,
+    textBorderEnabled: true,
+    textBorderRgba: { r: 120, g: 200, b: 255, a: 255 },
     beepOnAnswer: true
   });
   assert.equal(display.ok, true);
@@ -167,9 +190,14 @@ try {
   assert.equal(display.event.display.bodyTextScale, 4);
   assert.equal(display.event.display.animationFps, 12);
   assert.equal(display.event.display.motionStepMs, 280);
+  assert.deepEqual(display.event.display.screenBackgroundRgba, { r: 2, g: 4, b: 8, a: 255 });
   assert.deepEqual(display.event.display.petBackgroundRgba, { r: 8, g: 12, b: 20, a: 255 });
   assert.deepEqual(display.event.display.textColorRgba, { r: 255, g: 245, b: 210, a: 255 });
   assert.deepEqual(display.event.display.textBackgroundRgba, { r: 4, g: 8, b: 12, a: 180 });
+  assert.equal(display.event.display.petOffsetX, -40);
+  assert.equal(display.event.display.petOffsetY, 24);
+  assert.equal(display.event.display.textBorderEnabled, true);
+  assert.deepEqual(display.event.display.textBorderRgba, { r: 120, g: 200, b: 255, a: 255 });
   assert.equal(display.event.display.beepOnAnswer, true);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
@@ -267,6 +295,9 @@ try {
       displaySettingsAnimationFpsControl: true,
       displaySettingsMotionStepControl: true,
       displaySettingsRgbaControls: true,
+      displaySettingsScreenBackgroundControl: true,
+      displaySettingsPetOffsetControls: true,
+      displaySettingsTextBorderControl: true,
       displaySettingsBeepControl: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
