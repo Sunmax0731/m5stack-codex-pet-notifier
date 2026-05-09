@@ -28,6 +28,7 @@
 - [x] Dashboard が `/codex/display` で pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信できる。
 - [x] Dashboard の command modal が tab とパラメータフォームを持ち、localhost allowlist command だけを実行できる。
 - [x] Host Bridge を hidden background process として起動する `bridge:start:bg` がある。
+- [x] Dashboard の command modal から Host Bridge を background restart できる。
 - [x] clipboard relay が日本語本文を UTF-8 として保持できる。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。

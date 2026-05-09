@@ -1100,13 +1100,6 @@ input[type="range"] {
   grid-template-columns: 1fr;
 }
 
-.debug-send-block {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--preview-surface);
-  padding: 12px;
-}
-
 .debug-subheader {
   display: flex;
   align-items: flex-start;
@@ -1221,6 +1214,17 @@ input[type="range"] {
   grid-column: 1 / -1;
 }
 
+.command-shared-settings {
+  display: grid;
+  grid-template-columns: minmax(240px, 380px);
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.compact-device-field {
+  margin-bottom: 0;
+}
+
 .run-command {
   width: 100%;
   min-height: 42px;
@@ -1241,9 +1245,6 @@ input[type="range"] {
 }
 
 .modal-debug-area {
-  display: grid;
-  grid-template-columns: minmax(420px, 1.3fr) minmax(320px, 0.8fr);
-  gap: 12px;
   margin-top: 14px;
   border-top: 1px solid var(--border);
   padding-top: 14px;

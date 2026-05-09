@@ -15,7 +15,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。Bridge 再起動後に実機が旧 token で poll した場合は、`paired-*` token を再取り込みして既存実機を復帰させる。
-- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Decision / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグ送信はサイドバーのモーダル内タブへ集約し、任意パラメータで実行できる。
+- Host Bridge 同梱 Dashboard で環境構築コマンド、Bridge 再起動、状態確認、event log、Answer / Decision / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグ送信はサイドバーのモーダル内タブへ集約し、任意パラメータで実行できる。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
 - `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。

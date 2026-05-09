@@ -103,11 +103,11 @@
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Decision / Notification はそれぞれ `/codex/answer`、`/codex/decision`、`/codex/notification` を使う。互換用に `/codex/choice` も残す。
-- Answer / Decision / Notification の送信フォームは環境構築コマンド modal に統合し、独立した送信 section と Debug section は持たない。
+- Answer / Decision / Notification は環境構築コマンド modal の `デバッグ送信` tab のallowlist commandとして扱い、重複した直接送信フォーム、独立した送信 section、Debug section は持たない。
 - Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、pet X/Y offset、UI text size、body text size、pet render FPS、motion step、screen / pet / text / border RGBA、answer beep を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-- 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信` の tab から allowlist 済み command を任意パラメータで実行できる。sample replay は重複した保守tabではなくデバッグ送信tabへ統合する。command 実行は localhost からの `/debug/commands/run` に限定する。
+- 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信` の tab から allowlist 済み command を任意パラメータで実行できる。`環境構築` tab には Bridge background 起動と Bridge 再起動を含める。sample replay は重複した保守tabではなくデバッグ送信tabへ統合する。command 実行は localhost からの `/debug/commands/run` に限定する。
 - Decision 返信ワークフローと送信結果は環境構築コマンド modal に統合し、Decision 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
 - 各 section は View / Hide で折りたたみできる。主要 field は `?` help icon のクリックで hint を表示する。
 - `/events` は reply の `choiceId`、`requestEventId`、input、heartbeat summary などの運用確認に必要な最小情報だけを返し、回答本文を永続 evidence に残さない。

@@ -220,11 +220,12 @@ assert(dashboardIndexSource.includes('commandTabs'), 'Dashboard command modal mu
 assert(dashboardIndexSource.includes('runtimeState'), 'Dashboard sidebar must display bridge runtime status');
 assert(fs.readFileSync('src/host-bridge/dashboard/styles.css', 'utf8').includes('.sidebar-status-panel'), 'Dashboard must style the sidebar status section');
 assert(!dashboardIndexSource.includes('data-section="sendSection"'), 'Dashboard must merge the standalone sender section into the command modal');
-assert(dashboardIndexSource.includes('debug-send-block'), 'Dashboard command modal must contain the outbound sender controls');
+assert(dashboardIndexSource.includes('command-shared-settings'), 'Dashboard command modal must keep shared device settings without duplicate direct sender forms');
+assert(!dashboardIndexSource.includes('debug-send-block'), 'Dashboard command modal must not duplicate direct outbound sender forms');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
-assert(dashboardAppSource.includes('/codex/decision'), 'Dashboard must publish Codex decision requests to M5Stack');
+assert(dashboardAppSource.includes('codexDecision'), 'Dashboard command modal must publish Codex decision requests through the debug command tab');
 assert(dashboardAppSource.includes('/pet/current/manifest'), 'Dashboard must load the current local pet asset for preview');
 assert(dashboardAppSource.includes('/pet/packages'), 'Dashboard must list local pet packages for preview');
 assert(dashboardAppSource.includes('animationFps'), 'Dashboard must publish animation fps in display settings');
@@ -248,6 +249,8 @@ assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashbo
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 assert(dashboardAppSource.includes('/debug/commands/run'), 'Dashboard must run allowlisted setup/debug commands from the modal');
+assert(dashboardAppSource.includes('bridgeRestartBackground'), 'Dashboard command modal must expose local Bridge restart');
+assert(dashboardAppSource.includes('codexNotification'), 'Dashboard command modal must integrate notification debug sending');
 assert(dashboardAppSource.includes('renderRuntimeStatus'), 'Dashboard must render server runtime status in the sidebar');
 assert(dashboardAppSource.includes('ensureApiBase'), 'Dashboard must discover the latest Bridge API when an old process owns the current port');
 assert(dashboardAppSource.includes('bridgeCandidates'), 'Dashboard must try known local Bridge ports for pet asset preview');

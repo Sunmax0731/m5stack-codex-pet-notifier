@@ -208,8 +208,6 @@ const labels = {
     commandModalHeading: '環境構築とデバッグコマンド',
     reload: '再読込',
     close: '閉じる',
-    debugSendHeading: 'Codex から M5Stack へ送る',
-    debugSendNote: 'Answer / Decision / Notify はデバッグ操作として送信します。',
     deviceId: 'デバイスID',
     summary: '要約',
     body: '本文',
@@ -302,8 +300,6 @@ const labels = {
     commandModalHeading: 'Setup and debug commands',
     reload: 'Reload',
     close: 'Close',
-    debugSendHeading: 'Send from Codex to M5Stack',
-    debugSendNote: 'Answer / Decision / Notify are sent as debug operations.',
     deviceId: 'deviceId',
     summary: 'summary',
     body: 'body',
@@ -353,6 +349,12 @@ const commandText = {
       description: 'Start Host Bridge without leaving a PowerShell window. If the port is already active, only returns status.'
     }
   },
+  bridgeRestartBackground: {
+    en: {
+      label: 'Restart Bridge in background',
+      description: 'Stop the current Host Bridge and restart it on the same host and port in the background.'
+    }
+  },
   petAsset: {
     en: {
       label: 'Generate pet asset',
@@ -375,6 +377,12 @@ const commandText = {
     en: {
       label: 'Send ABC Decision',
       description: 'Send a three-choice prompt that M5Stack can answer with A/B/C.'
+    }
+  },
+  codexNotification: {
+    en: {
+      label: 'Send Notification',
+      description: 'Send a notification event to M5Stack from the debug command tab.'
     }
   },
   codexDisplay: {
@@ -413,6 +421,9 @@ const commandParamLabels = {
   summary: { ja: '要約', en: 'summary' },
   text: { ja: '本文', en: 'text' },
   question: { ja: '質問', en: 'question' },
+  title: { ja: 'タイトル', en: 'title' },
+  severity: { ja: '重要度', en: 'severity' },
+  body: { ja: '本文', en: 'body' },
   phase: { ja: 'phase', en: 'phase' },
   petScale: { ja: 'ペット表示面積', en: 'pet scale' },
   uiTextScale: { ja: 'UI文字サイズ', en: 'UI text scale' },
@@ -427,7 +438,8 @@ const commandParamLabels = {
   petOffsetY: { ja: 'ペットY位置', en: 'pet Y offset' },
   textBorderEnabled: { ja: '文字枠を表示', en: 'show text border' },
   textBorderColor: { ja: '文字枠色', en: 'text border color' },
-  beepOnAnswer: { ja: 'ビープ通知', en: 'beep on answer' }
+  beepOnAnswer: { ja: 'ビープ通知', en: 'beep on answer' },
+  visualProbe: { ja: '反映確認表示', en: 'visual probe' }
 };
 
 function t(key) {
@@ -887,6 +899,16 @@ async function runDashboardCommand(commandId) {
   });
   const result = await response.json();
   elements.commandOutput.textContent = JSON.stringify(result, null, 2);
+  if (result.restarting) {
+    elements.runtimeState.textContent = 'Bridge restarting';
+    elements.runtimePid.textContent = `helper pid ${result.helperPid ?? '-'}`;
+    elements.runtimeDot.className = 'status-dot warn';
+    resetApiDiscovery();
+    setTimeout(() => {
+      refresh().catch(showError);
+    }, 2500);
+    return;
+  }
   await refresh();
 }
 
@@ -1367,21 +1389,22 @@ function syncPreviewAnimationTimer() {
 function previewContent(mode, petScale) {
   if (mode === 'answer') {
     const sessionText = state.latestSession?.body;
-    const body = sessionText || $('#answerBody').value;
+    const body = sessionText || 'Codexの回答本文をM5StackのAnswer画面へ送ります。';
+    const summary = state.latestSession?.summary || 'Codex GUI answer';
     return {
-      body: `${$('#answerSummary').value}\n${body}`,
+      body: `${summary}\n${body}`,
       footer: ['A up', 'B idle', 'C down']
     };
   }
   if (mode === 'choice') {
     return {
-      body: `${$('#choicePrompt').value}\nA: ${$('#choiceA').value}\nB: ${$('#choiceB').value}\nC: ${$('#choiceC').value}`,
+      body: '次の作業を選択してください。\nA: 進める\nB: 修正する\nC: 保留する',
       footer: ['A send', 'B send', 'C send']
     };
   }
   if (mode === 'notification') {
     return {
-      body: `${$('#notificationTitle').value}\n${$('#notificationBody').value}`,
+      body: 'Codex notification\n確認が必要な通知です。',
       footer: ['A ack', 'B pet', 'C idle']
     };
   }
@@ -1447,38 +1470,7 @@ function wireSideNav() {
   });
 }
 
-function wireForms() {
-  $('#answerForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitJson('/codex/answer', {
-      deviceId: deviceId(),
-      summary: $('#answerSummary').value,
-      body: $('#answerBody').value
-    }).catch(showError);
-  });
-
-  $('#choiceForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitJson('/codex/decision', {
-      deviceId: deviceId(),
-      question: $('#choicePrompt').value,
-      a: $('#choiceA').value,
-      b: $('#choiceB').value,
-      c: $('#choiceC').value,
-      timeoutSec: 300
-    }).catch(showError);
-  });
-
-  $('#notificationForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    submitJson('/codex/notification', {
-      deviceId: deviceId(),
-      title: $('#notificationTitle').value,
-      severity: $('#notificationSeverity').value,
-      body: $('#notificationBody').value
-    }).catch(showError);
-  });
-}
+function wireForms() {}
 
 function wireActions() {
   [
@@ -1517,16 +1509,8 @@ function wireActions() {
     elements.previewMode,
     elements.petName,
     elements.petState,
-    elements.petSprite,
-    $('#answerSummary'),
-    $('#answerBody'),
-    $('#choicePrompt'),
-    $('#choiceA'),
-    $('#choiceB'),
-    $('#choiceC'),
-    $('#notificationTitle'),
-    $('#notificationBody')
-  ].forEach((control) => {
+    elements.petSprite
+  ].filter(Boolean).forEach((control) => {
     control.addEventListener('input', renderM5Preview);
     control.addEventListener('change', renderM5Preview);
   });
@@ -1595,9 +1579,6 @@ function wireActions() {
   $('#loadSessionButton').addEventListener('click', loadLatestSession);
   $('#publishSessionButton').addEventListener('click', () => {
     publishLatestSession().catch(showError);
-  });
-  $('#replayButton').addEventListener('click', () => {
-    submitJson('/codex/replay-samples', { deviceId: deviceId() }).catch(showError);
   });
   $('#sendPetButton').addEventListener('click', () => {
     const payload = petPayload();

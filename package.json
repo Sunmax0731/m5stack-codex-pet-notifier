@@ -11,6 +11,7 @@
     "dashboard:smoke": "node scripts/dashboard-smoke.mjs",
     "bridge:start": "node src/host-bridge/server.mjs",
     "bridge:start:bg": "node tools/start-bridge-background.mjs",
+    "bridge:restart:bg": "node tools/restart-bridge-background.mjs",
     "codex:answer": "node src/codex-adapter/relay.mjs answer",
     "codex:clipboard": "node src/codex-adapter/relay.mjs clipboard",
     "codex:choice": "node src/codex-adapter/relay.mjs choice",

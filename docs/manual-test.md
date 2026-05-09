@@ -56,9 +56,9 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | --- | --- | --- | --- |
 | GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、sidebar 内の状態確認 section に paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
 | GUI-02 | `debug JSON` を開く | `/debug/snapshot` に health、redacted events、debug commands が出る | `dashboard:smoke` 済み |
-| GUI-03 | `環境構築コマンド` modal の `デバッグ送信` tab、または modal 内の直接送信フォームから Answer 本文を送る | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
+| GUI-03 | `環境構築コマンド` modal の `デバッグ送信` tab から `Answer を送信` を実行する | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
 | GUI-04 | Dashboard の `M5Stack 表示プレビュー` から Pet state `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションし、Sprite buffer により pet surface 外の文字や footer がちらつかない | ユーザー手動 |
-| GUI-05 | `環境構築コマンド` modal の `デバッグ送信` tab、または modal 内の直接送信フォームから A/B/C を送り、Core2 で A/B/C を押す | inbound に `device.reply_selected`、modal の `Decision 返信` に choiceId / input が出る | ユーザー手動 |
+| GUI-05 | `環境構築コマンド` modal の `デバッグ送信` tab から `ABC Decision を送信` を実行し、Core2 で A/B/C を押す | inbound に `device.reply_selected`、modal の `Decision 返信` に choiceId / input が出る | ユーザー手動 |
 | GUI-06 | `環境構築コマンド` modal の `sample replay` を押す | sample events が outbound に追加され、Core2 が poll する | ユーザー手動 |
 | GUI-07 | `環境構築コマンド` modal で `codexSessions` を確認し、任意パラメータで実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
@@ -67,7 +67,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-11 | side menu で `プレビュー`、`最近の回答`、`ログ` へ移動する | `状態確認` section は sidebar 内に常時表示され、状態 button は表示されない。各 section へ移動できる。独立した `送信` / `デバッグ` menu はなく、Answer / Decision / Notification は `環境構築コマンド` modal 内にある | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-12 | 各 section の `Hide` / `View` を押す | section body が折りたたみ / 再表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-13 | 主要 input / slider 横の `?` icon をクリックする | 項目の意味を説明する help popover が表示され、外側 click または Esc で閉じる | `dashboard:smoke` 済み。ユーザー目視 |
-| GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信` のタブ付き command modal が開き、pet asset、Core2 upload、Codex relay、sample replay を任意パラメータで実行できる。重複していた `保守` tab は表示されない | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信` のタブ付き command modal が開き、Bridge background 起動 / 再起動、pet asset、Core2 upload、Codex Answer / Decision / Notification / Display / session、sample replay を任意パラメータで実行できる。重複していた `保守` tab と直接送信フォームは表示されない | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-15 | `local hatch-pet asset` を別packageへ切り替える、または `asset path override` に `%USERPROFILE%\.codex\pets\Mira` を入れる | preview の `current pet` と simulated display が選択した package の spritesheet に切り替わる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-16 | `M5Stack 表示プレビュー` の `device` を Core2 / GRAY で切り替える | preview readout が `Core2 / 320x240 / touch` と `GRAY / 320x240 / buttons` で切り替わる。`M5Stack 表示プレビュー` は1ペイン全幅で表示され、`最近の Codex 回答` と `イベントログ` は左右ペインのまま表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-17 | `cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080` で起動し、Dashboard sidebar を見る | PowerShell 画面を残さずHost Bridgeが動き、sidebarに `Bridge running / background`、pid、uptimeが表示される | `dashboard:smoke` 済み。ユーザー目視 |
@@ -75,6 +75,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-19 | Dashboard preview の Pet 画面で footer を見る | `A poll` が左、`B pet` が中央、`C idle` が右に表示され、実機 footer 位置と一致する | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-20 | topbar の `テーマ` を `OSに追従`、`ライト`、`ダーク` に切り替える | Dashboard 全体が選択 theme に切り替わる。既定は `OSに追従` | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-21 | topbar の `言語` を `日本語` / `English` に切り替える | 項目名、主要ボタン、command modal の代表 label が選択言語に切り替わる。既定は日本語 | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-22 | `環境構築コマンド` modal の `環境構築` tab で `Bridge を再起動` を実行する | 実行結果に `restarting: true` が出る。数秒後にDashboardが再接続し、sidebar runtime status の pid / uptime が更新される | ユーザー手動 |
 
 ## 記録項目
 

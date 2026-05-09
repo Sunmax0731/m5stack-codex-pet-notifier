@@ -85,14 +85,14 @@ try {
   assert.match(index, /commandModal/);
   assert.match(index, /commandTabs/);
   assert.match(index, /commandOutput/);
+  assert.match(index, /command-shared-settings/);
   assert.match(index, /runtimeState/);
   assert.match(index, /環境構築コマンド/);
   assert.match(index, /max="8"/);
   assert.doesNotMatch(index, /data-section="sendSection"/);
-  assert.match(index, /debug-send-block/);
+  assert.doesNotMatch(index, /debug-send-block/);
 
   const app = await getText(`${baseUrl}/dashboard/app.js`);
-  assert.match(app, /\/codex\/decision/);
   assert.match(app, /\/codex\/pet/);
   assert.match(app, /\/codex\/session\/latest/);
   assert.match(app, /\/codex\/session\/publish/);
@@ -123,6 +123,9 @@ try {
   assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
+  assert.match(app, /codexDecision/);
+  assert.match(app, /bridgeRestartBackground/);
+  assert.match(app, /codexNotification/);
   assert.match(app, /renderRuntimeStatus/);
   assert.match(app, /applyTheme/);
   assert.match(app, /applyLanguage/);
@@ -158,9 +161,13 @@ try {
   assert.equal(typeof snapshot.runtime.commandExecution.runner, 'string');
   assert.equal(snapshot.commandDefinitions.ok, true);
   assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'bridgeStartBackground'));
+  assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'bridgeRestartBackground'));
+  assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'codexNotification'));
   assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'codexDisplay'));
+  assert.match(snapshot.commands.bridgeRestartBackground, /bridge:restart:bg/);
   assert.match(snapshot.commands.codexChoice, /codex:choice/);
   assert.match(snapshot.commands.codexDecision, /codex:decision/);
+  assert.match(snapshot.commands.codexNotification, /codex:notification/);
   assert.match(snapshot.commands.codexDecisionWait, /codex:decision:wait/);
   assert.match(snapshot.commands.codexSessions, /codex:sessions/);
   assert.match(snapshot.commands.codexHook, /codex:hook/);

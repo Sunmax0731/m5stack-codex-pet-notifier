@@ -713,6 +713,7 @@ function redactSessionLatest(latest, options = {}) {
 function buildDebugCommands() {
   return {
     bridgeStartBackground: 'cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080',
+    bridgeRestartBackground: `cmd.exe /d /s /c npm run bridge:restart:bg -- --host=0.0.0.0 --port=8080 --current-pid ${process.pid}`,
     bridgeStart: 'cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080',
     petAsset: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\\.codex\\pets\\Mira --output firmware\\include\\pet_asset.local.h',
     petAssetAny: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir "<local-hatch-pet-package-dir>" --output firmware\\include\\pet_asset.local.h',
@@ -724,6 +725,7 @@ function buildDebugCommands() {
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
     codexDecision: 'cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"',
     codexDecisionWait: 'cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000',
+    codexNotification: 'cmd.exe /d /s /c npm run codex:notification -- --title "Codex notification" --body "確認が必要な通知です。" --severity info',
     codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
@@ -794,6 +796,52 @@ function isLocalRequest(request) {
   return remote === '127.0.0.1' || remote === '::1' || remote === '::ffff:127.0.0.1';
 }
 
+function scheduleBridgeRestart(values) {
+  const host = String(values.host || '0.0.0.0');
+  const port = String(values.port || '8080');
+  const helper = spawn(process.execPath, [
+    'tools/restart-bridge-background.mjs',
+    '--host', host,
+    '--port', port,
+    '--current-pid', String(process.pid)
+  ], {
+    cwd: repoRoot,
+    detached: true,
+    stdio: 'ignore',
+    windowsHide: true,
+    env: {
+      ...process.env,
+      M5STACK_BRIDGE_BACKGROUND: '1'
+    }
+  });
+  helper.unref();
+  const numericPort = Number(port);
+  writeRuntimeStatusFile({
+    pid: process.pid,
+    helperPid: helper.pid,
+    host,
+    port: Number.isFinite(numericPort) ? numericPort : port,
+    url: `http://${host}:${port}`,
+    healthUrl: `http://127.0.0.1:${port}/health`,
+    background: process.env.M5STACK_BRIDGE_BACKGROUND === '1',
+    restarting: true,
+    requestedAt: new Date().toISOString()
+  });
+  setTimeout(() => {
+    process.exit(0);
+  }, 900).unref();
+  return {
+    ok: true,
+    restarting: true,
+    currentPid: process.pid,
+    helperPid: helper.pid,
+    host,
+    port: Number.isFinite(numericPort) ? numericPort : port,
+    healthUrl: `http://127.0.0.1:${port}/health`,
+    message: 'Bridge restart scheduled. Dashboard will reconnect after the background process starts.'
+  };
+}
+
 function bridgeUrlFromRequest(request) {
   const host = request.headers.host ?? '127.0.0.1:8080';
   return `http://${host.replace(/^0\.0\.0\.0:/, '127.0.0.1:')}`;
@@ -814,6 +862,16 @@ function buildDashboardCommandDefinitions(request) {
         tab: 'setup',
         label: 'Bridge をバックグラウンド起動',
         description: 'PowerShell画面を残さずHost Bridgeを起動します。既に同portで動いている場合は状態確認だけ返します。',
+        params: [
+          { name: 'host', label: 'host', type: 'text', defaultValue: '0.0.0.0' },
+          { name: 'port', label: 'port', type: 'number', defaultValue: '8080' }
+        ]
+      },
+      {
+        id: 'bridgeRestartBackground',
+        tab: 'setup',
+        label: 'Bridge を再起動',
+        description: '現在のHost Bridgeを終了し、同じhost/portでバックグラウンド再起動します。Dashboardは数秒後に再接続します。',
         params: [
           { name: 'host', label: 'host', type: 'text', defaultValue: '0.0.0.0' },
           { name: 'port', label: 'port', type: 'number', defaultValue: '8080' }
@@ -862,6 +920,19 @@ function buildDashboardCommandDefinitions(request) {
           { name: 'a', label: 'A', type: 'text', defaultValue: '進める' },
           { name: 'b', label: 'B', type: 'text', defaultValue: '修正する' },
           { name: 'c', label: 'C', type: 'text', defaultValue: '保留する' }
+        ]
+      },
+      {
+        id: 'codexNotification',
+        tab: 'debug',
+        label: 'Notification を送信',
+        description: '通知イベントをM5Stackへ送ります。Answer / Decision と同じデバッグ送信tabに統合しています。',
+        params: [
+          { name: 'bridge', label: 'bridge', type: 'text', defaultValue: bridgeUrl },
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId },
+          { name: 'title', label: 'title', type: 'text', defaultValue: 'Codex notification' },
+          { name: 'severity', label: 'severity', type: 'select', defaultValue: 'info', options: ['info', 'warning', 'error'] },
+          { name: 'body', label: 'body', type: 'textarea', defaultValue: '確認が必要な通知です。' }
         ]
       },
       {
@@ -923,6 +994,8 @@ async function runDashboardCommand(commandId, params, request, bridge) {
         '--host', values.host || '0.0.0.0',
         '--port', values.port || '8080'
       ], { timeoutMs: 10000 });
+    case 'bridgeRestartBackground':
+      return scheduleBridgeRestart(values);
     case 'petAsset':
       return runNpmScript('pet:asset', [
         '--pet-dir', expandUserPath(values.petDir || '%USERPROFILE%\\.codex\\pets\\Mira'),
@@ -947,6 +1020,14 @@ async function runDashboardCommand(commandId, params, request, bridge) {
         '--a', values.a || '進める',
         '--b', values.b || '修正する',
         '--c', values.c || '保留する'
+      ], { timeoutMs: 60000 });
+    case 'codexNotification':
+      return runNpmScript('codex:notification', [
+        '--bridge', bridgeUrl,
+        '--device-id', values.deviceId || productProfile.sampleDeviceId,
+        '--title', values.title || 'Codex notification',
+        '--severity', values.severity || 'info',
+        '--body', values.body || '確認が必要な通知です。'
       ], { timeoutMs: 60000 });
     case 'codexDisplay':
       return runNpmScript('codex:display', [
