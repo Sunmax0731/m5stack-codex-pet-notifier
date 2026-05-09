@@ -13,7 +13,7 @@
     "result": "404 Not Found",
     "interpretation": "No stable latest release exists; the beta prerelease is not returned as latest."
   },
-  "assetCount": 9,
+  "assetCount": 10,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
@@ -24,9 +24,11 @@
       "docs/strict-manual-test-addendum.md",
       "docs/hardware-runtime-evidence.json",
       "docs/display-sync-evidence.json",
+      "docs/browser-device-sync-evidence.json",
       "docs/release-evidence.json"
     ],
     "actualNames": [
+      "browser-device-sync-evidence.json",
       "dashboard-smoke-result.json",
       "display-sync-evidence.json",
       "hardware-runtime-evidence.json",
@@ -45,7 +47,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "partial-pass-core2-existing-upload-wifi-pairing-codex-relay-answer-button-reply; beta mood-gesture-installer checks prepared but not executed by Codex",
+  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-display-sync; beta long-run, GRAY hardware, and signed installer checks prepared but not executed by Codex",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
@@ -53,6 +55,10 @@
     },
     {
       "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2",
+      "result": "passed"
+    },
+    {
+      "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4",
       "result": "passed"
     },
     {
@@ -64,8 +70,12 @@
       "result": "passed"
     },
     {
-      "command": "Browser plugin reload of http://127.0.0.1:18083/",
-      "result": "passed-no-console-errors"
+      "command": "Browser plugin reload of http://127.0.0.1:8080/",
+      "result": "passed-no-console-errors-display-sync-applied"
+    },
+    {
+      "command": "browser-device-sync-evidence.json",
+      "result": "passed-outbound-vs-heartbeat-screen-idle"
     }
   ],
   "git": {
