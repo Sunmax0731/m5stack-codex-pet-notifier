@@ -58,6 +58,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
 | GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、sidebar 内の状態確認 section に paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
+| GUI-01a | 8080 番が使用中の状態で `npm run bridge:start -- --host=0.0.0.0 --port=8080` を実行する | Node stack trace ではなく、既存 Bridge version と fallback 手順が表示される。同一 version の Bridge が動いている場合は成功扱いで終了する | 準備済み。ユーザー手動 |
 | GUI-02 | `debug JSON` を開く | `/debug/snapshot` に health、redacted events、debug commands が出る | `dashboard:smoke` 済み |
 | GUI-03 | `環境構築コマンド` modal の `デバッグ送信` tab から `Answer を送信` を実行する | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
 | GUI-04 | Dashboard の `M5Stack 表示プレビュー` から Pet state `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションし、Sprite buffer により pet surface 外の文字や footer がちらつかない | ユーザー手動 |

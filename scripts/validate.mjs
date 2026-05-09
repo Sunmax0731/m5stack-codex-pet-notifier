@@ -209,6 +209,8 @@ assert(bridgeSource.includes('try {') && bridgeSource.includes('message: error.m
 assert(bridgeSource.includes('cmd-wrapper-v1'), 'Host Bridge runtime must expose the Windows-safe GUI command runner version');
 assert(bridgeSource.includes('handlePetInteraction'), 'Host Bridge must turn long-press pet interactions into Codex choice requests');
 assert(bridgeSource.includes('sourceInteraction'), 'Host Bridge side effects must identify the source pet interaction');
+assert(bridgeSource.includes('EADDRINUSE'), 'Host Bridge must handle occupied ports without an unhandled Node stack trace');
+assert(bridgeSource.includes('readExistingBridgeHealth'), 'Host Bridge occupied-port handling must inspect the existing bridge version');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');

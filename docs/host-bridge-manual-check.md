@@ -21,6 +21,12 @@ cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ```
 
+`Port 8080 is already in use` と表示された場合は、firmware upload の失敗ではありません。既存の Host Bridge または別プロセスが 8080 番を使っています。表示された `Existing Bridge version` が現在の version と一致する場合は、そのまま `http://127.0.0.1:8080/` を開いて確認します。version が古い場合や 8080 を閉じられない場合は、repo root の `start-dashboard.bat` をダブルクリックして fallback port を自動選択するか、次を実行します。
+
+```powershell
+cmd.exe /d /s /c npm run bridge:start:bg -- --host=127.0.0.1 --port=18081
+```
+
 別ターミナルで health を確認します。
 
 ```powershell

@@ -1280,6 +1280,34 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const port = Number(portArg?.split('=')[1] ?? process.env.PORT ?? 8080);
   const host = hostArg?.split('=')[1] ?? process.env.HOST ?? '0.0.0.0';
   const server = createBridgeHttpServer();
+  server.on('error', async (error) => {
+    if (error.code !== 'EADDRINUSE') {
+      console.error(error);
+      process.exit(1);
+      return;
+    }
+
+    const dashboardUrl = `http://127.0.0.1:${port}/`;
+    const health = await readExistingBridgeHealth(port);
+    if (health?.ok && health.version === productProfile.version) {
+      console.log(`m5stack-codex-pet-notifier bridge is already running on ${dashboardUrl}`);
+      console.log(`version=${health.version}; pairedDevices=${health.pairedDevices?.length ?? 0}`);
+      console.log('Open the dashboard URL above, or close the existing Bridge window before starting a foreground server.');
+      process.exit(0);
+      return;
+    }
+
+    console.error(`Port ${port} is already in use, so this foreground Bridge cannot start.`);
+    if (health?.ok) {
+      console.error(`Existing Bridge version: ${health.version ?? 'unknown'} at ${dashboardUrl}`);
+      console.error(`Current repository version: ${productProfile.version}`);
+    } else {
+      console.error(`Another process is listening on ${dashboardUrl}, but it did not answer /health.`);
+    }
+    console.error('Use start-dashboard.bat to auto-select a beta fallback port, or run:');
+    console.error('  cmd.exe /d /s /c npm run bridge:start:bg -- --host=127.0.0.1 --port=18081');
+    process.exit(1);
+  });
   server.listen(port, host, () => {
     writeRuntimeStatusFile({
       pid: process.pid,
@@ -1292,4 +1320,19 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     });
     console.log(`m5stack-codex-pet-notifier bridge listening on http://${host}:${port}`);
   });
+}
+
+async function readExistingBridgeHealth(port) {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 750);
+    const response = await fetch(`http://127.0.0.1:${port}/health`, { signal: controller.signal });
+    clearTimeout(timer);
+    if (!response.ok) {
+      return null;
+    }
+    return response.json();
+  } catch {
+    return null;
+  }
 }
