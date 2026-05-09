@@ -61,7 +61,15 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 firmware:
 
 ```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+```
+
+repo root から実行する場合:
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 ## Codex実施ログ要約

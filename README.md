@@ -34,10 +34,17 @@ cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080
 ## Firmware
 
 ```powershell
-cd D:\AI\IoT\m5stack-codex-pet-notifier
+cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2 -t upload --upload-port COM4
+```
+
+repo root から実行する場合は `-d firmware` を付けます。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+E:\DevEnv\PlatformIO\venv\Scripts\pio.exe -d firmware run -e m5stack-core2 -t upload --upload-port COM4
 ```
 
 `D:\AI\secure\ssid.txt` は Git に入れません。M5Stack/ESP32 は 2.4GHz Wi-Fi のみ対応するため、5GHz SSID が記載されている場合は device scan で見つかった対応 2.4GHz SSID を `firmware/include/wifi_config.local.h` に設定します。この local header は `.gitignore` 対象です。
