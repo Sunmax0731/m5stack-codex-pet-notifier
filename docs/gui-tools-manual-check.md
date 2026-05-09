@@ -41,7 +41,7 @@ http://127.0.0.1:8080/
 - `Display` tab があり、pet display area、UI text size、body text size を `1..8`、animation FPS を `4..20` で変更できる。
 - `M5Stack 表示プレビュー` があり、Pet / Answer / Choice / Notify の simulated display を送信前に確認できる。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
-- `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
+- `/health` の `version` が `0.1.0-alpha.6` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
 ## 2. M5Stack の pairing と状態確認
 

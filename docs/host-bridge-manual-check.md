@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.5`。
+- `version` が `0.1.0-alpha.6`。
 
 Dashboard を開きます。
 
@@ -43,7 +43,7 @@ http://127.0.0.1:8080/
 - `M5Stack Codex Pet Console` が表示される。
 - paired、outbound、inbound、security の状態が見える。
 - `debug JSON` から `/debug/snapshot` を確認できる。
-- `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。
+- `/health` の `version` が `0.1.0-alpha.6` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。
 
 ## 3. Firmware upload
 

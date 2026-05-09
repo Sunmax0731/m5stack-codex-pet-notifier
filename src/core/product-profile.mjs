@@ -1,7 +1,7 @@
 export const productProfile = {
   repo: 'm5stack-codex-pet-notifier',
-  version: '0.1.0-alpha.5',
-  tag: 'v0.1.0-alpha.5',
+  version: '0.1.0-alpha.6',
+  tag: 'v0.1.0-alpha.6',
   domain: 'IoT',
   ideaNo: 18,
   platformType: 'iot-simulator-mock',
@@ -48,6 +48,6 @@ export const productProfile = {
     'docs/hardware-runtime-evidence.json',
     'docs/host-bridge-manual-check.md',
     'docs/codex-relay-manual-check.md',
-    'docs/releases/v0.1.0-alpha.5.md'
+    'docs/releases/v0.1.0-alpha.6.md'
   ]
 };

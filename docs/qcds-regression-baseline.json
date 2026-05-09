@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.5",
+  "version": "0.1.0-alpha.6",
   "suiteStatus": "passed",
   "scenarios": [
     {

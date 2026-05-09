@@ -44,4 +44,4 @@
 
 ## Decision
 
-`v0.1.0-alpha.5` は closed alpha prerelease として公開し、stable release にはしません。
+`v0.1.0-alpha.6` は closed alpha prerelease として公開し、stable release にはしません。
