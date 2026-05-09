@@ -62,7 +62,7 @@
     "core2JapaneseAnswerSourceGate": true,
     "clipboardUtf8RelaySmoke": true,
     "core2ClipboardJapaneseVisualConfirmation": true,
-    "core2FileWatchVisualConfirmation": true,
+    "core2FileWatchAnswerScreenConfirmation": false,
     "representativeSuite": [
       "happy-path",
       "missing-required",
@@ -72,6 +72,7 @@
   },
   "notes": [
     "GRAY実機、長時間運用、実Codex App内部API連携は対象外のためS+は付けない。",
+    "Core2 file watch は本文到達を確認したが、期待する Answer 画面状態は未確認。",
     "A-未満の観点はない。"
   ]
 }

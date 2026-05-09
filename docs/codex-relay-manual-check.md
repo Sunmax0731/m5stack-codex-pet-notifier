@@ -61,7 +61,10 @@ cmd.exe /d /s /c npm run codex:watch -- --file dist\codex-answer.txt --once
 
 期待結果:
 
-- file 内容が `answer.completed` として送信される。
+- コマンド結果が `ok=true`。
+- `/events` の outbound に `answer.completed` が出る。
+- Core2 が `Answer` 画面へ遷移し、summary と file 内容が表示される。
+- footer が `A up`、`B idle`、`C down` になる。
 
 ## 確認コマンド
 
