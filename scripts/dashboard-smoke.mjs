@@ -71,6 +71,7 @@ try {
   assert.match(index, /文字枠/);
   assert.match(index, /テキスト枠を表示/);
   assert.match(index, /Codex回答のビープ通知/);
+  assert.match(index, /変更を自動送信/);
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
   assert.match(index, /preview-settings-dock/);
@@ -108,6 +109,7 @@ try {
   assert.match(app, /petOffsetY/);
   assert.match(app, /textBorderEnabled/);
   assert.match(app, /textBorderRgba/);
+  assert.match(app, /scheduleAutoDisplaySync/);
   assert.match(app, /updateRgbaVisual/);
   assert.match(app, /beepOnAnswer/);
   assert.match(app, /display: displaySettingsPayload/);
@@ -374,6 +376,7 @@ try {
       petUpdateCarriesDisplaySettings: true,
       displaySettingsTextBorderControl: true,
       displaySettingsBeepControl: true,
+      displaySettingsAutoSync: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
       m5StackPreviewDeviceSwitch: true,

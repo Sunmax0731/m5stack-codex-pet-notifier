@@ -15,6 +15,8 @@ const state = {
   previewPetFrame: 0,
   previewAnimationInterval: null,
   previewAnimationDelay: null,
+  autoDisplaySyncTimer: null,
+  autoDisplaySyncInFlight: false,
   language: localStorage.getItem('m5pet-language') || 'ja',
   themeMode: localStorage.getItem('m5pet-theme') || 'system'
 };
@@ -70,6 +72,7 @@ const elements = {
   textBorderAlpha: $('#textBorderAlpha'),
   textBorderEnabled: $('#textBorderEnabled'),
   beepOnAnswer: $('#beepOnAnswer'),
+  autoDisplaySync: $('#autoDisplaySync'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
@@ -145,6 +148,7 @@ const labels = {
     spriteRef: 'スプライト参照',
     sendPet: 'ペット更新を送信',
     sendDisplay: '表示設定を送信',
+    autoDisplaySync: '変更を自動送信',
     localPetAsset: 'local hatch-pet アセット',
     reloadAsset: 'asset 再読み込み',
     petName: 'ペット名',
@@ -230,6 +234,7 @@ const labels = {
     spriteRef: 'spriteRef',
     sendPet: 'Send pet update',
     sendDisplay: 'Send display settings',
+    autoDisplaySync: 'Auto-send changes',
     localPetAsset: 'local hatch-pet asset',
     reloadAsset: 'Reload asset',
     petName: 'pet name',
@@ -1002,6 +1007,28 @@ function createDisplayFallbackPetEvent(payload) {
   };
 }
 
+function scheduleAutoDisplaySync() {
+  if (!elements.autoDisplaySync?.checked) {
+    return;
+  }
+  if (state.autoDisplaySyncTimer) {
+    clearTimeout(state.autoDisplaySyncTimer);
+  }
+  state.autoDisplaySyncTimer = setTimeout(() => {
+    state.autoDisplaySyncTimer = null;
+    if (state.autoDisplaySyncInFlight) {
+      scheduleAutoDisplaySync();
+      return;
+    }
+    state.autoDisplaySyncInFlight = true;
+    publishDisplaySettings()
+      .catch(showError)
+      .finally(() => {
+        state.autoDisplaySyncInFlight = false;
+      });
+  }, 650);
+}
+
 function petPayload() {
   return {
     deviceId: deviceId(),
@@ -1293,8 +1320,14 @@ function wireActions() {
     elements.textBorderEnabled,
     elements.beepOnAnswer
   ].forEach((control) => {
-    control.addEventListener('input', renderDisplayControls);
-    control.addEventListener('change', renderDisplayControls);
+    control.addEventListener('input', () => {
+      renderDisplayControls();
+      scheduleAutoDisplaySync();
+    });
+    control.addEventListener('change', () => {
+      renderDisplayControls();
+      scheduleAutoDisplaySync();
+    });
   });
   [
     elements.previewDevice,

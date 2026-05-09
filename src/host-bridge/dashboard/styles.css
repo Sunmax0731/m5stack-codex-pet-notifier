@@ -955,6 +955,11 @@ input[type="range"] {
   margin-top: 4px;
 }
 
+.preview-actions .compact-check {
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
 .preview-controls .check-field {
   min-height: 70px;
 }

@@ -119,6 +119,7 @@ int pageCount(const String& value, int charsPerPage);
 int footerTop();
 int bodyLineHeight();
 void drawScreenContentOverlay(bool includeFooter);
+void invalidatePetSprite();
 
 String screenName() {
   switch (screenState) {
@@ -517,6 +518,7 @@ bool applyDisplaySettings(JsonVariant display) {
   applyRgbaSetting(display["textBorderRgba"], textBorderRgba);
   beepOnAnswer = display["beepOnAnswer"] | beepOnAnswer;
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
+  invalidatePetSprite();
   return true;
 }
 
@@ -847,6 +849,15 @@ bool ensurePetSprite(int width, int height) {
   petSpriteWidth = petSpriteReady ? width : 0;
   petSpriteHeight = petSpriteReady ? height : 0;
   return petSpriteReady;
+}
+
+void invalidatePetSprite() {
+  if (petSpriteReady) {
+    petSprite.deleteSprite();
+  }
+  petSpriteReady = false;
+  petSpriteWidth = 0;
+  petSpriteHeight = 0;
 }
 
 int petDrawX(int width) {
