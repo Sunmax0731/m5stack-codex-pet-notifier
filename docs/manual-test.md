@@ -26,7 +26,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-10 | Answer 画面で swipe または footer touch を行う | 本文ページが上下に移動する | ユーザー手動 |
 | C2-11 | Choice 画面で row tap または footer touch を行う | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
 | C2-12 | `codex:answer` で日本語本文を送る | Core2 の Answer 画面で日本語が文字化けせず表示される | 準備済み。ユーザー目視 |
-| C2-13 | 日本語本文を clipboard に入れ、`codex:clipboard` を実行する | Core2 の Answer 画面で clipboard 日本語本文が文字化けせず表示される | 準備済み。ユーザー目視 |
+| C2-13 | 日本語本文を clipboard に入れ、`codex:clipboard` を実行する | Core2 の Answer 画面で clipboard 日本語本文が文字化けせず表示される | 実施済み。ユーザー目視で文字化けなし |
 
 ## GRAY 今回対象外
 
@@ -83,5 +83,6 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - Japanese display source gate: `scripts/validate.mjs` で `fonts::efontJA_12` と UTF-8 code point 境界のページングを確認する。
 - Serial evidence: `wifi_connected`、`pair_ok`、Host Bridge sample event を確認対象にする。
 - Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。
+- Clipboard Japanese evidence: `codex:clipboard` で日本語本文を送信し、Core2 の Answer 表示が文字化けしていないことをユーザー目視で確認済み。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
 - 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。

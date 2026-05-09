@@ -61,6 +61,7 @@
     "core2CodexRelayAnswer": true,
     "core2JapaneseAnswerSourceGate": true,
     "clipboardUtf8RelaySmoke": true,
+    "core2ClipboardJapaneseVisualConfirmation": true,
     "representativeSuite": [
       "happy-path",
       "missing-required",
@@ -69,7 +70,7 @@
     ]
   },
   "notes": [
-    "GRAY実機、長時間運用、実Codex App内部API連携、日本語glyphのユーザー目視確認は対象外のためS+は付けない。",
+    "GRAY実機、長時間運用、実Codex App内部API連携は対象外のためS+は付けない。",
     "A-未満の観点はない。"
   ]
 }

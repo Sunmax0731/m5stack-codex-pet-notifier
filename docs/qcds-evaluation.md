@@ -9,7 +9,7 @@ QCDS は Quality、Cost、Delivery、Satisfaction として評価します。gra
 | Quality | S- | schema、LAN Host Bridge smoke、Codex relay smoke、clipboard UTF-8 relay smoke、simulator、representative suite、runtime gate、security/privacy、Core2 upload / Wi-Fi / pairing / Codex answer 表示、日本語フォント対応が検証対象。GRAY 実機と長時間運用は未確認のため S+ ではない |
 | Cost | A+ | Node.js 標準ライブラリ中心の Host Bridge と PlatformIO firmware で導入負荷を抑えている |
 | Delivery | A+ | docs、samples、schemas、runtime evidence、release notes、docs ZIP、redacted hardware evidence を prerelease へ出せる |
-| Satisfaction | S- | 導入、操作、Host Bridge 手動確認、Codex relay 手順、日本語表示手順、残範囲が明確。長時間 UX と日本語 glyph のユーザー目視確認が残るため S+ ではない |
+| Satisfaction | S- | 導入、操作、Host Bridge 手動確認、Codex relay 手順、日本語表示手順、残範囲が明確。clipboard 日本語表示はユーザー目視で確認済み。長時間 UX が未確認のため S+ ではない |
 
 ## Evidence
 
@@ -31,4 +31,4 @@ QCDS は Quality、Cost、Delivery、Satisfaction として評価します。gra
 
 ## Manual Test Cap
 
-Core2 の upload、Wi-Fi、pairing、Codex relay answer、A button reply は確認対象です。日本語表示は firmware build と source gate で確認し、Core2 への送信準備まで行います。GRAY 実機、長時間運用、実 Codex App 内部 API 連携は対象外です。残範囲があるため `S+` は付けません。
+Core2 の upload、Wi-Fi、pairing、Codex relay answer、A button reply、clipboard 日本語表示は確認対象です。GRAY 実機、長時間運用、実 Codex App 内部 API 連携は対象外です。残範囲があるため `S+` は付けません。
