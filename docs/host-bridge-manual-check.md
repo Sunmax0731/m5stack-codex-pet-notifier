@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.4`。
+- `version` が `0.1.0-alpha.5`。
 
 ## 3. Firmware upload
 

@@ -2,18 +2,18 @@
   "product": "m5stack-codex-pet-notifier",
   "repository": "Sunmax0731/m5stack-codex-pet-notifier",
   "githubUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier",
-  "releaseStatus": "created",
-  "releaseUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier/releases/tag/v0.1.0-alpha.4",
-  "tag": "v0.1.0-alpha.4",
+  "releaseStatus": "pending",
+  "releaseUrl": "https://github.com/Sunmax0731/m5stack-codex-pet-notifier/releases/tag/v0.1.0-alpha.5",
+  "tag": "v0.1.0-alpha.5",
   "isPrereleasePlanned": true,
-  "prerelease": true,
-  "latest": false,
+  "prerelease": null,
+  "latest": null,
   "latestCheck": {
     "endpoint": "repos/Sunmax0731/m5stack-codex-pet-notifier/releases/latest",
-    "result": "404-no-stable-release",
+    "result": "pending",
     "latestIsThisPrerelease": false
   },
-  "assetCount": 4,
+  "assetCount": 0,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
@@ -21,13 +21,8 @@
       "docs/strict-manual-test-addendum.md",
       "docs/hardware-runtime-evidence.json"
     ],
-    "actualNames": [
-      "hardware-runtime-evidence.json",
-      "m5stack-codex-pet-notifier-docs.zip",
-      "manual-test.md",
-      "strict-manual-test-addendum.md"
-    ],
-    "allRequiredPresent": true
+    "actualNames": [],
+    "allRequiredPresent": false
   },
   "qcdsEvaluation": {
     "Quality": "S-",

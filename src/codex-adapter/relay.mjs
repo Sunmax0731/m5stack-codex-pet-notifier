@@ -66,7 +66,7 @@ export async function buildEvent(command, args, options = {}) {
   }
   if (command === 'clipboard') {
     return createAnswerEvent({
-      body: readClipboard(),
+      body: options.readClipboard ? options.readClipboard() : readClipboard(),
       summary: args.summary ?? 'Codex clipboard answer',
       threadId: args.thread ?? args.threadId,
       eventId: args['event-id'] ?? args.eventId
@@ -159,15 +159,24 @@ async function resolveText(args, options = {}) {
   return readStream(stdin);
 }
 
-function readClipboard() {
-  const result = cp.spawnSync('powershell', ['-NoProfile', '-Command', 'Get-Clipboard -Raw'], {
+export function readClipboard() {
+  const result = cp.spawnSync('powershell', ['-NoProfile', '-Command', [
+    '$text = Get-Clipboard -Raw -Format Text;',
+    'if ($null -eq $text) { $text = ""; }',
+    '$bytes = [System.Text.Encoding]::UTF8.GetBytes($text);',
+    '[Console]::Out.Write([System.Convert]::ToBase64String($bytes));'
+  ].join(' ')], {
     encoding: 'utf8',
     windowsHide: true
   });
   if (result.status !== 0) {
     throw new Error(`Get-Clipboard failed: ${result.stderr}`);
   }
-  return result.stdout;
+  const text = Buffer.from(result.stdout.trim(), 'base64').toString('utf8');
+  if (!text.trim()) {
+    throw new Error('clipboard text is empty or not available as text');
+  }
+  return text;
 }
 
 function readStream(stream) {

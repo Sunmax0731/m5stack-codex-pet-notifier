@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer",
   "status": "partial-pass",
   "device": {
@@ -31,7 +31,7 @@
   "hostBridge": {
     "command": "cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080",
     "localPort8080ObservedVersion": "0.1.0-alpha.2",
-    "alpha4BridgeValidatedBySmokeTest": true,
+    "alpha5BridgeValidatedBySmokeTest": true,
     "localPort8080RestartBlockedByAccessDenied": true,
     "healthOk": true,
     "pairingObserved": true,
@@ -52,7 +52,7 @@
       "invalid-token",
       "unpaired-device"
     ],
-    "core2RuntimeConfirmation": "firmware-uploaded; alpha4 local bridge restart requires closing the admin-owned 8080 process first"
+    "core2RuntimeConfirmation": "firmware-uploaded; alpha5 local bridge restart requires closing the admin-owned 8080 process first"
   },
   "codexRelay": {
     "command": "cmd.exe /d /s /c npm run codex:answer -- --summary \"Codex返答表示\" --text \"...\"",
@@ -64,6 +64,15 @@
     "observedEventType": "answer.completed",
     "bodyPersistedInEvidence": false,
     "evidence": "User confirmed the Core2 displayed the Codex relay answer as intended after running npm run codex:answer."
+  },
+  "clipboardRelay": {
+    "powershellClipboardReadMode": "base64-utf8",
+    "utf8RelaySmokePassed": true,
+    "core2ClipboardJapaneseAnswerQueued": true,
+    "core2ClipboardJapaneseAnswerPolled": true,
+    "latestClipboardJapaneseAnswerEventId": "evt-answer-1778290344886-e655dde1",
+    "bodyPersistedInEvidence": false,
+    "evidence": "Clipboard relay no longer reads non-ASCII text directly from PowerShell stdout. It base64-encodes UTF-8 bytes in PowerShell and decodes them in Node.js."
   },
   "japaneseDisplay": {
     "firmwareFont": "fonts::efontJA_12",
@@ -111,6 +120,6 @@
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file input",
     "Core2 Japanese glyph rendering requires user visual confirmation after upload",
-    "local 8080 bridge is still an admin-owned v0.1.0-alpha.2 process; close it and start v0.1.0-alpha.4 before final manual confirmation"
+    "local 8080 bridge is still an admin-owned v0.1.0-alpha.2 process; close it and start v0.1.0-alpha.5 before final manual confirmation"
   ]
 }

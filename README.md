@@ -4,7 +4,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 ## Status
 
-- Version: `0.1.0-alpha.4`
+- Version: `0.1.0-alpha.5`
 - Domain: IoT
 - Idea No: 18
 - Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
@@ -15,7 +15,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
-- `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、`answer.completed` として M5Stack へ送る。
+- `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
@@ -67,7 +67,7 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
-- [releases/v0.1.0-alpha.4.md](docs/releases/v0.1.0-alpha.4.md)
+- [releases/v0.1.0-alpha.5.md](docs/releases/v0.1.0-alpha.5.md)
 
 ## Closed Alpha Boundary
 

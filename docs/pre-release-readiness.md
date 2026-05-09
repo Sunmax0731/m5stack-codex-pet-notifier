@@ -5,6 +5,7 @@
 - Host Bridge mock。
 - LAN Host Bridge server。
 - Codex relay。
+- Clipboard UTF-8 relay。
 - JSON event contract。
 - Core2 / GRAY device profile。
 - Simulator と representative suite。
@@ -28,4 +29,4 @@
 
 ## Decision
 
-`v0.1.0-alpha.4` は closed alpha prerelease として公開し、stable release にはしません。
+`v0.1.0-alpha.5` は closed alpha prerelease として公開し、stable release にはしません。

@@ -84,3 +84,5 @@ cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "C
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:answer -- --summary "日本語表示" --text "これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。"
 ```
+
+Windows で長い日本語本文を送る場合、`cmd.exe` の code page に左右されない clipboard または UTF-8 file watch を優先します。`codex:clipboard` は PowerShell clipboard を Base64 UTF-8 経由で読み取ります。

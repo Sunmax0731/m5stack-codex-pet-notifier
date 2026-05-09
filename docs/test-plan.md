@@ -12,6 +12,7 @@
 | device profile | Core2 / GRAY の入力割り当て差分を検証する | `profileCovered` |
 | LAN bridge smoke | HTTP pairing、sample replay、polling、device reply 受信を検証する | `npm run bridge:smoke` |
 | Codex relay smoke | relay CLI と `/codex/answer` から `answer.completed` を queue / poll できることを検証する | `scripts/codex-relay-smoke.mjs` |
+| clipboard UTF-8 relay smoke | 日本語 clipboard 本文を `answer.completed` として壊さず送れることを検証する | `scripts/codex-relay-smoke.mjs` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
@@ -35,6 +36,7 @@
 | Core2 re-pairing | Host Bridge 再起動後に invalid token を検出し、再pairingへ戻る | `docs/hardware-runtime-evidence.json` |
 | Core2 Codex answer | `npm run codex:answer` で Core2 に Answer を表示する | `docs/hardware-runtime-evidence.json` |
 | Core2 Japanese answer | 日本語本文の `answer.completed` を送り、文字化けがないことを目視する | `docs/hardware-runtime-evidence.json` |
+| Core2 Clipboard Japanese answer | clipboard 経由の日本語本文を送り、文字化けがないことを目視する | `docs/hardware-runtime-evidence.json` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 
 GRAY 実機、GRAY IMU、長時間運用、実 Codex App 内部 API 連携の手動テストは Codex では未実施です。手順と対象外範囲は `docs/manual-test.md`、`docs/host-bridge-manual-check.md`、`docs/codex-relay-manual-check.md` に残し、release notes にも明記します。

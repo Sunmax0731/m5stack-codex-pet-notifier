@@ -32,6 +32,24 @@ try {
   assert.equal(polled.event.summary, 'Codex relay smoke');
   assert.equal(polled.event.body, 'Codex relay smoke answer body');
 
+  const japaneseClipboard = 'クリップボード経由の日本語本文です。PowerShellの出力エンコーディングで壊れないことを確認します。';
+  const clipboardRelay = await runRelayCli([
+    'clipboard',
+    '--bridge', baseUrl,
+    '--device-id', deviceId,
+    '--summary', 'Clipboard UTF8 smoke'
+  ], {
+    stdout: { write() {} },
+    readClipboard: () => japaneseClipboard
+  });
+  assert.equal(clipboardRelay.ok, true);
+
+  const clipboardPolled = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
+  assert.equal(clipboardPolled.ok, true);
+  assert.equal(clipboardPolled.event.type, 'answer.completed');
+  assert.equal(clipboardPolled.event.summary, 'Clipboard UTF8 smoke');
+  assert.equal(clipboardPolled.event.body, japaneseClipboard);
+
   const endpoint = await postJson(`${baseUrl}/codex/answer`, {
     deviceId,
     summary: 'Codex endpoint smoke',

@@ -13,6 +13,7 @@
 - [x] Host Bridge model が pairing token を発行できる。
 - [x] LAN Host Bridge が HTTP pairing / polling / replay / device event 受信を提供する。
 - [x] Codex relay が clipboard / stdin / file から `answer.completed` を送信できる。
+- [x] clipboard relay が日本語本文を UTF-8 として保持できる。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
 - [x] 長文回答を page 分割できる。

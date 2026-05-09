@@ -26,6 +26,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-10 | Answer 画面で swipe または footer touch を行う | 本文ページが上下に移動する | ユーザー手動 |
 | C2-11 | Choice 画面で row tap または footer touch を行う | `device.reply_selected` が Host Bridge inbound に出る | ユーザー手動 |
 | C2-12 | `codex:answer` で日本語本文を送る | Core2 の Answer 画面で日本語が文字化けせず表示される | 準備済み。ユーザー目視 |
+| C2-13 | 日本語本文を clipboard に入れ、`codex:clipboard` を実行する | Core2 の Answer 画面で clipboard 日本語本文が文字化けせず表示される | 準備済み。ユーザー目視 |
 
 ## GRAY 今回対象外
 
@@ -58,6 +59,7 @@ Codex relay:
 
 ```powershell
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
+cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 ```
 
 firmware:

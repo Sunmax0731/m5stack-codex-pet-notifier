@@ -33,6 +33,12 @@ cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 期待結果:
 
 - clipboard の本文が Core2 の `Answer` 画面に表示される。
+- 日本語本文も PowerShell stdout の文字コードに依存せず UTF-8 のまま送信される。
+
+注意:
+
+- `cmd.exe` 経由の `--text "日本語..."` は Windows の code page に影響される場合があるため、長い日本語本文は clipboard または UTF-8 file watch を優先する。
+- clipboard 送信時の `--summary` は ASCII でもよい。本文は clipboard から取得する。
 
 ## 3. 日本語表示
 
