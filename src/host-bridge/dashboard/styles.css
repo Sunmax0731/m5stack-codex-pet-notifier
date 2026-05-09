@@ -123,6 +123,15 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: 244px minmax(0, 1fr);
@@ -251,8 +260,8 @@ textarea:focus-visible {
 .topbar {
   display: flex;
   min-height: 72px;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-end;
+  justify-content: flex-end;
   gap: 16px;
   border-bottom: 1px solid var(--border);
 }
@@ -283,6 +292,17 @@ textarea:focus-visible {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.topbar-actions {
+  align-items: flex-end;
+}
+
+.topbar-actions select,
+.topbar-actions button,
+.topbar-actions .button {
+  min-height: 42px;
+  height: 42px;
 }
 
 .toolbar-field {
@@ -464,6 +484,83 @@ textarea:focus-visible {
 
 .hint {
   position: relative;
+}
+
+.rgba-field {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  padding: 10px;
+}
+
+.rgba-field-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-right: 28px;
+}
+
+.rgba-swatch,
+.rgba-picker-preview {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.32) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.32) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.32) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.32) 75%),
+    var(--rgba-preview, #000000);
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+}
+
+.rgba-swatch {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+}
+
+.rgba-picker {
+  position: relative;
+}
+
+.rgba-picker-button {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 8px;
+  border-color: var(--border);
+  background: var(--control);
+  color: var(--text);
+}
+
+.rgba-picker-preview {
+  width: 22px;
+  height: 22px;
+}
+
+.rgba-popover {
+  position: absolute;
+  z-index: 24;
+  display: none;
+  width: min(260px, calc(100vw - 40px));
+  top: calc(100% + 8px);
+  left: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 10px;
+}
+
+.rgba-picker.open .rgba-popover {
+  display: grid;
+  gap: 10px;
+}
+
+.rgba-popover input[type="color"] {
+  height: 44px;
+  padding: 4px;
 }
 
 .help-control {

@@ -13,7 +13,7 @@
 | Pet render / motion separation | 実装済み | `animationFps` と `motionStepMs` を分離 |
 | Collapsible dashboard sections | 実装済み | `section-toggle` による View / Hide |
 | Click help hints | 実装済み | `?` icon と `data-tooltip` field hints |
-| Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal。環境構築 / デバッグ送信 / 保守のtabとlocalhost限定のallowlist command実行を含む |
+| Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal。環境構築 / デバッグ送信のtabとlocalhost限定のallowlist command実行を含む。sample replay はデバッグ送信tabへ統合 |
 | Background bridge runtime | 実装済み | `npm run bridge:start:bg`、`/debug/runtime`、sidebar runtime status |
 
 ## Release Candidate Workstreams

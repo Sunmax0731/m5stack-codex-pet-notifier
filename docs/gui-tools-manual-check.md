@@ -35,7 +35,7 @@ http://127.0.0.1:8080/
 
 期待結果:
 
-- `M5Stack Codex Pet Console` が表示される。
+- topbar には言語、テーマ、更新、debug JSON の操作だけが表示され、旧ヘッダー文言やBridge行は表示されない。
 - sidebar 内の状態確認 section に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
@@ -43,7 +43,7 @@ http://127.0.0.1:8080/
 - Answer / Decision / Notify の送信、sample replay、各種 debug command は `環境構築コマンド` modal に集約されている。
 - `M5Stack 表示プレビュー` に Pet 設定、pet display area、UI text size、body text size、render FPS、motion step が統合されている。
 - `M5Stack 表示プレビュー` があり、現在の hatch-pet キャラで Pet / Answer / Decision / Notify の simulated display を送信前に確認できる。
-- `M5Stack 表示プレビュー` で Core2 / GRAY、local hatch-pet asset、screen background RGBA、pet background RGBA、text color RGBA、text background RGBA、text border RGBA、pet X/Y offset、Codex answer beep を変更できる。
+- `M5Stack 表示プレビュー` で Core2 / GRAY、local hatch-pet asset、screen background RGBA、pet background RGBA、text color RGBA、text background RGBA、text border RGBA、pet X/Y offset、Codex answer beep を変更できる。各色は1つの RGBA picker で色と透明度を操作でき、現在色の swatch と `#hex / alpha` が同じ項目内に表示される。
 - `M5Stack 表示プレビュー` は1ペインで全幅表示され、画面プレビュー、readout、asset、表示設定が同じ section 内で見通せる。
 - 最近の Codex 回答とイベントログは左右ペインで並ぶ。
 - sidebar に Bridge runtime status があり、foreground / background、pid、uptime が見える。
@@ -51,7 +51,7 @@ http://127.0.0.1:8080/
 - topbar に `言語` と `テーマ` があり、既定は日本語、テーマはOSに追従する。手動でEnglish / light / darkへ切り替えできる。
 - 各 section の `Hide` / `View` で折りたたみできる。
 - sidebar の `環境構築コマンド` から setup / debug command modal を開ける。
-- command modal は `環境構築`、`デバッグ送信`、`保守` のタブを持つ。
+- command modal は `環境構築`、`デバッグ送信` のタブを持つ。重複していた保守タブは廃止し、sample replay はデバッグ送信tabへ統合されている。
 - command modal で pet asset 生成、Core2 upload、Codex answer、ABC Decision、Display settings、Codex session、sample replay を任意パラメータで実行できる。実行結果は modal 下部の output に表示される。
 - command modal の実行 button は各 card 下部に一定高さで表示され、入力欄の量によって極端に縦長にならない。
 - `/health` の `version` が `0.1.0-alpha.10` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `bridge:start:bg -- --port=18081` で最新Bridgeを起動し、Dashboardが最新Bridge APIを自動検出していることを確認する。
@@ -137,11 +137,10 @@ Dashboard の sidebar で `環境構築コマンド` を押します。
 
 期待結果:
 
-- modal 上部に `環境構築`、`デバッグ送信`、`保守` のタブが表示される。
+- modal 上部に `環境構築`、`デバッグ送信` のタブが表示され、`保守` タブは表示されない。
 - `環境構築` tab で `petDir` と `output` を変えて pet asset 生成を実行できる。
 - `環境構築` tab で `uploadPort` を空欄または `COM3` などにして Core2 upload を実行できる。
-- `デバッグ送信` tab で Answer、Decision、Display settings の値を変更し、button 実行で outbound に反映できる。
-- `保守` tab で sample replay を実行できる。
+- `デバッグ送信` tab で Answer、Decision、Display settings、sample replay の値を変更し、button 実行で outbound に反映できる。
 - modal の output に command、code、stdout / stderr または replay result が表示される。
 - localhost 以外から `/debug/commands/run` を呼んだ場合は `local-command-execution-only` で拒否される。
 - `cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080` で起動した場合、PowerShell 画面を残さず、sidebar runtime status が `background` と pid を表示する。

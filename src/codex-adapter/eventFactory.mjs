@@ -58,6 +58,9 @@ export function createChoiceEvent(options = {}) {
 }
 
 export function createPetEvent(options = {}) {
+  const display = options.display && typeof options.display === 'object'
+    ? normalizeDisplaySettings(options.display)
+    : null;
   return {
     type: 'pet.updated',
     eventId: options.eventId ?? generatedId('evt-pet'),
@@ -68,7 +71,8 @@ export function createPetEvent(options = {}) {
       state: options.state ?? 'review',
       spriteRef: options.spriteRef ?? 'host://pet/codex-default',
       ...(options.fallbackState ? { fallbackState: options.fallbackState } : {})
-    }
+    },
+    ...(display ? { display } : {})
   };
 }
 
@@ -77,47 +81,51 @@ export function createDisplaySettingsEvent(options = {}) {
     type: 'display.settings_updated',
     eventId: options.eventId ?? generatedId('evt-display'),
     createdAt: options.createdAt ?? new Date().toISOString(),
-    display: {
-      petScale: clampInteger(options.petScale, 1, 8, 2),
-      uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
-      bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
-      animationFps: clampInteger(options.animationFps, 4, 20, 12),
-      motionStepMs: clampInteger(options.motionStepMs, 120, 800, 280),
-      screenBackgroundRgba: normalizeRgba(options.screenBackgroundRgba ?? options.screenBg ?? options.screenBackground, {
-        r: 5,
-        g: 11,
-        b: 20,
-        a: 255
-      }),
-      petBackgroundRgba: normalizeRgba(options.petBackgroundRgba ?? options.petBg ?? options.petBackground, {
-        r: 5,
-        g: 11,
-        b: 20,
-        a: 255
-      }),
-      textColorRgba: normalizeRgba(options.textColorRgba ?? options.textColor, {
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255
-      }),
-      textBackgroundRgba: normalizeRgba(options.textBackgroundRgba ?? options.textBg ?? options.textBackground, {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 178
-      }),
-      petOffsetX: clampInteger(options.petOffsetX ?? options.petX, -320, 320, 0),
-      petOffsetY: clampInteger(options.petOffsetY ?? options.petY, -240, 240, 0),
-      textBorderEnabled: normalizeBoolean(options.textBorderEnabled ?? options.textBorder, false),
-      textBorderRgba: normalizeRgba(options.textBorderRgba ?? options.textBorderColor, {
-        r: 255,
-        g: 255,
-        b: 255,
-        a: 255
-      }),
-      beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true)
-    }
+    display: normalizeDisplaySettings(options)
+  };
+}
+
+function normalizeDisplaySettings(options = {}) {
+  return {
+    petScale: clampInteger(options.petScale, 1, 8, 2),
+    uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
+    bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
+    animationFps: clampInteger(options.animationFps, 4, 20, 12),
+    motionStepMs: clampInteger(options.motionStepMs, 120, 800, 280),
+    screenBackgroundRgba: normalizeRgba(options.screenBackgroundRgba ?? options.screenBg ?? options.screenBackground, {
+      r: 5,
+      g: 11,
+      b: 20,
+      a: 255
+    }),
+    petBackgroundRgba: normalizeRgba(options.petBackgroundRgba ?? options.petBg ?? options.petBackground, {
+      r: 5,
+      g: 11,
+      b: 20,
+      a: 255
+    }),
+    textColorRgba: normalizeRgba(options.textColorRgba ?? options.textColor, {
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255
+    }),
+    textBackgroundRgba: normalizeRgba(options.textBackgroundRgba ?? options.textBg ?? options.textBackground, {
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 178
+    }),
+    petOffsetX: clampInteger(options.petOffsetX ?? options.petX, -320, 320, 0),
+    petOffsetY: clampInteger(options.petOffsetY ?? options.petY, -240, 240, 0),
+    textBorderEnabled: normalizeBoolean(options.textBorderEnabled ?? options.textBorder, false),
+    textBorderRgba: normalizeRgba(options.textBorderRgba ?? options.textBorderColor, {
+      r: 255,
+      g: 255,
+      b: 255,
+      a: 255
+    }),
+    beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true)
   };
 }
 

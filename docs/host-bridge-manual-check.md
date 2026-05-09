@@ -40,7 +40,7 @@ http://127.0.0.1:8080/
 
 期待結果:
 
-- `M5Stack Codex Pet Console` が表示される。
+- topbar に言語、テーマ、更新、debug JSON の操作が表示され、旧ヘッダー文言やBridge行は表示されない。
 - paired、outbound、inbound、security の状態が見える。
 - `debug JSON` から `/debug/snapshot` を確認できる。
 - `/health` の `version` が `0.1.0-alpha.10` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `--port=18081` で最新Bridgeを起動する。

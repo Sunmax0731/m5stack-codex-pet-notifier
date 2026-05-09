@@ -107,7 +107,7 @@
 - Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、pet X/Y offset、UI text size、body text size、pet render FPS、motion step、screen / pet / text / border RGBA、answer beep を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-- 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信`、`保守` の tab から allowlist 済み command を任意パラメータで実行できる。command 実行は localhost からの `/debug/commands/run` に限定する。
+- 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信` の tab から allowlist 済み command を任意パラメータで実行できる。sample replay は重複した保守tabではなくデバッグ送信tabへ統合する。command 実行は localhost からの `/debug/commands/run` に限定する。
 - Decision 返信ワークフローと送信結果は環境構築コマンド modal に統合し、Decision 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
 - 各 section は View / Hide で折りたたみできる。主要 field は `?` help icon のクリックで hint を表示する。
 - `/events` は reply の `choiceId`、`requestEventId`、input、heartbeat summary などの運用確認に必要な最小情報だけを返し、回答本文を永続 evidence に残さない。
@@ -122,6 +122,7 @@
 - `display.settings_updated.display.motionStepMs` は `120..800` を受け付け、既定 `280ms` でキャラの pose / frame 切替間隔を決める。
 - `display.settings_updated.display.screenBackgroundRgba` は LCD 画面全体の背景に反映する。
 - `display.settings_updated.display.*Rgba` は `r/g/b/a=0..255` を受け付け、pet 背景、本文文字、本文背景、文字枠に反映する。
+- Dashboard の色設定は各項目1つの RGBA picker で操作し、現在色の swatch と `#hex / alpha` の数値表示を同じ section 内に維持する。
 - `display.settings_updated.display.petOffsetX` と `petOffsetY` はそれぞれ `-320..320`、`-240..240` を受け付け、pet を画面外にはみ出す位置まで動かせる。
 - `display.settings_updated.display.textBorderEnabled` は boolean を受け付け、文字パネルと footer の枠線を切り替える。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。

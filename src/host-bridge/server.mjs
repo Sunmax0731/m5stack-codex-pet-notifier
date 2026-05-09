@@ -776,8 +776,7 @@ function buildDashboardCommandDefinitions(request) {
     localExecutionOnly: true,
     tabs: [
       { id: 'setup', label: '環境構築' },
-      { id: 'debug', label: 'デバッグ送信' },
-      { id: 'maintenance', label: '保守' }
+      { id: 'debug', label: 'デバッグ送信' }
     ],
     commands: [
       {
@@ -872,7 +871,7 @@ function buildDashboardCommandDefinitions(request) {
       },
       {
         id: 'sampleReplay',
-        tab: 'maintenance',
+        tab: 'debug',
         label: 'sample replay',
         description: '代表sample eventをHost Bridge queueへ投入します。',
         params: [

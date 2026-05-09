@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>M5Stack Codex Pet Console</title>
+    <title>M5Stack Pet Dashboard</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="/dashboard/styles.css">
   </head>
@@ -68,11 +68,7 @@
 
       <div class="workspace">
         <header class="topbar">
-          <div>
-            <p class="eyebrow" data-i18n="eyebrow">ローカルデバイス操作</p>
-            <h1>M5Stack Codex Pet Console</h1>
-            <p id="bridgeLine">Host Bridge 状態を読み込み中</p>
-          </div>
+          <p id="bridgeLine" class="visually-hidden" hidden>Host Bridge 状態を読み込み中</p>
           <div class="topbar-actions">
             <label class="toolbar-field">
               <span data-i18n="languageLabel">言語</span>
@@ -228,31 +224,71 @@
                     </div>
 
                     <div class="color-grid preview-color-controls">
-                      <label class="field hint" data-tooltip="LCD画面全体の背景色です。pet backgroundとは別に扱います。">
-                        <span><span data-i18n="screenBackground">画面背景</span> <strong id="screenBgValue">#050b14 / 255</strong></span>
-                        <input id="screenBgColor" type="color" value="#050b14">
-                        <input id="screenBgAlpha" type="range" min="0" max="255" step="1" value="255">
-                      </label>
-                      <label class="field hint" data-tooltip="ペット背面の色です。alphaを下げるとscreen backgroundへ合成します。">
-                        <span><span data-i18n="petBackground">ペット背景</span> <strong id="petBgValue">#050b14 / 255</strong></span>
-                        <input id="petBgColor" type="color" value="#050b14">
-                        <input id="petBgAlpha" type="range" min="0" max="255" step="1" value="255">
-                      </label>
-                      <label class="field hint" data-tooltip="Answerや通知本文の文字色です。">
-                        <span><span data-i18n="textColor">文字色</span> <strong id="textColorValue">#ffffff / 255</strong></span>
-                        <input id="textColor" type="color" value="#ffffff">
-                        <input id="textAlpha" type="range" min="0" max="255" step="1" value="255">
-                      </label>
-                      <label class="field hint" data-tooltip="文字の背面色です。alphaを下げるとペット上へ重なる見え方になります。">
-                        <span><span data-i18n="textBackground">文字背景</span> <strong id="textBgValue">#000000 / 178</strong></span>
-                        <input id="textBgColor" type="color" value="#000000">
-                        <input id="textBgAlpha" type="range" min="0" max="255" step="1" value="178">
-                      </label>
-                      <label class="field hint" data-tooltip="Answer / Decision / Notify の文字パネル枠線色です。非表示時は送信されても描画しません。">
-                        <span><span data-i18n="textBorder">文字枠</span> <strong id="textBorderValue">#ffffff / 255</strong></span>
-                        <input id="textBorderColor" type="color" value="#ffffff">
-                        <input id="textBorderAlpha" type="range" min="0" max="255" step="1" value="255">
-                      </label>
+                      <div class="field hint rgba-field" data-tooltip="LCD画面全体の背景色です。pet backgroundとは別に扱います。">
+                        <span class="rgba-field-title"><span><span data-i18n="screenBackground">画面背景</span> <strong id="screenBgValue">#050b14 / 255</strong></span><span id="screenBgSwatch" class="rgba-swatch" aria-hidden="true"></span></span>
+                        <div class="rgba-picker" data-rgba-picker>
+                          <button class="rgba-picker-button" type="button" data-rgba-toggle>
+                            <span id="screenBgPreview" class="rgba-picker-preview" aria-hidden="true"></span>
+                            <span>RGBA</span>
+                          </button>
+                          <div class="rgba-popover">
+                            <input id="screenBgColor" type="color" value="#050b14" aria-label="screen background color">
+                            <input id="screenBgAlpha" type="range" min="0" max="255" step="1" value="255" aria-label="screen background alpha">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field hint rgba-field" data-tooltip="ペット背面の色です。alphaを下げるとscreen backgroundへ合成します。">
+                        <span class="rgba-field-title"><span><span data-i18n="petBackground">ペット背景</span> <strong id="petBgValue">#050b14 / 255</strong></span><span id="petBgSwatch" class="rgba-swatch" aria-hidden="true"></span></span>
+                        <div class="rgba-picker" data-rgba-picker>
+                          <button class="rgba-picker-button" type="button" data-rgba-toggle>
+                            <span id="petBgPreview" class="rgba-picker-preview" aria-hidden="true"></span>
+                            <span>RGBA</span>
+                          </button>
+                          <div class="rgba-popover">
+                            <input id="petBgColor" type="color" value="#050b14" aria-label="pet background color">
+                            <input id="petBgAlpha" type="range" min="0" max="255" step="1" value="255" aria-label="pet background alpha">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field hint rgba-field" data-tooltip="Answerや通知本文の文字色です。">
+                        <span class="rgba-field-title"><span><span data-i18n="textColor">文字色</span> <strong id="textColorValue">#ffffff / 255</strong></span><span id="textColorSwatch" class="rgba-swatch" aria-hidden="true"></span></span>
+                        <div class="rgba-picker" data-rgba-picker>
+                          <button class="rgba-picker-button" type="button" data-rgba-toggle>
+                            <span id="textColorPreview" class="rgba-picker-preview" aria-hidden="true"></span>
+                            <span>RGBA</span>
+                          </button>
+                          <div class="rgba-popover">
+                            <input id="textColor" type="color" value="#ffffff" aria-label="text color">
+                            <input id="textAlpha" type="range" min="0" max="255" step="1" value="255" aria-label="text alpha">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field hint rgba-field" data-tooltip="文字の背面色です。alphaを下げるとペット上へ重なる見え方になります。">
+                        <span class="rgba-field-title"><span><span data-i18n="textBackground">文字背景</span> <strong id="textBgValue">#000000 / 178</strong></span><span id="textBgSwatch" class="rgba-swatch" aria-hidden="true"></span></span>
+                        <div class="rgba-picker" data-rgba-picker>
+                          <button class="rgba-picker-button" type="button" data-rgba-toggle>
+                            <span id="textBgPreview" class="rgba-picker-preview" aria-hidden="true"></span>
+                            <span>RGBA</span>
+                          </button>
+                          <div class="rgba-popover">
+                            <input id="textBgColor" type="color" value="#000000" aria-label="text background color">
+                            <input id="textBgAlpha" type="range" min="0" max="255" step="1" value="178" aria-label="text background alpha">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field hint rgba-field" data-tooltip="Answer / Decision / Notify の文字パネル枠線色です。非表示時は送信されても描画しません。">
+                        <span class="rgba-field-title"><span><span data-i18n="textBorder">文字枠</span> <strong id="textBorderValue">#ffffff / 255</strong></span><span id="textBorderSwatch" class="rgba-swatch" aria-hidden="true"></span></span>
+                        <div class="rgba-picker" data-rgba-picker>
+                          <button class="rgba-picker-button" type="button" data-rgba-toggle>
+                            <span id="textBorderPreview" class="rgba-picker-preview" aria-hidden="true"></span>
+                            <span>RGBA</span>
+                          </button>
+                          <div class="rgba-popover">
+                            <input id="textBorderColor" type="color" value="#ffffff" aria-label="text border color">
+                            <input id="textBorderAlpha" type="range" min="0" max="255" step="1" value="255" aria-label="text border alpha">
+                          </div>
+                        </div>
+                      </div>
                       <label class="check-field hint" data-tooltip="文字パネルとfooterの枠線を表示するかを切り替えます。">
                         <input id="textBorderEnabled" type="checkbox">
                         <span data-i18n="showTextBorder">テキスト枠を表示</span>

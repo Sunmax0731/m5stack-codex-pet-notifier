@@ -82,6 +82,16 @@ const elements = {
   textColorValue: $('#textColorValue'),
   textBgValue: $('#textBgValue'),
   textBorderValue: $('#textBorderValue'),
+  screenBgSwatch: $('#screenBgSwatch'),
+  petBgSwatch: $('#petBgSwatch'),
+  textColorSwatch: $('#textColorSwatch'),
+  textBgSwatch: $('#textBgSwatch'),
+  textBorderSwatch: $('#textBorderSwatch'),
+  screenBgPreview: $('#screenBgPreview'),
+  petBgPreview: $('#petBgPreview'),
+  textColorPreview: $('#textColorPreview'),
+  textBgPreview: $('#textBgPreview'),
+  textBorderPreview: $('#textBorderPreview'),
   previewDevice: $('#previewDevice'),
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
@@ -112,7 +122,6 @@ const labels = {
     navSession: '最近の回答',
     navLog: 'ログ',
     openCommands: '環境構築コマンド',
-    eyebrow: 'ローカルデバイス操作',
     languageLabel: '言語',
     themeLabel: 'テーマ',
     refresh: '更新',
@@ -199,7 +208,6 @@ const labels = {
     navSession: 'Recent answer',
     navLog: 'Logs',
     openCommands: 'Setup commands',
-    eyebrow: 'Local device operations',
     languageLabel: 'Language',
     themeLabel: 'Theme',
     refresh: 'Refresh',
@@ -349,8 +357,7 @@ const commandText = {
 
 const commandTabLabels = {
   setup: { ja: '環境構築', en: 'Setup' },
-  debug: { ja: 'デバッグ送信', en: 'Debug send' },
-  maintenance: { ja: '保守', en: 'Maintenance' }
+  debug: { ja: 'デバッグ送信', en: 'Debug send' }
 };
 
 const commandParamLabels = {
@@ -612,7 +619,7 @@ async function refresh() {
   } catch (error) {
     resetApiDiscovery();
     elements.bridgeLine.textContent = `Host Bridge error: ${error.message}`;
-    elements.bridgeLine.className = 'danger';
+    elements.bridgeLine.className = 'visually-hidden danger';
     renderRuntimeStatus();
   }
 }
@@ -675,7 +682,7 @@ function render() {
   if (state.apiBaseWarning) {
     elements.bridgeLine.textContent += ` / ${state.apiBaseWarning}`;
   }
-  elements.bridgeLine.className = health.pairedDevices.length ? 'ok' : 'warn';
+  elements.bridgeLine.className = `visually-hidden ${health.pairedDevices.length ? 'ok' : 'warn'}`;
   elements.lastUpdated.textContent = `updated ${nowLabel()}`;
   elements.pairedCount.textContent = String(health.pairedDevices.length);
   elements.outboundCount.textContent = String(health.outboundEvents);
@@ -913,6 +920,18 @@ function rgbaLabel(colorInput, alphaInput) {
   return `${colorInput.value} / ${alphaInput.value}`;
 }
 
+function updateRgbaVisual(swatch, preview, colorInput, alphaInput) {
+  const value = rgbaFromControls(colorInput, alphaInput);
+  const css = rgbaCss(value);
+  [swatch, preview].forEach((item) => {
+    if (!item) {
+      return;
+    }
+    item.style.setProperty('--rgba-preview', css);
+    item.title = rgbaLabel(colorInput, alphaInput);
+  });
+}
+
 function displaySettingsPayload() {
   return {
     deviceId: deviceId(),
@@ -983,7 +1002,8 @@ function petPayload() {
     deviceId: deviceId(),
     name: elements.petName.value || state.petManifest?.displayName || 'Codex Pet',
     state: elements.petState.value,
-    spriteRef: elements.petSprite.value || 'host://pet/current'
+    spriteRef: elements.petSprite.value || 'host://pet/current',
+    display: displaySettingsPayload()
   };
 }
 
@@ -1000,6 +1020,11 @@ function renderDisplayControls() {
   elements.textColorValue.textContent = rgbaLabel(elements.textColor, elements.textAlpha);
   elements.textBgValue.textContent = rgbaLabel(elements.textBgColor, elements.textBgAlpha);
   elements.textBorderValue.textContent = rgbaLabel(elements.textBorderColor, elements.textBorderAlpha);
+  updateRgbaVisual(elements.screenBgSwatch, elements.screenBgPreview, elements.screenBgColor, elements.screenBgAlpha);
+  updateRgbaVisual(elements.petBgSwatch, elements.petBgPreview, elements.petBgColor, elements.petBgAlpha);
+  updateRgbaVisual(elements.textColorSwatch, elements.textColorPreview, elements.textColor, elements.textAlpha);
+  updateRgbaVisual(elements.textBgSwatch, elements.textBgPreview, elements.textBgColor, elements.textBgAlpha);
+  updateRgbaVisual(elements.textBorderSwatch, elements.textBorderPreview, elements.textBorderColor, elements.textBorderAlpha);
   renderM5Preview();
 }
 
@@ -1305,10 +1330,14 @@ function wireActions() {
     if (!event.target.closest('.hint')) {
       closeHelpPopovers();
     }
+    if (!event.target.closest('[data-rgba-picker]')) {
+      closeRgbaPickers();
+    }
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       closeHelpPopovers();
+      closeRgbaPickers();
       closeModal(elements.commandModal);
     }
   });
@@ -1355,8 +1384,25 @@ function wireActions() {
   $('#sendDisplayButton').addEventListener('click', () => {
     publishDisplaySettings().catch(showError);
   });
+  $$('[data-rgba-toggle]').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      const picker = button.closest('[data-rgba-picker]');
+      const shouldOpen = !picker.classList.contains('open');
+      closeRgbaPickers(picker);
+      picker.classList.toggle('open', shouldOpen);
+    });
+  });
   $$('.section-toggle').forEach((button) => {
     button.addEventListener('click', () => toggleSection(button.dataset.target, button));
+  });
+}
+
+function closeRgbaPickers(except = null) {
+  $$('[data-rgba-picker].open').forEach((picker) => {
+    if (picker !== except) {
+      picker.classList.remove('open');
+    }
   });
 }
 

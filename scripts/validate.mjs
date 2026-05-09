@@ -113,6 +113,9 @@ assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pe
 
 const petAssetGeneratorSource = fs.readFileSync('tools/generate-pet-firmware-asset.py', 'utf8');
 assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset generator must emit scale-specific frames');
+
+const eventFactorySource = fs.readFileSync('src/codex-adapter/eventFactory.mjs', 'utf8');
+assert(eventFactorySource.includes('normalizeDisplaySettings(options.display)'), 'pet.updated events must preserve optional display settings for device updates');
 assert(petAssetGeneratorSource.includes('Image.Resampling.LANCZOS'), 'pet asset generator must resample scale-specific frames from source cells');
 assert(petAssetGeneratorSource.includes('detect_frame_count'), 'pet asset generator must auto-detect non-empty animation frames');
 
@@ -151,6 +154,8 @@ assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge m
 assert(bridgeSource.includes("url.pathname === '/codex/decision'"), 'Host Bridge must expose a decision endpoint for Codex-to-M5Stack choice workflows');
 assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must expose a pet update endpoint');
 assert(bridgeSource.includes("url.pathname === '/codex/display'"), 'Host Bridge must expose a display settings endpoint');
+assert(!bridgeSource.includes("{ id: 'maintenance'"), 'Host Bridge command modal must not keep overlapping maintenance tab commands');
+assert(bridgeSource.includes("id: 'sampleReplay'") && bridgeSource.includes("tab: 'debug'"), 'sample replay must be consolidated into the debug command tab');
 assert(bridgeSource.includes("url.pathname === '/codex/session/latest'"), 'Host Bridge must expose a latest Codex session endpoint for the GUI');
 assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host Bridge must expose a latest Codex session publish endpoint for the GUI');
 assert(bridgeSource.includes("url.pathname === '/pet/packages'"), 'Host Bridge must expose local pet package metadata for dashboard preview');
@@ -182,6 +187,8 @@ assert(dashboardIndexSource.includes('アニメ間隔'), 'Dashboard must expose 
 assert(dashboardIndexSource.includes('画面背景'), 'Dashboard must expose full-screen background color controls in Japanese by default');
 assert(dashboardIndexSource.includes('ペット背景'), 'Dashboard must expose pet background color controls in Japanese by default');
 assert(dashboardIndexSource.includes('文字背景'), 'Dashboard must expose text background color controls in Japanese by default');
+assert(dashboardIndexSource.includes('data-rgba-picker'), 'Dashboard must expose a unified RGBA picker for color and alpha controls');
+assert(dashboardIndexSource.includes('rgba-swatch'), 'Dashboard must show the currently selected RGBA color in each color section');
 assert(dashboardIndexSource.includes('ペットX位置'), 'Dashboard must expose horizontal pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('ペットY位置'), 'Dashboard must expose vertical pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('文字枠'), 'Dashboard must expose text border color controls in Japanese by default');
@@ -220,6 +227,8 @@ assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertic
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');
 assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
+assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
+assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 assert(dashboardAppSource.includes('/debug/commands/run'), 'Dashboard must run allowlisted setup/debug commands from the modal');

@@ -30,7 +30,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
 - `display.settings_updated` は画面全体の背景、pet 背景、文字色、文字背景、文字枠、pet X/Y offset を受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
-- Dashboard は side menu、サイドバー内の状態確認 section、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。
+- Dashboard は side menu、サイドバー内の状態確認 section、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。色と透明度は項目ごとの1つの RGBA picker で操作し、現在色の swatch と `#hex / alpha` を同時に表示する。
 - Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。

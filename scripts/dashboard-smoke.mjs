@@ -45,7 +45,9 @@ const deviceId = productProfile.sampleDeviceId;
 
 try {
   const index = await getText(`${baseUrl}/`);
-  assert.match(index, /M5Stack Codex Pet Console/);
+  assert.match(index, /M5Stack Pet Dashboard/);
+  assert.doesNotMatch(index, /ローカルデバイス操作/);
+  assert.match(index, /id="bridgeLine" class="visually-hidden" hidden/);
   assert.match(index, /side-nav/);
   assert.match(index, /data-section="statusSection"/);
   assert.match(index, /<aside class="sidebar">[\s\S]*<section id="statusSection" class="panel status-panel sidebar-status-panel"/);
@@ -60,6 +62,9 @@ try {
   assert.match(index, /画面背景/);
   assert.match(index, /ペット背景/);
   assert.match(index, /文字背景/);
+  assert.match(index, /data-rgba-picker/);
+  assert.match(index, /rgba-swatch/);
+  assert.match(index, /rgba-picker-preview/);
   assert.match(index, /ペットX位置/);
   assert.match(index, /ペットY位置/);
   assert.match(index, /文字枠/);
@@ -102,7 +107,9 @@ try {
   assert.match(app, /petOffsetY/);
   assert.match(app, /textBorderEnabled/);
   assert.match(app, /textBorderRgba/);
+  assert.match(app, /updateRgbaVisual/);
   assert.match(app, /beepOnAnswer/);
+  assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
   assert.match(app, /renderRuntimeStatus/);
@@ -126,6 +133,8 @@ try {
   assert.match(css, /\.preview-tuning-column/);
   assert.match(css, /\.command-tabs/);
   assert.match(css, /\.color-grid/);
+  assert.match(css, /\.rgba-picker/);
+  assert.match(css, /\.rgba-swatch/);
   assert.match(css, /\.help-button/);
   assert.doesNotMatch(css, /\.hint::after/);
 
@@ -218,10 +227,24 @@ try {
     deviceId,
     name: 'Dashboard Pet',
     state: 'celebrate',
-    spriteRef: 'host://pet/dashboard'
+    spriteRef: 'host://pet/dashboard',
+    display: {
+      petScale: 4,
+      petOffsetX: 28,
+      petOffsetY: -12,
+      screenBackgroundRgba: '#112233ff',
+      petBackgroundRgba: '#445566cc',
+      textBackgroundRgba: '#00000080'
+    }
   });
   assert.equal(pet.ok, true);
   assert.equal(pet.event.type, 'pet.updated');
+  assert.equal(pet.event.display.petScale, 4);
+  assert.equal(pet.event.display.petOffsetX, 28);
+  assert.equal(pet.event.display.petOffsetY, -12);
+  assert.deepEqual(pet.event.display.screenBackgroundRgba, { r: 17, g: 34, b: 51, a: 255 });
+  assert.deepEqual(pet.event.display.petBackgroundRgba, { r: 68, g: 85, b: 102, a: 204 });
+  assert.deepEqual(pet.event.display.textBackgroundRgba, { r: 0, g: 0, b: 0, a: 128 });
 
   const choice = await postJson(`${baseUrl}/codex/choice`, {
     deviceId,
@@ -279,6 +302,8 @@ try {
   assert.equal(commandDefinitions.ok, true);
   assert(commandDefinitions.tabs.some((tab) => tab.id === 'setup'));
   assert(commandDefinitions.tabs.some((tab) => tab.id === 'debug'));
+  assert(!commandDefinitions.tabs.some((tab) => tab.id === 'maintenance'));
+  assert(commandDefinitions.commands.some((command) => command.id === 'sampleReplay' && command.tab === 'debug'));
 
   const replayRun = await postJson(`${baseUrl}/debug/commands/run`, {
     commandId: 'sampleReplay',
@@ -309,8 +334,10 @@ try {
       displaySettingsAnimationFpsControl: true,
       displaySettingsMotionStepControl: true,
       displaySettingsRgbaControls: true,
+      displaySettingsUnifiedRgbaPicker: true,
       displaySettingsScreenBackgroundControl: true,
       displaySettingsPetOffsetControls: true,
+      petUpdateCarriesDisplaySettings: true,
       displaySettingsTextBorderControl: true,
       displaySettingsBeepControl: true,
       m5StackPreviewPanel: true,
