@@ -82,7 +82,26 @@ export function createDisplaySettingsEvent(options = {}) {
       uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
       bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
       animationFps: clampInteger(options.animationFps, 4, 20, 12),
-      motionStepMs: clampInteger(options.motionStepMs, 120, 800, 280)
+      motionStepMs: clampInteger(options.motionStepMs, 120, 800, 280),
+      petBackgroundRgba: normalizeRgba(options.petBackgroundRgba ?? options.petBg ?? options.petBackground, {
+        r: 5,
+        g: 11,
+        b: 20,
+        a: 255
+      }),
+      textColorRgba: normalizeRgba(options.textColorRgba ?? options.textColor, {
+        r: 255,
+        g: 255,
+        b: 255,
+        a: 255
+      }),
+      textBackgroundRgba: normalizeRgba(options.textBackgroundRgba ?? options.textBg ?? options.textBackground, {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 178
+      }),
+      beepOnAnswer: normalizeBoolean(options.beepOnAnswer, true)
     }
   };
 }
@@ -97,6 +116,60 @@ function clampInteger(value, min, max, fallback) {
     return fallback;
   }
   return Math.max(min, Math.min(max, Math.round(parsed)));
+}
+
+function normalizeRgba(value, fallback) {
+  if (typeof value === 'string') {
+    const parsed = parseRgbaString(value);
+    return parsed ?? fallback;
+  }
+  if (value && typeof value === 'object') {
+    return {
+      r: clampInteger(value.r, 0, 255, fallback.r),
+      g: clampInteger(value.g, 0, 255, fallback.g),
+      b: clampInteger(value.b, 0, 255, fallback.b),
+      a: clampInteger(value.a, 0, 255, fallback.a)
+    };
+  }
+  return fallback;
+}
+
+function parseRgbaString(value) {
+  const text = value.trim();
+  const hex = text.startsWith('#') ? text.slice(1) : text;
+  if (/^[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) {
+    return {
+      r: Number.parseInt(hex.slice(0, 2), 16),
+      g: Number.parseInt(hex.slice(2, 4), 16),
+      b: Number.parseInt(hex.slice(4, 6), 16),
+      a: hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) : 255
+    };
+  }
+  const channels = text.split(',').map((part) => Number(part.trim()));
+  if (channels.length >= 3 && channels.every(Number.isFinite)) {
+    return {
+      r: clampInteger(channels[0], 0, 255, 0),
+      g: clampInteger(channels[1], 0, 255, 0),
+      b: clampInteger(channels[2], 0, 255, 0),
+      a: clampInteger(channels[3], 0, 255, 255)
+    };
+  }
+  return null;
+}
+
+function normalizeBoolean(value, fallback) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    if (/^(true|1|yes|on)$/i.test(value.trim())) {
+      return true;
+    }
+    if (/^(false|0|no|off)$/i.test(value.trim())) {
+      return false;
+    }
+  }
+  return fallback;
 }
 
 function normalizeChoices(value) {

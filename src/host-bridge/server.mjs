@@ -227,11 +227,14 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
       if (request.method === 'GET' && url.pathname.startsWith('/dashboard/')) {
         return sendDashboardAsset(response, url.pathname);
       }
+      if (request.method === 'GET' && url.pathname === '/pet/packages') {
+        return sendJson(response, 200, listLocalPetPackages());
+      }
       if (request.method === 'GET' && url.pathname === '/pet/current/manifest') {
-        return sendJson(response, 200, buildCurrentPetManifest());
+        return sendJson(response, 200, buildCurrentPetManifest(petSelectionFromUrl(url)));
       }
       if (request.method === 'GET' && url.pathname === '/pet/current/spritesheet.webp') {
-        const filePath = resolveCurrentPetSpritesheetPath();
+        const filePath = resolveCurrentPetSpritesheetPath(petSelectionFromUrl(url));
         if (!filePath) {
           return sendJson(response, 404, { ok: false, reason: 'pet-asset-not-found' });
         }
@@ -419,8 +422,8 @@ function sendStaticFile(response, filePath) {
   response.end(body);
 }
 
-function buildCurrentPetManifest() {
-  const petDir = resolveCurrentPetDirectory();
+function buildCurrentPetManifest(selection = {}) {
+  const petDir = resolveCurrentPetDirectory(selection);
   const petJsonPath = path.join(petDir, 'pet.json');
   if (!fs.existsSync(petJsonPath)) {
     return {
@@ -434,15 +437,33 @@ function buildCurrentPetManifest() {
       idleFrames: 4
     };
   }
-  const pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  let pet;
+  try {
+    pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  } catch (error) {
+    return {
+      ok: false,
+      reason: 'pet-json-parse-failed',
+      message: error.message,
+      displayName: path.basename(petDir),
+      frameWidth: 192,
+      frameHeight: 208,
+      columns: 8,
+      rows: 9,
+      idleFrames: 4
+    };
+  }
   const spritesheetPath = path.resolve(petDir, pet.spritesheetPath ?? 'spritesheet.webp');
   const headerInfo = readLocalPetHeaderInfo();
+  const packageName = path.basename(petDir);
+  const packageQuery = new URLSearchParams({ package: packageName }).toString();
   return {
     ok: fs.existsSync(spritesheetPath),
     id: pet.id ?? path.basename(petDir),
+    packageName,
     displayName: pet.displayName ?? pet.id ?? path.basename(petDir),
     description: pet.description ?? '',
-    spritesheetUrl: '/pet/current/spritesheet.webp',
+    spritesheetUrl: `/pet/current/spritesheet.webp?${packageQuery}`,
     frameWidth: 192,
     frameHeight: 208,
     columns: 8,
@@ -453,13 +474,18 @@ function buildCurrentPetManifest() {
   };
 }
 
-function resolveCurrentPetSpritesheetPath() {
-  const petDir = resolveCurrentPetDirectory();
+function resolveCurrentPetSpritesheetPath(selection = {}) {
+  const petDir = resolveCurrentPetDirectory(selection);
   const petJsonPath = path.join(petDir, 'pet.json');
   if (!fs.existsSync(petJsonPath)) {
     return null;
   }
-  const pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  let pet;
+  try {
+    pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+  } catch {
+    return null;
+  }
   const spritesheetPath = path.resolve(petDir, pet.spritesheetPath ?? 'spritesheet.webp');
   const rootPrefix = `${path.resolve(petDir)}${path.sep}`;
   if (!spritesheetPath.startsWith(rootPrefix) || !fs.existsSync(spritesheetPath)) {
@@ -468,12 +494,85 @@ function resolveCurrentPetSpritesheetPath() {
   return spritesheetPath;
 }
 
-function resolveCurrentPetDirectory() {
+function petSelectionFromUrl(url) {
+  return {
+    packageName: url.searchParams.get('package') ?? url.searchParams.get('pet') ?? '',
+    petDir: url.searchParams.get('petDir') ?? ''
+  };
+}
+
+function resolveCurrentPetDirectory(selection = {}) {
+  const root = localPetsRoot();
+  if (selection.petDir) {
+    const requested = path.resolve(expandPetDirectory(selection.petDir));
+    if (isPathInside(requested, root) && fs.existsSync(path.join(requested, 'pet.json'))) {
+      return requested;
+    }
+  }
+  if (selection.packageName) {
+    const requested = path.resolve(root, selection.packageName);
+    if (isPathInside(requested, root) && fs.existsSync(path.join(requested, 'pet.json'))) {
+      return requested;
+    }
+  }
   if (process.env.M5STACK_PET_PACKAGE) {
     return path.resolve(process.env.M5STACK_PET_PACKAGE);
   }
+  return path.join(root, 'Mira');
+}
+
+function localPetsRoot() {
   const home = process.env.USERPROFILE ?? process.env.HOME ?? '';
-  return path.join(home, '.codex', 'pets', 'Mira');
+  return path.join(home, '.codex', 'pets');
+}
+
+function expandPetDirectory(value) {
+  const home = process.env.USERPROFILE ?? process.env.HOME ?? '';
+  return value
+    .replace(/^~/, home)
+    .replace(/%USERPROFILE%/gi, process.env.USERPROFILE ?? home)
+    .replace(/%HOME%/gi, process.env.HOME ?? home);
+}
+
+function isPathInside(candidatePath, rootPath) {
+  const root = path.resolve(rootPath);
+  const candidate = path.resolve(candidatePath);
+  return candidate === root || candidate.startsWith(`${root}${path.sep}`);
+}
+
+function listLocalPetPackages() {
+  const root = localPetsRoot();
+  if (!fs.existsSync(root)) {
+    return { ok: true, root, packages: [] };
+  }
+  const packages = fs.readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => {
+      const petDir = path.join(root, entry.name);
+      const petJsonPath = path.join(petDir, 'pet.json');
+      if (!fs.existsSync(petJsonPath)) {
+        return null;
+      }
+      try {
+        const pet = JSON.parse(fs.readFileSync(petJsonPath, 'utf8'));
+        return {
+          name: entry.name,
+          id: pet.id ?? entry.name,
+          displayName: pet.displayName ?? pet.id ?? entry.name,
+          description: pet.description ?? ''
+        };
+      } catch {
+        return {
+          name: entry.name,
+          id: entry.name,
+          displayName: entry.name,
+          description: 'pet.json parse failed'
+        };
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+  return { ok: true, root, packages };
 }
 
 function readLocalPetHeaderInfo() {
@@ -544,6 +643,7 @@ function buildDebugCommands() {
   return {
     bridgeStart: 'cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080',
     petAsset: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\\.codex\\pets\\Mira --output firmware\\include\\pet_asset.local.h',
+    petAssetAny: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir "<local-hatch-pet-package-dir>" --output firmware\\include\\pet_asset.local.h',
     core2Upload: 'E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4',
     codexAnswer: 'cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"',
     codexSessions: 'cmd.exe /d /s /c npm run codex:sessions -- --phase any',
@@ -551,7 +651,7 @@ function buildDebugCommands() {
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
     codexDecision: 'cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"',
     codexDecisionWait: 'cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000',
-    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280',
+    codexDisplay: 'cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --beep-on-answer true',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
   };

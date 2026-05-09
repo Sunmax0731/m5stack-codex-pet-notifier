@@ -20,14 +20,14 @@
           <button class="side-link active" type="button" data-section="statusSection">状態</button>
           <button class="side-link" type="button" data-section="sendSection">送信</button>
           <button class="side-link" type="button" data-section="previewSection">プレビュー</button>
-          <button class="side-link" type="button" data-section="sessionSection">Codex回答</button>
+          <button class="side-link" type="button" data-section="sessionSection">最近の回答</button>
           <button class="side-link" type="button" data-section="logSection">ログ</button>
           <button class="side-link" type="button" data-section="debugSection">デバッグ</button>
         </nav>
         <button id="openCommandsButton" class="sidebar-action" type="button">環境構築コマンド</button>
         <div class="side-note">
           <span class="status-dot"></span>
-          <span>LAN内の closed alpha bridge</span>
+          <span>LAN内 closed alpha bridge</span>
         </div>
       </aside>
 
@@ -58,19 +58,19 @@
             </div>
             <div class="panel-body">
               <div class="metric-grid">
-                <div class="metric hint" tabindex="0" data-tooltip="Pairing 済みで poll 可能な M5Stack の台数です。">
+                <div class="metric hint" tabindex="0" data-tooltip="Pairing済みでpoll可能なM5Stackの台数です。">
                   <span class="metric-label">paired</span>
                   <strong id="pairedCount">0</strong>
                 </div>
-                <div class="metric hint" tabindex="0" data-tooltip="Codex/GUI から M5Stack へ送信待ちまたは送信済みの event 数です。">
+                <div class="metric hint" tabindex="0" data-tooltip="CodexまたはGUIからM5Stackへ送ったイベント数です。">
                   <span class="metric-label">outbound</span>
                   <strong id="outboundCount">0</strong>
                 </div>
-                <div class="metric hint" tabindex="0" data-tooltip="M5Stack の A/B/C 返信、pet touch、heartbeat などの受信数です。">
+                <div class="metric hint" tabindex="0" data-tooltip="M5StackのA/B/C返信、pet touch、heartbeatなどの受信数です。">
                   <span class="metric-label">inbound</span>
                   <strong id="inboundCount">0</strong>
                 </div>
-                <div class="metric hint" tabindex="0" data-tooltip="未pairingや誤tokenなど、安全境界で拒否したリクエスト数です。">
+                <div class="metric hint" tabindex="0" data-tooltip="誤pairing codeや誤tokenなど、安全境界で拒否したリクエスト数です。">
                   <span class="metric-label">security</span>
                   <strong id="securityCount">0</strong>
                 </div>
@@ -88,7 +88,7 @@
               <button class="section-toggle secondary" type="button" data-target="sendSection">Hide</button>
             </div>
             <div class="panel-body">
-              <label class="field hint" data-tooltip="通常は sample device のままでよいです。実機側の DEVICE_ID と一致させます。">
+              <label class="field hint" data-tooltip="通常はsample deviceのままでよいです。実機のDEVICE_IDと一致させます。">
                 <span>deviceId</span>
                 <input id="deviceId" value="m5stack-sample-001" autocomplete="off">
               </label>
@@ -99,32 +99,32 @@
               </div>
 
               <form id="answerForm" class="tab-panel active">
-                <label class="field hint" data-tooltip="M5Stack の Answer 画面上部に出る短い見出しです。">
+                <label class="field hint" data-tooltip="M5StackのAnswer画面上部に表示する短い見出しです。">
                   <span>summary</span>
                   <input id="answerSummary" value="Codex GUI answer">
                 </label>
-                <label class="field hint" data-tooltip="Codex の返答本文として M5Stack に表示する内容です。">
+                <label class="field hint" data-tooltip="Codexの回答本文としてM5Stackに表示する内容です。">
                   <span>body</span>
-                  <textarea id="answerBody" rows="5">Codex の回答本文を M5Stack の Answer 画面へ送ります。</textarea>
+                  <textarea id="answerBody" rows="5">Codexの回答本文をM5StackのAnswer画面へ送ります。</textarea>
                 </label>
                 <button type="submit">Answer を送信</button>
               </form>
 
               <form id="choiceForm" class="tab-panel">
-                <label class="field hint" data-tooltip="Codex 側から M5Stack ユーザーへ三択で判断を求める質問です。">
+                <label class="field hint" data-tooltip="Codex側からM5Stackユーザーへ三択で判断を求める質問です。">
                   <span>prompt</span>
-                  <textarea id="choicePrompt" rows="3">次の作業を M5Stack から選択してください。</textarea>
+                  <textarea id="choicePrompt" rows="3">次の作業をM5Stackから選択してください。</textarea>
                 </label>
                 <div class="choice-grid">
-                  <label class="field hint" data-tooltip="Core2 の A ボタン、または左側の touch 操作に対応します。">
+                  <label class="field hint" data-tooltip="Core2/GRAYのAボタンに対応します。">
                     <span>A</span>
                     <input id="choiceA" value="進める">
                   </label>
-                  <label class="field hint" data-tooltip="Core2 の B ボタン、または中央の touch 操作に対応します。">
+                  <label class="field hint" data-tooltip="Core2/GRAYのBボタンに対応します。">
                     <span>B</span>
                     <input id="choiceB" value="修正する">
                   </label>
-                  <label class="field hint" data-tooltip="Core2 の C ボタン、または右側の touch 操作に対応します。">
+                  <label class="field hint" data-tooltip="Core2/GRAYのCボタンに対応します。">
                     <span>C</span>
                     <input id="choiceC" value="保留する">
                   </label>
@@ -138,7 +138,7 @@
                     <span>title</span>
                     <input id="notificationTitle" value="Codex notification">
                   </label>
-                  <label class="field hint" data-tooltip="通知の重要度です。表示色や将来の通知ルールに使います。">
+                  <label class="field hint" data-tooltip="通知の重要度です。">
                     <span>severity</span>
                     <select id="notificationSeverity">
                       <option value="info">info</option>
@@ -163,6 +163,13 @@
                 <h2 id="previewHeading">M5Stack 表示プレビュー</h2>
               </div>
               <div class="panel-actions">
+                <label class="compact-field hint" data-tooltip="Core2とGRAYの筐体・入力前提を切り替えます。LCD解像度はどちらも320x240です。">
+                  <span>device</span>
+                  <select id="previewDevice">
+                    <option value="core2">Core2</option>
+                    <option value="gray">GRAY</option>
+                  </select>
+                </label>
                 <label class="compact-field hint" data-tooltip="Pet / Answer / Decision / Notify の想定画面を切り替えます。">
                   <span>screen</span>
                   <select id="previewMode">
@@ -177,19 +184,30 @@
             </div>
             <div class="panel-body">
               <div class="m5-preview-layout">
-                <div class="m5-device-frame" aria-label="M5Stack simulated display">
-                  <div id="m5Preview" class="m5-screen">
-                    <div id="previewPet" class="preview-pet sprite-fallback" aria-hidden="true">
-                      <span class="pet-ear left"></span>
-                      <span class="pet-ear right"></span>
-                      <span class="pet-eye left"></span>
-                      <span class="pet-eye right"></span>
-                      <span class="pet-mouth"></span>
+                <div class="preview-stage">
+                  <div class="m5-device-frame" aria-label="M5Stack simulated display">
+                    <div id="m5Preview" class="m5-screen" data-device="core2">
+                      <div id="previewPet" class="preview-pet sprite-fallback" aria-hidden="true">
+                        <span class="pet-ear left"></span>
+                        <span class="pet-ear right"></span>
+                        <span class="pet-eye left"></span>
+                        <span class="pet-eye right"></span>
+                        <span class="pet-mouth"></span>
+                      </div>
+                      <div id="previewBody" class="preview-body">Pet only preview</div>
+                      <div id="previewFooter" class="preview-footer">A poll  B pet  C idle</div>
                     </div>
-                    <div id="previewBody" class="preview-body">Pet only preview</div>
-                    <div id="previewFooter" class="preview-footer">A poll　B pet　C idle</div>
+                  </div>
+                  <div class="preview-readout">
+                    <div class="readout-row"><span>device</span><strong id="previewDeviceReadout">Core2 / 320x240</strong></div>
+                    <div class="readout-row"><span>pet area</span><strong id="previewPetReadout">2/8</strong></div>
+                    <div class="readout-row"><span>UI text</span><strong id="previewUiReadout">1/8</strong></div>
+                    <div class="readout-row"><span>body text</span><strong id="previewBodyReadout">1/8</strong></div>
+                    <div class="readout-row"><span>render</span><strong id="previewFpsReadout">12 fps</strong></div>
+                    <div class="readout-row"><span>motion</span><strong id="previewMotionReadout">280 ms</strong></div>
                   </div>
                 </div>
+
                 <div class="preview-controls">
                   <div class="pet-current">
                     <span class="muted">current pet</span>
@@ -197,11 +215,22 @@
                     <span id="petAssetDescription" class="muted">local pet asset を確認中</span>
                   </div>
                   <div class="choice-grid two">
-                    <label class="field hint" data-tooltip="pet.updated の name です。未変更なら local hatch-pet の displayName を使います。">
+                    <label class="field hint" data-tooltip="Host Bridgeが参照するlocal hatch-pet packageです。%USERPROFILE%\\.codex\\pets から選択します。">
+                      <span>local hatch-pet asset</span>
+                      <select id="petPackage"></select>
+                    </label>
+                    <button id="reloadPetPackagesButton" class="secondary align-end" type="button">asset 再読み込み</button>
+                  </div>
+                  <label class="field hint" data-tooltip="任意のlocal hatch-pet packageディレクトリを指定します。空なら上の選択値を使います。">
+                    <span>asset path override</span>
+                    <input id="petPackagePath" placeholder="%USERPROFILE%\\.codex\\pets\\Mira">
+                  </label>
+                  <div class="choice-grid two">
+                    <label class="field hint" data-tooltip="pet.updatedのnameです。未変更なら選択したlocal petのdisplayNameを使います。">
                       <span>pet name</span>
                       <input id="petName" value="Codex Pet">
                     </label>
-                    <label class="field hint" data-tooltip="pet の状態です。背景色や表情、将来の animation row 選択に使います。">
+                    <label class="field hint" data-tooltip="petの状態です。プレビューのアニメーションと実機のpet stateに使います。">
                       <span>pet state</span>
                       <select id="petState">
                         <option value="idle">idle</option>
@@ -211,43 +240,60 @@
                       </select>
                     </label>
                   </div>
-                  <label class="field hint" data-tooltip="asset の参照名です。現状は host 側の説明値として送ります。">
+                  <label class="field hint" data-tooltip="assetの参照名です。現状はhost側の説明値として送ります。">
                     <span>spriteRef</span>
                     <input id="petSprite" value="host://pet/current">
                   </label>
+
                   <div class="display-controls">
-                    <label class="field range-field hint" data-tooltip="1 は小さめ、8 は画面全体に近い最大表示です。">
+                    <label class="field range-field hint" data-tooltip="1は小さめ、8は画面全体に近い最大表示です。">
                       <span>pet display area <strong id="petScaleValue">2/8</strong></span>
                       <input id="petScale" type="range" min="1" max="8" step="1" value="2">
                     </label>
-                    <label class="field range-field hint" data-tooltip="footer や操作ラベルの文字サイズです。">
+                    <label class="field range-field hint" data-tooltip="footerや操作ラベルの文字サイズです。">
                       <span>UI text size <strong id="uiTextScaleValue">1/8</strong></span>
                       <input id="uiTextScale" type="range" min="1" max="8" step="1" value="1">
                     </label>
-                    <label class="field range-field hint" data-tooltip="Answer / Notification の本文サイズです。大きくすると1ページの文字量は減ります。">
+                    <label class="field range-field hint" data-tooltip="Answer / Notification の本文サイズです。">
                       <span>body text size <strong id="bodyTextScaleValue">1/8</strong></span>
                       <input id="bodyTextScale" type="range" min="1" max="8" step="1" value="1">
                     </label>
-                    <label class="field range-field hint" data-tooltip="描画更新の上限です。高いほど反応は速くなりますが、pose 切替は motion step で抑えます。">
+                    <label class="field range-field hint" data-tooltip="描画更新の上限です。高いほど反応が速くなります。">
                       <span>render FPS <strong id="animationFpsValue">12 fps</strong></span>
                       <input id="animationFps" type="range" min="4" max="20" step="1" value="12">
                     </label>
-                    <label class="field range-field hint" data-tooltip="キャラの絵柄 frame を切り替える間隔です。大きいほど震えにくく、ゆっくり動きます。">
+                    <label class="field range-field hint" data-tooltip="キャラの絵柄frameを切り替える間隔です。大きいほどゆっくり動きます。">
                       <span>motion step <strong id="motionStepValue">280 ms</strong></span>
                       <input id="motionStepMs" type="range" min="120" max="800" step="20" value="280">
                     </label>
                   </div>
+
+                  <div class="color-grid">
+                    <label class="field hint" data-tooltip="ペット背面の色です。alphaを下げると黒背景へ合成します。">
+                      <span>pet background <strong id="petBgValue">#050b14 / 255</strong></span>
+                      <input id="petBgColor" type="color" value="#050b14">
+                      <input id="petBgAlpha" type="range" min="0" max="255" step="1" value="255">
+                    </label>
+                    <label class="field hint" data-tooltip="Answerや通知本文の文字色です。">
+                      <span>text color <strong id="textColorValue">#ffffff / 255</strong></span>
+                      <input id="textColor" type="color" value="#ffffff">
+                      <input id="textAlpha" type="range" min="0" max="255" step="1" value="255">
+                    </label>
+                    <label class="field hint" data-tooltip="文字の背面色です。alphaを下げるとペット上へ重なる見え方になります。">
+                      <span>text background <strong id="textBgValue">#000000 / 178</strong></span>
+                      <input id="textBgColor" type="color" value="#000000">
+                      <input id="textBgAlpha" type="range" min="0" max="255" step="1" value="178">
+                    </label>
+                    <label class="check-field hint" data-tooltip="Codex回答が届いたときにM5StackのSpeaker/Buzzerで短いビープ音を鳴らします。">
+                      <input id="beepOnAnswer" type="checkbox" checked>
+                      <span>Codex回答のビープ通知</span>
+                    </label>
+                  </div>
+
                   <div class="panel-actions">
                     <button id="sendPetButton" type="button">Pet 更新を送信</button>
                     <button id="sendDisplayButton" type="button" class="secondary">表示設定を送信</button>
                   </div>
-                </div>
-                <div class="preview-readout">
-                  <div class="readout-row"><span>pet area</span><strong id="previewPetReadout">2/8</strong></div>
-                  <div class="readout-row"><span>UI text</span><strong id="previewUiReadout">1/8</strong></div>
-                  <div class="readout-row"><span>body text</span><strong id="previewBodyReadout">1/8</strong></div>
-                  <div class="readout-row"><span>render</span><strong id="previewFpsReadout">12 fps</strong></div>
-                  <div class="readout-row"><span>motion</span><strong id="previewMotionReadout">280 ms</strong></div>
                 </div>
               </div>
             </div>
@@ -272,10 +318,10 @@
               </div>
               <div class="session-preview">
                 <h3>latest answer</h3>
-                <pre id="sessionAnswer">最近の Codex session を読み込んでいません。</pre>
+                <pre id="sessionAnswer">最近のCodex sessionを読み込んでいません。</pre>
               </div>
               <details class="session-user">
-                <summary>直前の user message</summary>
+                <summary>直前のuser message</summary>
                 <pre id="sessionUser">未読込</pre>
               </details>
             </div>

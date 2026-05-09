@@ -22,6 +22,9 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - `Decision` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound と Debug section で確認する。
 - `M5Stack 表示プレビュー` で現在の hatch-pet キャラ、pet name / state / spriteRef、Pet / Answer / Decision / Notify の見え方を送信前に確認する。
 - `M5Stack 表示プレビュー` から pet display area、UI text size、body text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信し、M5Stack 上の pet 表示面積、文字サイズ、描画更新上限、キャラ frame 切替頻度を調整する。
+- `M5Stack 表示プレビュー` の `device` で Core2 / GRAY を切り替え、同じ 320x240 画面で入力前提と footer label の違いを確認する。
+- `M5Stack 表示プレビュー` の `local hatch-pet asset` または `asset path override` で `%USERPROFILE%\.codex\pets` 配下の任意 package を preview する。
+- pet background、text color、text background の color / alpha を調整し、`表示設定を送信` で M5Stack へ反映する。`Codex回答のビープ通知` を有効にすると次回 `answer.completed` 到着時に短い beep が鳴る。
 - 主要項目に focus して tooltip hint を確認し、各 section の `Hide` / `View` で必要な領域だけ表示する。
 - sidebar の `環境構築コマンド` から bridge 起動、pet asset 生成、Core2 upload、Codex relay の command modal を確認する。
 - `最近の Codex 回答` panel で local Codex session の最新 assistant 回答を確認し、`M5Stackへ送信` で直前 user message と合わせて Answer 画面へ送る。
@@ -66,19 +69,22 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 ```
 
 `firmware/include/pet_asset.local.h` は local file です。Git、release asset、docs ZIP には含めません。
+Dashboard preview だけを切り替える場合は、Host Bridge 起動後に `local hatch-pet asset` の選択または `asset path override` を使います。firmware へ反映する場合は上記の `pet:asset` 生成後に Core2 build / upload を実行します。
 
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
 - pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
-- pet surface は `M5Canvas` Sprite buffer へ off-screen 描画してから転送するため、animation tick 中に Answer / Choice の本文や footer text を毎フレーム塗り直さない。
+- pet surface は `M5Canvas` Sprite buffer へ off-screen 描画してから転送するため、animation tick 中に画面全体の黒塗りや Answer / Choice の本文、footer text の明滅を抑える。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。
 - pet display area は Dashboard の `M5Stack 表示プレビュー` から `1..8` を切り替えられる。`8/8` は pet を画面全体に近い最大面積で表示する。
 - render FPS は Dashboard の `M5Stack 表示プレビュー` から `4..20` を切り替えられる。既定は `12fps` で、描画更新の上限として扱う。
 - motion step は Dashboard の `M5Stack 表示プレビュー` から `120..800ms` を切り替えられる。既定は `280ms` で、キャラ frame / bounce の切替頻度として扱うため、高FPS時の小刻みな震えを抑える。
 - `20fps` でちらつきが目立つ場合は、Core2 に Sprite buffer 対応 firmware が upload されているか、Host Bridge から display settings が届いているかを確認する。
 - UI text と body text は Dashboard の `M5Stack 表示プレビュー` から `1..8` を切り替えられる。body text を大きくすると1ページに入る文字量は少なくなる。
+- pet 背景、文字色、文字背景は RGBA 設定を受け取り、LCD では最終RGB565色として合成表示する。透明度は Dashboard preview と完全一致ではなく近似です。
+- `beepOnAnswer` が有効な場合、Codex answer 到着時に speaker で短い beep を鳴らす。
 - Answer 画面では swipe または footer touch で本文ページを移動する。
 - Answer 画面は日本語本文に対応し、Codex relay から送った日本語の summary / body を表示する。
 - Choice 画面では下部 touch button または choice row tap を A/B/C として扱う。
@@ -88,6 +94,7 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 - 物理 A/B/C ボタンで返信する。
 - B 長押しまたは IMU tap を pet interaction の代替にする。
 - Answer 画面では scroll mode で A/C を上下移動に使う。
+- GRAY build は `huge_app.csv` partition を使う。local hatch-pet header はFlash余裕を優先して取り込まず、GRAY実機では vector fallback の pet 表示を確認する。
 
 ## 制約
 

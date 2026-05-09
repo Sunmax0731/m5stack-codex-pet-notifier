@@ -72,6 +72,11 @@ assert(firmwareSource.includes('DEFAULT_PET_MOTION_STEP_MS = 280'), 'firmware mu
 assert(firmwareSource.includes('petAnimationFps'), 'firmware must store runtime-configurable pet animation fps');
 assert(firmwareSource.includes('display["animationFps"]'), 'firmware must accept animation fps in display settings');
 assert(firmwareSource.includes('display["motionStepMs"]'), 'firmware must accept pet motion step timing in display settings');
+assert(firmwareSource.includes('display["petBackgroundRgba"]'), 'firmware must accept pet background RGBA in display settings');
+assert(firmwareSource.includes('display["textColorRgba"]'), 'firmware must accept text color RGBA in display settings');
+assert(firmwareSource.includes('display["textBackgroundRgba"]'), 'firmware must accept text background RGBA in display settings');
+assert(firmwareSource.includes('display["beepOnAnswer"]'), 'firmware must accept answer beep setting in display settings');
+assert(firmwareSource.includes('M5.Speaker.tone'), 'firmware must beep when configured answer events arrive');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 assert(firmwareSource.includes('M5Canvas petSprite'), 'firmware must use an off-screen sprite for pet rendering');
 assert(firmwareSource.includes('drawPetSurfaceSprite'), 'firmware must push the pet surface as a sprite');
@@ -120,6 +125,7 @@ assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must
 assert(bridgeSource.includes("url.pathname === '/codex/display'"), 'Host Bridge must expose a display settings endpoint');
 assert(bridgeSource.includes("url.pathname === '/codex/session/latest'"), 'Host Bridge must expose a latest Codex session endpoint for the GUI');
 assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host Bridge must expose a latest Codex session publish endpoint for the GUI');
+assert(bridgeSource.includes("url.pathname === '/pet/packages'"), 'Host Bridge must expose local pet package metadata for dashboard preview');
 assert(bridgeSource.includes('/pet/current/manifest'), 'Host Bridge must expose the current local pet manifest for dashboard preview');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
 
@@ -132,6 +138,11 @@ assert(dashboardIndexSource.includes('pet display area'), 'Dashboard must expose
 assert(dashboardIndexSource.includes('body text size'), 'Dashboard must expose body text size controls');
 assert(dashboardIndexSource.includes('render FPS'), 'Dashboard must expose render fps controls');
 assert(dashboardIndexSource.includes('motion step'), 'Dashboard must expose pet motion step controls');
+assert(dashboardIndexSource.includes('pet background'), 'Dashboard must expose pet background color controls');
+assert(dashboardIndexSource.includes('text background'), 'Dashboard must expose text background color controls');
+assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboard must expose answer beep controls');
+assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and GRAY preview switching');
+assert(dashboardIndexSource.includes('petPackagePath'), 'Dashboard must expose local pet package path override');
 assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
 assert(dashboardIndexSource.includes('data-tooltip'), 'Dashboard controls must provide focusable tooltip hints');
 assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must support View/Hide collapse controls');
@@ -141,8 +152,13 @@ assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must pu
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
 assert(dashboardAppSource.includes('/codex/decision'), 'Dashboard must publish Codex decision requests to M5Stack');
 assert(dashboardAppSource.includes('/pet/current/manifest'), 'Dashboard must load the current local pet asset for preview');
+assert(dashboardAppSource.includes('/pet/packages'), 'Dashboard must list local pet packages for preview');
 assert(dashboardAppSource.includes('animationFps'), 'Dashboard must publish animation fps in display settings');
 assert(dashboardAppSource.includes('motionStepMs'), 'Dashboard must publish pet motion step timing in display settings');
+assert(dashboardAppSource.includes('petBackgroundRgba'), 'Dashboard must publish pet background RGBA in display settings');
+assert(dashboardAppSource.includes('textColorRgba'), 'Dashboard must publish text color RGBA in display settings');
+assert(dashboardAppSource.includes('textBackgroundRgba'), 'Dashboard must publish text background RGBA in display settings');
+assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 
