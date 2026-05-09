@@ -124,6 +124,12 @@ button.secondary:hover,
   margin-bottom: 14px;
 }
 
+.panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .panel h2,
 .panel h3 {
   margin: 0;
@@ -255,7 +261,9 @@ textarea {
 
 .result,
 .reply-box,
-.command {
+.command,
+.session-preview pre,
+.session-user pre {
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -278,6 +286,33 @@ textarea {
 .reply-box {
   min-height: 58px;
   padding: 12px;
+}
+
+.session-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.session-preview pre,
+.session-user pre {
+  max-height: 260px;
+  margin: 8px 0 0;
+  padding: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.session-user {
+  margin-top: 12px;
+}
+
+.session-user summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .log-columns {

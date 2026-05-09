@@ -9,6 +9,7 @@ import {
   createNotificationEvent,
   createPetEvent
 } from '../codex-adapter/eventFactory.mjs';
+import { readLatestSessionExchange } from '../codex-adapter/sessionWatcher.mjs';
 import { productProfile } from '../core/product-profile.mjs';
 import { loadSchemas, validateEvent } from '../protocol/validator.mjs';
 
@@ -207,7 +208,7 @@ export class LanHostBridge {
   }
 }
 
-export function createBridgeHttpServer(bridge = new LanHostBridge()) {
+export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {}) {
   const server = http.createServer(async (request, response) => {
     try {
       const url = new URL(request.url, `http://${request.headers.host ?? 'localhost'}`);
@@ -266,6 +267,32 @@ export function createBridgeHttpServer(bridge = new LanHostBridge()) {
         const event = createPetEvent(body.event ?? body);
         const result = bridge.publish(event, { deviceId: body.deviceId });
         return sendJson(response, 200, { ...result, event });
+      }
+      if (request.method === 'GET' && url.pathname === '/codex/session/latest') {
+        const latest = readLatestSessionExchange({
+          sessionsRoot: options.sessionsRoot,
+          phase: url.searchParams.get('phase') ?? 'any',
+          mode: url.searchParams.get('mode') ?? 'assistant'
+        });
+        return sendJson(response, latest.ok ? 200 : 404, redactSessionLatest(latest));
+      }
+      if (request.method === 'POST' && url.pathname === '/codex/session/publish') {
+        const body = await readJsonBody(request);
+        const latest = readLatestSessionExchange({
+          sessionsRoot: options.sessionsRoot,
+          phase: body.phase ?? 'any',
+          mode: body.mode ?? 'exchange'
+        });
+        if (!latest.ok) {
+          return sendJson(response, 404, redactSessionLatest(latest));
+        }
+        const event = createAnswerEvent({
+          body: latest.body,
+          summary: body.summary ?? latest.summary,
+          threadId: `codex-session:${latest.sessionName}`
+        });
+        const result = bridge.publish(event, { deviceId: body.deviceId });
+        return sendJson(response, 200, { ...result, event, latest: redactSessionLatest(latest, { includeBody: false }) });
       }
       if (request.method === 'POST' && url.pathname === '/codex/replay-samples') {
         const body = await readJsonBody(request);
@@ -373,6 +400,30 @@ function summarizeDeviceEvent(event) {
     };
   }
   return {};
+}
+
+function redactSessionLatest(latest, options = {}) {
+  if (!latest) {
+    return { ok: false, reason: 'no-session-result' };
+  }
+  if (latest.ok === false) {
+    return {
+      ok: false,
+      reason: latest.reason,
+      ...(latest.sessionFile ? { sessionName: path.basename(latest.sessionFile) } : {}),
+      ...(latest.message ? { message: latest.message } : {})
+    };
+  }
+  return {
+    ok: true,
+    sessionName: latest.sessionName,
+    phase: latest.phase,
+    timestamp: latest.timestamp,
+    summary: latest.summary,
+    ...(options.includeBody === false ? {} : { body: latest.body }),
+    ...(latest.user ? { user: { timestamp: latest.user.timestamp, text: latest.user.text } } : {}),
+    signature: latest.signature
+  };
 }
 
 function buildDebugCommands() {

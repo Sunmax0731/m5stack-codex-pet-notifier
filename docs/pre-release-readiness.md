@@ -8,6 +8,7 @@
 - Codex session auto relay。
 - Codex hook relay。
 - Host Bridge Dashboard GUI。
+- Dashboard 最新 Codex session 回答表示と M5Stack 送信。
 - Clipboard UTF-8 relay。
 - JSON event contract。
 - Core2 / GRAY device profile。
@@ -32,6 +33,7 @@
 - Dashboard からの Choice / hatch-pet animation 実機目視確認。
 - Codex session auto relay の Core2 実機目視確認。
 - Codex hook relay の Core2 実機目視確認。
+- Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 

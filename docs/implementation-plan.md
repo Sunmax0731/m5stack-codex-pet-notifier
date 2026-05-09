@@ -19,6 +19,7 @@
 - [x] clipboard / stdin / file から返答本文を送る Codex relay を追加する。
 - [x] local Codex session JSONL から最近の user / assistant のやり取りを自動送信する session watcher を追加する。
 - [x] Codex Hooks から呼べる one-shot hook relay と重複抑止 state を追加する。
+- [x] Dashboard で最近の Codex session 回答を表示し、M5Stack へ送信する GUI と endpoint を追加する。
 - [ ] 公開 Codex App adapter API が提供された場合に relay source として追加する。
 
 ## Phase 2: Simulator
@@ -43,6 +44,7 @@
 - [x] README、導入手順、manual test、security/privacy、release checklist を更新する。
 - [x] hatch-pet asset 生成と privacy 境界を docs に反映する。
 - [x] Codex session auto relay と privacy 境界を docs に反映する。
+- [x] Dashboard 最新 Codex 回答表示/送信の手動確認手順を docs に反映する。
 - [x] `docs/qcds-strict-metrics.json` と release notes を作る。
 - [x] docs ZIP を `npm test` で生成する。
 - [ ] GitHub prerelease 作成後、release evidence を実 URL で更新する。

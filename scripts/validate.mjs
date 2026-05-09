@@ -80,6 +80,7 @@ assert(relaySource.includes("Buffer.from(result.stdout.trim(), 'base64').toStrin
 const sessionWatcherSource = fs.readFileSync('src/codex-adapter/sessionWatcher.mjs', 'utf8');
 assert(sessionWatcherSource.includes('.codex'), 'session watcher must default to local Codex session logs');
 assert(sessionWatcherSource.includes('publishLatestSession'), 'session watcher must publish the latest Codex exchange');
+assert(sessionWatcherSource.includes('readLatestSessionExchange'), 'session watcher must expose latest exchange reading for the dashboard');
 assert(sessionWatcherSource.includes('bodyPersistedInEvidence') === false, 'session watcher source must not persist session body evidence directly');
 
 const hookRelaySource = fs.readFileSync('src/codex-adapter/hookRelay.mjs', 'utf8');
@@ -89,7 +90,15 @@ assert(fs.existsSync('docs/codex-hooks.example.json'), 'Codex hooks example must
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');
 assert(bridgeSource.includes("url.pathname === '/codex/pet'"), 'Host Bridge must expose a pet update endpoint');
+assert(bridgeSource.includes("url.pathname === '/codex/session/latest'"), 'Host Bridge must expose a latest Codex session endpoint for the GUI');
+assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host Bridge must expose a latest Codex session publish endpoint for the GUI');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
+
+const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
+const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
+assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
+assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
+assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

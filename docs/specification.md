@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Host Bridge model | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する contract を検証する | `src/host-adapter/localLanBridge.mjs` |
 | LAN Host Bridge | pairing、token 認証、HTTP polling、device event 受信、sample replay、event log を提供する | `src/host-bridge/server.mjs` |
-| Dashboard GUI | Host Bridge の状態確認、debug snapshot、event 送信、ABC 返信確認、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
+| Dashboard GUI | Host Bridge の状態確認、debug snapshot、event 送信、ABC 返信確認、最近の Codex session 回答表示、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
 | Codex relay | clipboard / stdin / file の Codex 返答を `answer.completed` へ変換して Host Bridge に送る。PowerShell clipboard は Base64 UTF-8 経由で読む | `src/codex-adapter/relay.mjs` |
 | Codex session watcher | `%USERPROFILE%\.codex\sessions` の最新 session JSONL から user / assistant の最新やり取りを抽出し、`answer.completed` として送る | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex hook relay | Codex Hooks の command hook から one-shot で session watcher を実行し、重複送信を state file で抑止する | `src/codex-adapter/hookRelay.mjs` |
@@ -28,6 +28,8 @@
 | `POST` | `/codex/notification` | 通知本文から `notification.created` を生成して queue する |
 | `POST` | `/codex/choice` | 確認依頼から `prompt.choice_requested` を生成して queue する |
 | `POST` | `/codex/pet` | pet name / state / spriteRef から `pet.updated` を生成して queue する |
+| `GET` | `/codex/session/latest` | local Codex session JSONL から最新 assistant 回答を Dashboard 表示用に返す |
+| `POST` | `/codex/session/publish` | 最新 Codex session の user / assistant やり取りを `answer.completed` として queue する |
 | `POST` | `/codex/replay-samples` | sample event 一式を queue する |
 | `GET` | `/events` | outbound / inbound / security log を redaction 前提で確認する |
 | `GET` | `/health` | version、paired device、event count を確認する |
@@ -91,6 +93,7 @@
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Choice / Pet / Notification はそれぞれ `/codex/answer`、`/codex/choice`、`/codex/pet`、`/codex/notification` を使う。
+- `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
 - command panel は `codex:sessions` を表示し、Codex 最新 session 自動送信の起動コマンドを確認できる。
 - ABC 返信ワークフローでは、Choice 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
 - `/events` は reply の `choiceId`、`requestEventId`、input、heartbeat summary などの運用確認に必要な最小情報だけを返し、回答本文を永続 evidence に残さない。

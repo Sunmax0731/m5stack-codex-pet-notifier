@@ -8,6 +8,7 @@ import { productProfile } from '../src/core/product-profile.mjs';
 import {
   parseSessionText,
   publishLatestSession,
+  readLatestSessionExchange,
   runSessionWatcherCli,
   selectLatestExchange
 } from '../src/codex-adapter/sessionWatcher.mjs';
@@ -57,6 +58,11 @@ const finalExchange = selectLatestExchange(messages, { phase: 'final', mode: 'ex
 assert.match(finalExchange.body, /User:/);
 assert.match(finalExchange.body, /Codex:/);
 assert.match(finalExchange.body, /最新の Codex セッション応答です。/);
+const latestForDashboard = readLatestSessionExchange({ sessionFile, phase: 'final', mode: 'assistant' });
+assert.equal(latestForDashboard.ok, true);
+assert.equal(latestForDashboard.sessionName, 'rollout-session-smoke.jsonl');
+assert.equal(latestForDashboard.body, '最新の Codex セッション応答です。');
+assert.match(latestForDashboard.user.text, /最新セッションを M5Stack/);
 
 const bridge = new LanHostBridge();
 const server = createBridgeHttpServer(bridge);
@@ -140,6 +146,7 @@ try {
     checked: {
       localCodexSessionJsonl: true,
       latestExchangeExtraction: true,
+      latestExchangeReadApi: true,
       answerEventQueued: true,
       duplicateSuppression: true,
       hookStateFile: true,

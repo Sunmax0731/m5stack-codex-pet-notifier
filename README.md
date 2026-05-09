@@ -15,7 +15,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
-- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Choice / Pet / Notification 送信、ABC 返信確認を GUI から扱う。
+- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Choice / Pet / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
 - `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。
@@ -49,6 +49,7 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。
 
 `codex:sessions` はローカルの Codex session log を読む opt-in adapter です。`--phase any` は進行中の最新メッセージも送ります。完了応答だけに絞る場合は `--phase final` を指定します。
+Dashboard の `最近の Codex 回答` panel は同じ session log から最新 assistant 回答を表示し、`M5Stackへ送信` で直前 user message と合わせて `answer.completed` として送信します。
 
 Codex Hooks が使える環境では `codex:hook` を hook command として登録します。設定例は [codex-hooks.example.json](docs/codex-hooks.example.json) です。
 

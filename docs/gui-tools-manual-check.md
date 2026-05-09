@@ -36,6 +36,7 @@ http://127.0.0.1:8080/
 - `M5Stack Codex Pet Console` が表示される。
 - 状態確認に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
+- `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
 - `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
@@ -87,6 +88,20 @@ cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
 - Core2 が `Answer` 画面へ遷移する。
 - 最近の Codex session の最新 user / assistant やり取りが `User:`、`Codex:` 付きで表示される。
 - session JSONL の実本文は release evidence に保存しない。
+
+Dashboard から確認する場合:
+
+1. `最近の Codex 回答` panel の `読込` を押す。
+2. `latest answer` に最新 assistant 回答が表示されることを確認する。
+3. 必要に応じて `直前の user message` を開き、対応する直前 user message が表示されることを確認する。
+4. `M5Stackへ送信` を押す。
+
+期待結果:
+
+- Dashboard の send result が `ok=true`。
+- outbound に `answer.completed` が出る。
+- Core2 が `Answer` 画面へ遷移し、直前 user message と最新 assistant 回答が `User:`、`Codex:` 付きで表示される。
+- Dashboard 表示と M5Stack 表示の本文が一致する。
 
 Hook 経由相当の one-shot relay を確認する場合:
 

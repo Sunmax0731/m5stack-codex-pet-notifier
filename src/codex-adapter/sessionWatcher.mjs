@@ -116,6 +116,35 @@ export function selectLatestExchange(messages, options = {}) {
   };
 }
 
+export function readLatestSessionExchange(options = {}) {
+  const sessionFile = options.sessionFile ?? findLatestSessionFile(options.sessionsRoot ?? defaultSessionsRoot());
+  if (!sessionFile) {
+    return { ok: false, reason: 'no-session-file' };
+  }
+  const messages = parseSessionText(fs.readFileSync(sessionFile, 'utf8'));
+  const exchange = selectLatestExchange(messages, {
+    phase: options.phase ?? 'any',
+    mode: options.mode ?? 'assistant'
+  });
+  if (!exchange) {
+    return { ok: false, reason: 'no-session-message', sessionFile };
+  }
+  return {
+    ok: true,
+    sessionFile,
+    sessionName: path.basename(sessionFile),
+    phase: exchange.assistant.phase,
+    timestamp: exchange.assistant.timestamp,
+    summary: options.summary ?? exchange.summary,
+    body: exchange.body,
+    user: exchange.user ? {
+      timestamp: exchange.user.timestamp,
+      text: exchange.user.text
+    } : null,
+    signature: exchange.signature
+  };
+}
+
 export async function publishLatestSession(options = {}, state = {}) {
   const sessionFile = options.sessionFile ?? findLatestSessionFile(options.sessionsRoot ?? defaultSessionsRoot());
   if (!sessionFile) {

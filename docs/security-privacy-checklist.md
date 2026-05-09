@@ -13,6 +13,7 @@
 | Codex App 内部 API に固定依存しない | Pass | Codex relay は clipboard / stdin / file / local session JSONL を source にし、非公開 API scraping を行わない |
 | Codex session 自動送信を opt-in にする | Pass | `codex:sessions` はユーザーが明示的に起動する local watcher。release evidence に session 本文を保存しない |
 | Codex Hooks 連携で本文を state に残さない | Pass | `codex:hook` は `dist/codex-session-hook-state.json` に本文を含まない署名だけを保存する |
+| Dashboard の最新 session 表示を LAN 内運用に限定する | Pass | `/codex/session/latest` は local session 本文を GUI 表示するため、Host Bridge は公開ネットワークへ expose しない |
 | Dashboard が秘密情報を永続化しない | Pass | `/debug/snapshot` と `/events` は token、SSID、host IP、回答本文を release evidence として保存しない |
 | relay 入力を release asset に含めない | Pass | `codex-relay-manual-check.md` は手順のみ。実会話本文は保存しない |
 | 実機 Wi-Fi の安全設定確認 | Partial pass | SSID / password は ignored local header のみ。公開証跡は redacted |
@@ -23,4 +24,5 @@
 - local Wi-Fi config を含めて build した firmware binary は SSID / password / local host IP を含む可能性があるため release asset にしない。
 - token、host IP、実会話本文、個人 pet sprite、`firmware/include/pet_asset.local.h`、`dist/codex-session-hook-state.json`、`.env` は含めない。
 - clipboard / file watch / session watcher で扱う実 Codex 返答本文は release evidence に本文として保存しない。
+- Dashboard の `最近の Codex 回答` 表示は実本文を画面に出すが、docs ZIP、release evidence、hook state には保存しない。
 - 実機ログを共有する場合は SSID、IP、token、会話本文を削除する。

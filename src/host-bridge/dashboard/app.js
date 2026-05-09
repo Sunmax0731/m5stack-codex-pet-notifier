@@ -1,7 +1,8 @@
 const state = {
   health: null,
   events: null,
-  commands: null
+  commands: null,
+  latestSession: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -21,6 +22,10 @@ const elements = {
   inboundLog: $('#inboundLog'),
   securityLog: $('#securityLog'),
   latestReply: $('#latestReply'),
+  sessionName: $('#sessionName'),
+  sessionPhase: $('#sessionPhase'),
+  sessionAnswer: $('#sessionAnswer'),
+  sessionUser: $('#sessionUser'),
   commandList: $('#commandList')
 };
 
@@ -95,6 +100,7 @@ function render() {
   elements.latestReply.innerHTML = latestReply
     ? `<strong>choiceId: ${escapeHtml(latestReply.details.choiceId)}</strong><br>request: ${escapeHtml(latestReply.details.requestEventId)}<br>input: ${escapeHtml(latestReply.details.input ?? '')}`
     : 'まだ返信はありません。';
+  renderLatestSession();
   renderCommands();
 }
 
@@ -111,6 +117,51 @@ function renderCommands() {
   elements.commandList.innerHTML = Object.entries(state.commands).map(([name, command]) => (
     `<div class="command"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(command)}</code></div>`
   )).join('');
+}
+
+function renderLatestSession() {
+  const latest = state.latestSession;
+  if (!latest) {
+    elements.sessionName.textContent = 'session 未読込';
+    elements.sessionPhase.textContent = 'phase -';
+    elements.sessionAnswer.textContent = '最近の Codex session を読み込んでいません。';
+    elements.sessionUser.textContent = '未読込';
+    return;
+  }
+  if (latest.ok === false) {
+    elements.sessionName.textContent = latest.reason ?? '読み込み失敗';
+    elements.sessionPhase.textContent = 'phase -';
+    elements.sessionAnswer.textContent = latest.message ?? latest.reason ?? '最近の Codex 回答を取得できません。';
+    elements.sessionUser.textContent = '未読込';
+    return;
+  }
+  elements.sessionName.textContent = latest.sessionName ?? 'session';
+  elements.sessionPhase.textContent = `phase ${latest.phase ?? '-'}`;
+  elements.sessionAnswer.textContent = latest.body ?? '';
+  elements.sessionUser.textContent = latest.user?.text ?? '直前の user message はありません。';
+}
+
+async function loadLatestSession() {
+  try {
+    state.latestSession = await api('/codex/session/latest?phase=any&mode=assistant');
+  } catch (error) {
+    state.latestSession = { ok: false, reason: 'session-load-failed', message: error.message };
+  }
+  renderLatestSession();
+}
+
+async function publishLatestSession() {
+  const result = await api('/codex/session/publish', {
+    method: 'POST',
+    body: JSON.stringify({
+      deviceId: deviceId(),
+      phase: 'any',
+      mode: 'exchange'
+    })
+  });
+  elements.sendResult.textContent = JSON.stringify(result, null, 2);
+  await refresh();
+  await loadLatestSession();
 }
 
 function formatDetails(details = {}) {
@@ -202,6 +253,10 @@ function wireActions() {
   $('#refreshButton').addEventListener('click', refresh);
   $('#clearViewButton').addEventListener('click', render);
   $('#loadCommandsButton').addEventListener('click', refresh);
+  $('#loadSessionButton').addEventListener('click', loadLatestSession);
+  $('#publishSessionButton').addEventListener('click', () => {
+    publishLatestSession().catch(showError);
+  });
   $('#replayButton').addEventListener('click', () => {
     submitJson('/codex/replay-samples', { deviceId: deviceId() }).catch(showError);
   });
@@ -215,4 +270,6 @@ wireTabs();
 wireForms();
 wireActions();
 refresh();
+loadLatestSession();
 setInterval(refresh, 2500);
+setInterval(loadLatestSession, 5000);

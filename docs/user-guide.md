@@ -21,6 +21,7 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - `Answer` tab から Codex の返答本文を M5Stack へ送る。
 - `Choice` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound で確認する。
 - `Pet` tab から pet name / state / spriteRef を更新し、M5Stack の avatar 表示を確認する。
+- `最近の Codex 回答` panel で local Codex session の最新 assistant 回答を確認し、`M5Stackへ送信` で直前 user message と合わせて Answer 画面へ送る。
 - `debug JSON` で redacted snapshot と導入コマンドを確認する。
 
 ## Codex Session Auto Relay

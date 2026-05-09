@@ -156,6 +156,28 @@
           <div id="latestReply" class="reply-box">まだ返信はありません。</div>
         </section>
 
+        <section class="panel session-panel" aria-labelledby="sessionHeading">
+          <div class="panel-header">
+            <h2 id="sessionHeading">最近の Codex 回答</h2>
+            <div class="panel-actions">
+              <button id="loadSessionButton" type="button" class="secondary">読込</button>
+              <button id="publishSessionButton" type="button">M5Stackへ送信</button>
+            </div>
+          </div>
+          <div class="session-meta">
+            <span id="sessionName" class="device-chip">session 未読込</span>
+            <span id="sessionPhase" class="device-chip">phase -</span>
+          </div>
+          <div class="session-preview">
+            <h3>latest answer</h3>
+            <pre id="sessionAnswer">最近の Codex session を読み込んでいません。</pre>
+          </div>
+          <details class="session-user">
+            <summary>直前の user message</summary>
+            <pre id="sessionUser">未読込</pre>
+          </details>
+        </section>
+
         <section class="panel event-log" aria-labelledby="logHeading">
           <div class="panel-header">
             <h2 id="logHeading">イベントログ</h2>
