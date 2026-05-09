@@ -121,7 +121,7 @@
 - `display.settings_updated.display.motionStepMs` は `120..800` を受け付け、既定 `280ms` でキャラの pose / frame 切替間隔を決める。
 - `display.settings_updated.display.*Rgba` は `r/g/b/a=0..255` を受け付け、pet 背景、本文文字、本文背景に反映する。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
-- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step、RGBA、Core2 / GRAY 表示を確認できる。プレビューは画面と設定を2カラムにして縦方向の占有を抑える。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step、RGBA、Core2 / GRAY 表示を確認できる。プレビューは実機画面と readout を上段に置き、設定 dock を下段にまとめて余白と縦方向の占有を抑える。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - firmware は `display.*Rgba` を object、hex string、channel array として受け取り、local hatch-pet asset の透明ピクセル部分には固定アクセント色ではなく pet background の合成色を表示する。
 - firmware は pet surface を `M5Canvas` の off-screen Sprite に描画し、`pushSprite()` で一括転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。

@@ -212,24 +212,24 @@
                   </div>
                 </div>
 
-                <div class="preview-controls">
-                  <div class="pet-current">
+                <div class="preview-controls preview-settings-dock">
+                  <div class="pet-current preview-control-summary">
                     <span class="muted">current pet</span>
                     <strong id="petAssetName">fallback</strong>
                     <span id="petAssetDescription" class="muted">local pet asset を確認中</span>
                   </div>
-                  <div class="choice-grid two">
+                  <div class="choice-grid two preview-asset-row">
                     <label class="field hint" data-tooltip="Host Bridgeが参照するlocal hatch-pet packageです。%USERPROFILE%\\.codex\\pets から選択します。">
                       <span>local hatch-pet asset</span>
                       <select id="petPackage"></select>
                     </label>
                     <button id="reloadPetPackagesButton" class="secondary align-end" type="button">asset 再読み込み</button>
                   </div>
-                  <label class="field hint" data-tooltip="任意のlocal hatch-pet packageディレクトリを指定します。空なら上の選択値を使います。">
+                  <label class="field hint preview-path-field" data-tooltip="任意のlocal hatch-pet packageディレクトリを指定します。空なら上の選択値を使います。">
                     <span>asset path override</span>
                     <input id="petPackagePath" placeholder="%USERPROFILE%\\.codex\\pets\\Mira">
                   </label>
-                  <div class="choice-grid two">
+                  <div class="choice-grid two preview-pet-row">
                     <label class="field hint" data-tooltip="pet.updatedのnameです。未変更なら選択したlocal petのdisplayNameを使います。">
                       <span>pet name</span>
                       <input id="petName" value="Codex Pet">
@@ -244,12 +244,12 @@
                       </select>
                     </label>
                   </div>
-                  <label class="field hint" data-tooltip="assetの参照名です。現状はhost側の説明値として送ります。">
+                  <label class="field hint preview-sprite-field" data-tooltip="assetの参照名です。現状はhost側の説明値として送ります。">
                     <span>spriteRef</span>
                     <input id="petSprite" value="host://pet/current">
                   </label>
 
-                  <div class="display-controls">
+                  <div class="display-controls preview-display-controls">
                     <label class="field range-field hint" data-tooltip="1は小さめ、8は画面全体に近い最大表示です。">
                       <span>pet display area <strong id="petScaleValue">2/8</strong></span>
                       <input id="petScale" type="range" min="1" max="8" step="1" value="2">
@@ -272,7 +272,7 @@
                     </label>
                   </div>
 
-                  <div class="color-grid">
+                  <div class="color-grid preview-color-controls">
                     <label class="field hint" data-tooltip="ペット背面の色です。alphaを下げると黒背景へ合成します。">
                       <span>pet background <strong id="petBgValue">#050b14 / 255</strong></span>
                       <input id="petBgColor" type="color" value="#050b14">
@@ -294,7 +294,7 @@
                     </label>
                   </div>
 
-                  <div class="panel-actions">
+                  <div class="panel-actions preview-actions">
                     <button id="sendPetButton" type="button">Pet 更新を送信</button>
                     <button id="sendDisplayButton" type="button" class="secondary">表示設定を送信</button>
                   </div>

@@ -164,6 +164,7 @@ assert(dashboardIndexSource.includes('text background'), 'Dashboard must expose 
 assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboard must expose answer beep controls');
 assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and GRAY preview switching');
 assert(dashboardIndexSource.includes('petPackagePath'), 'Dashboard must expose local pet package path override');
+assert(dashboardIndexSource.includes('preview-settings-dock'), 'Dashboard preview settings must be docked below the screen preview');
 assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
 assert(dashboardIndexSource.includes('data-tooltip'), 'Dashboard controls must provide focusable tooltip hints');
 assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must support View/Hide collapse controls');

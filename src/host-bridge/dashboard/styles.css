@@ -512,14 +512,14 @@ input[type="range"] {
 
 .m5-preview-layout {
   display: grid;
-  grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1.1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
   align-items: start;
 }
 
 .preview-stage {
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: minmax(320px, max-content) minmax(260px, 1fr);
   gap: 10px;
   align-items: start;
 }
@@ -670,19 +670,44 @@ input[type="range"] {
 }
 
 .preview-controls {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
 }
 
-.preview-controls > .field,
-.preview-controls > .choice-grid,
-.preview-controls > .display-controls,
-.preview-controls > .color-grid,
-.preview-controls > .panel-actions {
+.preview-settings-dock {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.preview-controls .field,
+.preview-controls .choice-grid {
+  margin-bottom: 0;
+}
+
+.preview-control-summary,
+.preview-asset-row,
+.preview-path-field,
+.preview-pet-row,
+.preview-sprite-field {
+  grid-column: span 3;
+}
+
+.preview-display-controls,
+.preview-color-controls,
+.preview-actions {
   grid-column: 1 / -1;
 }
 
+.preview-color-controls {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.preview-controls .check-field {
+  min-height: 66px;
+}
+
 .display-controls {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -701,6 +726,7 @@ input[type="range"] {
 .pet-current {
   display: grid;
   gap: 2px;
+  min-height: 72px;
 }
 
 .readout-row {
@@ -709,6 +735,12 @@ input[type="range"] {
   justify-content: space-between;
   gap: 8px;
   min-height: 42px;
+}
+
+.readout-row strong {
+  min-width: 0;
+  text-align: right;
+  word-break: break-word;
 }
 
 .readout-row span {

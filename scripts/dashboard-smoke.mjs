@@ -57,6 +57,7 @@ try {
   assert.match(index, /Codex回答のビープ通知/);
   assert.match(index, /previewDevice/);
   assert.match(index, /petPackagePath/);
+  assert.match(index, /preview-settings-dock/);
   assert.match(index, /data-tooltip/);
   assert.match(index, /section-toggle/);
   assert.match(index, /commandModal/);
@@ -90,6 +91,8 @@ try {
   assert.match(css, /\.dashboard-grid/);
   assert.match(css, /\.m5-screen/);
   assert.match(css, /\.preview-stage/);
+  assert.match(css, /\.preview-settings-dock/);
+  assert.match(css, /\.preview-control-summary/);
   assert.match(css, /\.command-tabs/);
   assert.match(css, /\.color-grid/);
 
