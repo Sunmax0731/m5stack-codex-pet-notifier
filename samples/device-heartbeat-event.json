@@ -5,5 +5,22 @@
   "deviceId": "m5stack-sample-001",
   "battery": 88,
   "wifiRssi": -48,
-  "screen": "Choice"
+  "screen": "Choice",
+  "display": {
+    "petScale": 2,
+    "uiTextScale": 1,
+    "bodyTextScale": 1,
+    "animationFps": 12,
+    "motionStepMs": 280,
+    "petOffsetX": 0,
+    "petOffsetY": 0,
+    "screenBackgroundRgba": { "r": 5, "g": 11, "b": 20, "a": 255 },
+    "petBackgroundRgba": { "r": 5, "g": 11, "b": 20, "a": 255 },
+    "textColorRgba": { "r": 255, "g": 255, "b": 255, "a": 255 },
+    "textBackgroundRgba": { "r": 0, "g": 0, "b": 0, "a": 178 },
+    "textBorderEnabled": false,
+    "textBorderRgba": { "r": 255, "g": 255, "b": 255, "a": 255 },
+    "beepOnAnswer": true,
+    "applyCount": 0
+  }
 }

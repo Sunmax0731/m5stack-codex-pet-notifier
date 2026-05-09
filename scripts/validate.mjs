@@ -100,6 +100,9 @@ assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
 assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
+assert(firmwareSource.includes('writeDisplayDiagnostics'), 'firmware heartbeat must report the display settings currently applied on the device');
+assert(firmwareSource.includes('displayApplyCount'), 'firmware heartbeat must expose display settings apply count for manual diagnosis');
+assert(firmwareSource.includes('screenState == SCREEN_ERROR'), 'firmware display settings events must recover from transient error screen state');
 assert(firmwareSource.includes('parseRgbaString'), 'firmware must accept string RGBA settings as well as object RGBA settings');
 assert(!firmwareSource.includes('target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor())'), 'local hatch-pet transparent pixels must reveal the configured pet background instead of a fixed accent card');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
@@ -163,6 +166,7 @@ assert(bridgeSource.includes('/pet/current/manifest'), 'Host Bridge must expose 
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
 assert(bridgeSource.includes("url.pathname === '/debug/runtime'"), 'Host Bridge must expose runtime status for the GUI sidebar');
 assert(bridgeSource.includes("url.pathname === '/debug/commands/run'"), 'Host Bridge must expose allowlisted command execution for the GUI');
+assert(bridgeSource.includes('display: event.display ?? null'), 'Host Bridge event log must expose device heartbeat display diagnostics');
 assert(bridgeSource.includes('local-command-execution-only'), 'Host Bridge command execution must be restricted to local requests');
 assert(bridgeSource.includes('access-control-allow-origin'), 'Host Bridge must allow the dashboard to use a latest Bridge API on another local port');
 assert(bridgeSource.includes("request.method === 'OPTIONS'"), 'Host Bridge must answer CORS preflight requests for cross-port dashboard commands');
@@ -175,7 +179,8 @@ const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.ht
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
 assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
 assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side navigation');
-assert(dashboardIndexSource.includes('data-section="statusSection"'), 'Dashboard sidebar must keep the status item visible');
+assert(!/class="side-link[^"]*"[^>]*data-section="statusSection"/.test(dashboardIndexSource), 'Dashboard side navigation must not keep a status button after the status panel moved into the sidebar');
+assert(/class="side-link active"[^>]*data-section="previewSection"/.test(dashboardIndexSource), 'Dashboard side navigation must default to the preview section');
 assert(/<aside class="sidebar">[\s\S]*<section id="statusSection" class="panel status-panel sidebar-status-panel"/.test(dashboardIndexSource), 'Dashboard status section must be rendered inside the sidebar');
 assert(!dashboardIndexSource.includes('data-section="debugSection"'), 'Dashboard sidebar must not expose a separate debug item');
 assert(dashboardIndexSource.includes('M5Stack 表示プレビュー'), 'Dashboard must expose a M5Stack display preview');

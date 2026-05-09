@@ -105,6 +105,8 @@ RgbaColor textBackgroundRgba{0, 0, 0, 178};
 RgbaColor textBorderRgba{255, 255, 255, 255};
 bool textBorderEnabled = false;
 bool beepOnAnswer = true;
+uint32_t displayApplyCount = 0;
+String lastDisplayEventId = "";
 
 M5Canvas petSprite(&M5.Display);
 bool petSpriteReady = false;
@@ -329,6 +331,34 @@ void applyRgbaSetting(JsonVariant source, RgbaColor& target) {
   target.a = readColorChannel(source, "a", target.a);
 }
 
+void writeRgba(JsonObject target, const RgbaColor& color) {
+  target["r"] = color.r;
+  target["g"] = color.g;
+  target["b"] = color.b;
+  target["a"] = color.a;
+}
+
+void writeDisplayDiagnostics(JsonObject target) {
+  target["petScale"] = petDisplayScale;
+  target["uiTextScale"] = uiTextScale;
+  target["bodyTextScale"] = bodyTextScale;
+  target["animationFps"] = petAnimationFps;
+  target["motionStepMs"] = petMotionStepMs;
+  target["petOffsetX"] = petOffsetX;
+  target["petOffsetY"] = petOffsetY;
+  target["textBorderEnabled"] = textBorderEnabled;
+  target["beepOnAnswer"] = beepOnAnswer;
+  target["applyCount"] = displayApplyCount;
+  if (lastDisplayEventId.length()) {
+    target["lastEventId"] = lastDisplayEventId;
+  }
+  writeRgba(target["screenBackgroundRgba"].to<JsonObject>(), screenBackgroundRgba);
+  writeRgba(target["petBackgroundRgba"].to<JsonObject>(), petBackgroundRgba);
+  writeRgba(target["textColorRgba"].to<JsonObject>(), textColorRgba);
+  writeRgba(target["textBackgroundRgba"].to<JsonObject>(), textBackgroundRgba);
+  writeRgba(target["textBorderRgba"].to<JsonObject>(), textBorderRgba);
+}
+
 uint32_t petAnimationIntervalMs() {
   const uint32_t computed = 1000 / max(1, petAnimationFps);
   return computed < 50 ? 50 : computed;
@@ -468,9 +498,9 @@ int answerCharsPerPage() {
   return max(6, ANSWER_CHARS_PER_PAGE / bodyTextScale);
 }
 
-void applyDisplaySettings(JsonVariant display) {
+bool applyDisplaySettings(JsonVariant display) {
   if (display.isNull()) {
-    return;
+    return false;
   }
   petDisplayScale = clampDisplayScale(display["petScale"] | petDisplayScale);
   uiTextScale = clampDisplayScale(display["uiTextScale"] | uiTextScale);
@@ -487,6 +517,32 @@ void applyDisplaySettings(JsonVariant display) {
   applyRgbaSetting(display["textBorderRgba"], textBorderRgba);
   beepOnAnswer = display["beepOnAnswer"] | beepOnAnswer;
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
+  return true;
+}
+
+void rememberDisplaySettings(JsonVariant event) {
+  displayApplyCount += 1;
+  lastDisplayEventId = String(event["eventId"] | "");
+  Serial.printf(
+    "display_settings_applied count=%u event=%s petScale=%d offset=%d,%d screenRgba=%u,%u,%u,%u petRgba=%u,%u,%u,%u textBg=%u,%u,%u,%u\n",
+    displayApplyCount,
+    lastDisplayEventId.c_str(),
+    petDisplayScale,
+    petOffsetX,
+    petOffsetY,
+    screenBackgroundRgba.r,
+    screenBackgroundRgba.g,
+    screenBackgroundRgba.b,
+    screenBackgroundRgba.a,
+    petBackgroundRgba.r,
+    petBackgroundRgba.g,
+    petBackgroundRgba.b,
+    petBackgroundRgba.a,
+    textBackgroundRgba.r,
+    textBackgroundRgba.g,
+    textBackgroundRgba.b,
+    textBackgroundRgba.a
+  );
 }
 
 int utf8CharBytes(const String& value, int index) {
@@ -1073,6 +1129,7 @@ void sendHeartbeat() {
   doc["battery"] = 100;
   doc["wifiRssi"] = WiFi.RSSI();
   doc["screen"] = screenName();
+  writeDisplayDiagnostics(doc["display"].to<JsonObject>());
   sendDeviceEvent(doc);
 }
 
@@ -1166,7 +1223,9 @@ void handleHostEvent(JsonVariant event) {
     petState = String(event["pet"]["state"] | "idle");
     title = "Pet updated";
     body = String(event["pet"]["spriteRef"] | "fallback");
-    applyDisplaySettings(event["display"]);
+    if (applyDisplaySettings(event["display"])) {
+      rememberDisplaySettings(event);
+    }
     screenState = SCREEN_IDLE;
   } else if (type == "notification.created") {
     title = String(event["title"] | "Notification");
@@ -1194,7 +1253,13 @@ void handleHostEvent(JsonVariant event) {
     }
     screenState = SCREEN_CHOICE;
   } else if (type == "display.settings_updated") {
-    applyDisplaySettings(event["display"]);
+    if (applyDisplaySettings(event["display"])) {
+      rememberDisplaySettings(event);
+    }
+    if (screenState == SCREEN_ERROR) {
+      lastError = "";
+      screenState = SCREEN_IDLE;
+    }
   } else {
     lastError = String("unknown event: ") + type;
     screenState = SCREEN_ERROR;

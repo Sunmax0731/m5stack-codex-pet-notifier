@@ -10,6 +10,39 @@
     "deviceId": { "type": "string", "minLength": 1 },
     "battery": { "type": "integer", "minimum": 0, "maximum": 100 },
     "wifiRssi": { "type": "integer", "minimum": -100, "maximum": 0 },
-    "screen": { "type": "string", "minLength": 1 }
+    "screen": { "type": "string", "minLength": 1 },
+    "display": {
+      "type": "object",
+      "properties": {
+        "petScale": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "uiTextScale": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "bodyTextScale": { "type": "integer", "minimum": 1, "maximum": 8 },
+        "animationFps": { "type": "integer", "minimum": 4, "maximum": 20 },
+        "motionStepMs": { "type": "integer", "minimum": 120, "maximum": 800 },
+        "petOffsetX": { "type": "integer", "minimum": -320, "maximum": 320 },
+        "petOffsetY": { "type": "integer", "minimum": -240, "maximum": 240 },
+        "screenBackgroundRgba": { "$ref": "#/$defs/rgba" },
+        "petBackgroundRgba": { "$ref": "#/$defs/rgba" },
+        "textColorRgba": { "$ref": "#/$defs/rgba" },
+        "textBackgroundRgba": { "$ref": "#/$defs/rgba" },
+        "textBorderEnabled": { "type": "boolean" },
+        "textBorderRgba": { "$ref": "#/$defs/rgba" },
+        "beepOnAnswer": { "type": "boolean" },
+        "applyCount": { "type": "integer", "minimum": 0 },
+        "lastEventId": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "rgba": {
+      "type": "object",
+      "required": ["r", "g", "b", "a"],
+      "properties": {
+        "r": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "g": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "b": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "a": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    }
   }
 }

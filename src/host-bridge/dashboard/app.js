@@ -117,7 +117,6 @@ const elements = {
 
 const labels = {
   ja: {
-    navStatus: '状態',
     navPreview: 'プレビュー',
     navSession: '最近の回答',
     navLog: 'ログ',
@@ -203,7 +202,6 @@ const labels = {
     noRecentAnswer: '最近の Codex 回答を取得できません。'
   },
   en: {
-    navStatus: 'Status',
     navPreview: 'Preview',
     navSession: 'Recent answer',
     navLog: 'Logs',
@@ -898,8 +896,15 @@ function formatDetails(details = {}) {
     return '<span class="muted">details なし</span>';
   }
   return pairs.map(([key, value]) => (
-    `<span class="muted">${escapeHtml(key)}:</span> ${escapeHtml(String(value))}`
+    `<span class="muted">${escapeHtml(key)}:</span> ${formatDetailValue(value)}`
   )).join('<br>');
+}
+
+function formatDetailValue(value) {
+  if (value && typeof value === 'object') {
+    return `<code>${escapeHtml(JSON.stringify(value))}</code>`;
+  }
+  return escapeHtml(String(value));
 }
 
 function rgbaFromControls(colorInput, alphaInput) {

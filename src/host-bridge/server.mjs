@@ -661,7 +661,8 @@ function summarizeDeviceEvent(event) {
     return {
       battery: event.battery ?? null,
       wifiRssi: event.wifiRssi ?? null,
-      screen: event.screen ?? null
+      screen: event.screen ?? null,
+      display: event.display ?? null
     };
   }
   return {};

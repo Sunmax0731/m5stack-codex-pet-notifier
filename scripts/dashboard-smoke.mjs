@@ -49,7 +49,8 @@ try {
   assert.doesNotMatch(index, /ローカルデバイス操作/);
   assert.match(index, /id="bridgeLine" class="visually-hidden" hidden/);
   assert.match(index, /side-nav/);
-  assert.match(index, /data-section="statusSection"/);
+  assert.doesNotMatch(index, /class="side-link[^"]*"[^>]*data-section="statusSection"/);
+  assert.match(index, /class="side-link active"[^>]*data-section="previewSection"/);
   assert.match(index, /<aside class="sidebar">[\s\S]*<section id="statusSection" class="panel status-panel sidebar-status-panel"/);
   assert.doesNotMatch(index, /data-section="debugSection"/);
   assert.match(index, /最近の Codex 回答/);
@@ -289,10 +290,43 @@ try {
   });
   assert.equal(reply.ok, true);
 
+  const heartbeat = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
+    type: 'device.heartbeat',
+    eventId: 'evt-dashboard-smoke-heartbeat',
+    createdAt: '2026-05-09T00:00:31+09:00',
+    deviceId,
+    battery: 92,
+    wifiRssi: -45,
+    screen: 'Idle',
+    display: {
+      petScale: 8,
+      uiTextScale: 3,
+      bodyTextScale: 4,
+      animationFps: 12,
+      motionStepMs: 280,
+      petOffsetX: -40,
+      petOffsetY: 24,
+      screenBackgroundRgba: { r: 2, g: 4, b: 8, a: 255 },
+      petBackgroundRgba: { r: 8, g: 12, b: 20, a: 255 },
+      textColorRgba: { r: 255, g: 245, b: 210, a: 255 },
+      textBackgroundRgba: { r: 4, g: 8, b: 12, a: 180 },
+      textBorderEnabled: true,
+      textBorderRgba: { r: 120, g: 200, b: 255, a: 255 },
+      beepOnAnswer: true,
+      applyCount: 2,
+      lastEventId: display.event.eventId
+    }
+  });
+  assert.equal(heartbeat.ok, true);
+
   const events = await getJson(`${baseUrl}/events`);
   const latestReply = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-reply');
   assert.equal(latestReply.details.choiceId, 'yes');
   assert.equal(latestReply.details.input, 'button-a');
+  const latestHeartbeat = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-heartbeat');
+  assert.equal(latestHeartbeat.details.display.petScale, 8);
+  assert.equal(latestHeartbeat.details.display.petOffsetX, -40);
+  assert.deepEqual(latestHeartbeat.details.display.screenBackgroundRgba, { r: 2, g: 4, b: 8, a: 255 });
 
   const runtime = await getJson(`${baseUrl}/debug/runtime`);
   assert.equal(runtime.ok, true);
@@ -345,7 +379,8 @@ try {
       m5StackPreviewDeviceSwitch: true,
       m5StackPreviewFullWidthLayout: true,
       sideNavigation: true,
-      sideNavigationStatusItem: true,
+      sideNavigationNoStatusItem: true,
+      sidebarStatusSection: true,
       sideNavigationNoDebugItem: true,
       sectionCollapseControls: true,
       clickHelpButtons: true,
@@ -362,6 +397,7 @@ try {
       petEndpoint: true,
       choiceEndpoint: true,
       decisionEndpoint: true,
+      displayHeartbeatDiagnostics: true,
       inboundReplySummary: true
     }
   }, null, 2)}\n`);

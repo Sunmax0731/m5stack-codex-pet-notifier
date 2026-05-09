@@ -104,7 +104,8 @@ export class MockM5StackDevice {
       deviceId: this.deviceId,
       battery: 88,
       wifiRssi: -48,
-      screen: this.screen
+      screen: this.screen,
+      display: this.displaySettings
     };
   }
 
