@@ -29,9 +29,11 @@ const elements = {
   petScale: $('#petScale'),
   uiTextScale: $('#uiTextScale'),
   bodyTextScale: $('#bodyTextScale'),
+  animationFps: $('#animationFps'),
   petScaleValue: $('#petScaleValue'),
   uiTextScaleValue: $('#uiTextScaleValue'),
   bodyTextScaleValue: $('#bodyTextScaleValue'),
+  animationFpsValue: $('#animationFpsValue'),
   previewMode: $('#previewMode'),
   m5Preview: $('#m5Preview'),
   previewPet: $('#previewPet'),
@@ -40,6 +42,7 @@ const elements = {
   previewPetReadout: $('#previewPetReadout'),
   previewUiReadout: $('#previewUiReadout'),
   previewBodyReadout: $('#previewBodyReadout'),
+  previewFpsReadout: $('#previewFpsReadout'),
   commandList: $('#commandList')
 };
 
@@ -195,7 +198,8 @@ function displaySettingsPayload() {
     deviceId: deviceId(),
     petScale: Number(elements.petScale.value),
     uiTextScale: Number(elements.uiTextScale.value),
-    bodyTextScale: Number(elements.bodyTextScale.value)
+    bodyTextScale: Number(elements.bodyTextScale.value),
+    animationFps: Number(elements.animationFps.value)
   };
 }
 
@@ -228,7 +232,8 @@ function createDisplayFallbackPetEvent(payload) {
     display: {
       petScale: payload.petScale,
       uiTextScale: payload.uiTextScale,
-      bodyTextScale: payload.bodyTextScale
+      bodyTextScale: payload.bodyTextScale,
+      animationFps: payload.animationFps
     }
   };
 }
@@ -237,6 +242,7 @@ function renderDisplayControls() {
   elements.petScaleValue.textContent = `${elements.petScale.value}/8`;
   elements.uiTextScaleValue.textContent = `${elements.uiTextScale.value}/8`;
   elements.bodyTextScaleValue.textContent = `${elements.bodyTextScale.value}/8`;
+  elements.animationFpsValue.textContent = `${elements.animationFps.value} fps`;
   renderM5Preview();
 }
 
@@ -247,6 +253,7 @@ function renderM5Preview() {
   const petScale = Number(elements.petScale.value);
   const uiTextScale = Number(elements.uiTextScale.value);
   const bodyTextScale = Number(elements.bodyTextScale.value);
+  const animationFps = Number(elements.animationFps.value);
   const mode = elements.previewMode.value;
   const petSize = Math.round(42 + ((petScale - 1) / 7) * 196);
   const bodySize = Math.min(34, 10 + bodyTextScale * 3);
@@ -256,9 +263,11 @@ function renderM5Preview() {
   elements.m5Preview.style.setProperty('--pet-size', `${petSize}px`);
   elements.m5Preview.style.setProperty('--body-size', `${bodySize}px`);
   elements.m5Preview.style.setProperty('--ui-size', `${uiSize}px`);
+  elements.previewPet.style.setProperty('--pet-animation-duration', `${Math.round(1000 / Math.max(1, animationFps))}ms`);
   elements.previewPetReadout.textContent = `${petScale}/8`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
+  elements.previewFpsReadout.textContent = `${animationFps} fps`;
 
   const preview = previewContent(mode, petScale);
   elements.previewBody.textContent = preview.body;
@@ -386,7 +395,7 @@ function wireForms() {
 }
 
 function wireActions() {
-  [elements.petScale, elements.uiTextScale, elements.bodyTextScale].forEach((control) => {
+  [elements.petScale, elements.uiTextScale, elements.bodyTextScale, elements.animationFps].forEach((control) => {
     control.addEventListener('input', renderDisplayControls);
   });
   [

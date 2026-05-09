@@ -131,7 +131,7 @@ cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 ## 8. Display relay
 
 ```powershell
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12
 ```
 
 期待結果:
@@ -139,6 +139,7 @@ cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body
 - `/events` の outbound に `display.settings_updated` が出る。
 - Core2 は固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。
 - text size を `2` 以上に変更した場合は footer または本文の文字サイズが大きくなる。
+- animation FPS は `12fps` になり、固定 320ms 更新より滑らかに pet frame / bounce が更新される。
 
 ## 確認コマンド
 

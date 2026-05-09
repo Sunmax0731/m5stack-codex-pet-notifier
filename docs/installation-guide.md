@@ -81,7 +81,7 @@ Dashboard:
 http://127.0.0.1:8080/
 ```
 
-Dashboard では health、event log、debug command、Answer / Choice / Pet / Display / Notification 送信、ABC 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。side menu と tabs で作業領域を切り替え、`Display` tab では pet 表示面積と text size を `1..8` の8段階で実機へ送信できます。`M5Stack 表示プレビュー` では送信前に 320x240 画面の見え方を確認できます。
+Dashboard では health、event log、debug command、Answer / Choice / Pet / Display / Notification 送信、ABC 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。side menu と tabs で作業領域を切り替え、`Display` tab では pet 表示面積と text size を `1..8`、animation FPS を `4..20` で実機へ送信できます。`M5Stack 表示プレビュー` では送信前に 320x240 画面の見え方を確認できます。
 
 別の PowerShell で sample event を送信します。
 

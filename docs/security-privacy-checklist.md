@@ -15,7 +15,7 @@
 | Codex Hooks 連携で本文を state に残さない | Pass | `codex:hook` は `dist/codex-session-hook-state.json` に本文を含まない署名だけを保存する |
 | Dashboard の最新 session 表示を LAN 内運用に限定する | Pass | `/codex/session/latest` は local session 本文を GUI 表示するため、Host Bridge は公開ネットワークへ expose しない |
 | Dashboard が秘密情報を永続化しない | Pass | `/debug/snapshot` と `/events` は token、SSID、host IP、回答本文を release evidence として保存しない |
-| Display 設定に個人情報を含めない | Pass | `display.settings_updated` は petScale、uiTextScale、bodyTextScale の数値だけを扱う |
+| Display 設定に個人情報を含めない | Pass | `display.settings_updated` は petScale、uiTextScale、bodyTextScale、animationFps の数値だけを扱う |
 | relay 入力を release asset に含めない | Pass | `codex-relay-manual-check.md` は手順のみ。実会話本文は保存しない |
 | 実機 Wi-Fi の安全設定確認 | Partial pass | SSID / password は ignored local header のみ。公開証跡は redacted |
 

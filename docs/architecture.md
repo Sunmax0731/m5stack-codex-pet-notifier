@@ -35,7 +35,7 @@ flowchart LR
 4. Device -> Host event は token 検証後に reply / interaction / heartbeat として受理する。
 5. Dashboard は `/events` と `/debug/snapshot` で redacted log を表示し、ABC 返信の `choiceId` と input を確認する。
 6. Dashboard は `/codex/session/latest` で local session の最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-7. Dashboard は `/codex/display` で pet 表示倍率と text size を `display.settings_updated` として送る。
+7. Dashboard は `/codex/display` で pet 表示倍率、text size、animation FPS を `display.settings_updated` として送る。
 8. 通知本文と回答本文は device 永続保存せず、画面状態だけを保持する。
 
 ## Reversibility

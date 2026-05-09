@@ -12,7 +12,7 @@
 - [x] Codex session 自動送信の opt-in 手順と privacy 境界がある。
 - [x] Codex Hooks 連携の command 例と重複抑止方針がある。
 - [x] Dashboard で最新 Codex session 回答を表示し M5Stack へ送る手順がある。
-- [x] Dashboard から pet 表示倍率と text size を変更する手順がある。
+- [x] Dashboard から pet 表示倍率、text size、animation FPS を変更する手順がある。
 
 ## Implementation
 
@@ -23,7 +23,7 @@
 - [x] Codex hook relay が hook command から one-shot session relay を実行できる。
 - [x] Dashboard と CLI が `/codex/choice`、`/codex/pet` を送信できる。
 - [x] Dashboard が `/codex/session/latest` と `/codex/session/publish` で最新 Codex 回答を表示/送信できる。
-- [x] Dashboard が `/codex/display` で pet display area と text size を `1..8` で送信できる。
+- [x] Dashboard が `/codex/display` で pet display area と text size を `1..8`、animation FPS を `4..20` で送信できる。
 - [x] clipboard relay が日本語本文を UTF-8 として保持できる。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
@@ -32,8 +32,8 @@
 - [x] ボタン返信が Host Bridge へ届く。
 - [x] firmware が pet avatar animation を表示できる。
 - [x] firmware が固定ヘッダーテキストを表示せず、pet surface を優先表示できる。
-- [x] firmware が `display.settings_updated` による pet 表示倍率と text size の変更を処理できる。
-- [x] `display.settings_updated` が pet 表示面積と text size を `1..8` の8段階で扱える。
+- [x] firmware が `display.settings_updated` による pet 表示倍率、text size、animation FPS の変更を処理できる。
+- [x] `display.settings_updated` が pet 表示面積と text size を `1..8`、animation FPS を `4..20` で扱える。
 - [x] firmware が hatch-pet local asset を優先表示し、未生成時は fallback avatar を表示できる。
 - [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
 
@@ -54,7 +54,7 @@
 - [ ] Core2 実機で Codex session auto relay を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Codex hook relay を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、animation FPS 変更を目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 

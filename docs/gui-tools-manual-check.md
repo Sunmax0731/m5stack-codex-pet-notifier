@@ -38,7 +38,7 @@ http://127.0.0.1:8080/
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
 - side menu があり、状態、送信、プレビュー、ABC 返信、Codex 回答、ログ、デバッグへ移動できる。
-- `Display` tab があり、pet display area、UI text size、body text size を `1..8` の8段階で変更できる。
+- `Display` tab があり、pet display area、UI text size、body text size を `1..8`、animation FPS を `4..20` で変更できる。
 - `M5Stack 表示プレビュー` があり、Pet / Answer / Choice / Notify の simulated display を送信前に確認できる。
 - command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
 - `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
@@ -84,6 +84,7 @@ Dashboard の `Display` tab を開き、次を送信します。
 - `pet display area`: `8/8`
 - `UI text size`: `2/8`
 - `body text size`: `2/8`
+- `animation FPS`: `12fps`
 
 期待結果:
 
@@ -95,7 +96,8 @@ Dashboard の `Display` tab を開き、次を送信します。
 - Core2 では `petScale` に対応する scale-specific frame が描画され、低解像度 base frame の単純拡大より輪郭と模様が読みやすい。
 - `UI text size` を変更すると footer の文字サイズが変わる。
 - `body text size` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
-- Dashboard の M5Stack 表示プレビューも slider 変更を即時反映する。
+- `animation FPS` を `4`、`12`、`20` に変えると、pet frame / bounce の更新速度が変わる。
+- Dashboard の M5Stack 表示プレビューも slider 変更と FPS 設定を即時反映する。
 
 ## 5. Codex session 自動送信
 

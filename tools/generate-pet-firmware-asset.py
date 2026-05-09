@@ -72,6 +72,22 @@ def union_content_bbox(
     )
 
 
+def detect_frame_count(spritesheet: Image.Image, row: int, max_frames: int = 8) -> int:
+    cell_width = spritesheet.width // 8
+    cell_height = spritesheet.height // 9
+    last_non_empty = -1
+    for column in range(max_frames):
+        cell = spritesheet.crop((
+            column * cell_width,
+            row * cell_height,
+            (column + 1) * cell_width,
+            (row + 1) * cell_height,
+        ))
+        if cell.getbbox() is not None:
+            last_non_empty = column
+    return max(1, last_non_empty + 1)
+
+
 def frame_pixels(
     spritesheet: Image.Image,
     row: int,
@@ -134,10 +150,11 @@ def format_flat_pixels(values: list[int]) -> str:
 def write_header(args: argparse.Namespace) -> None:
     pet_dir = Path(args.pet_dir).resolve()
     metadata, spritesheet = load_pet(pet_dir)
-    bbox = union_content_bbox(spritesheet, args.row, args.frames)
+    frame_count = args.frames if args.frames > 0 else detect_frame_count(spritesheet, args.row)
+    bbox = union_content_bbox(spritesheet, args.row, frame_count)
     frames = [
         frame_pixels(spritesheet, args.row, column, args.width, args.height)
-        for column in range(args.frames)
+        for column in range(frame_count)
     ]
     scaled_dimensions = scale_dimensions(
         bbox,
@@ -151,7 +168,7 @@ def write_header(args: argparse.Namespace) -> None:
     if args.scaled:
         for width, height in scaled_dimensions:
             level_offsets: list[int] = []
-            for column in range(args.frames):
+            for column in range(frame_count):
                 level_offsets.append(len(scaled_pixels))
                 scaled_pixels.extend(frame_pixels(
                     spritesheet,
@@ -175,7 +192,7 @@ def write_header(args: argparse.Namespace) -> None:
             f"static constexpr uint16_t PET_ASSET_TRANSPARENT = 0x{TRANSPARENT_RGB565:04X};",
             f"static constexpr int PET_ASSET_FRAME_WIDTH = {args.width};",
             f"static constexpr int PET_ASSET_FRAME_HEIGHT = {args.height};",
-            f"static constexpr int PET_ASSET_FRAME_COUNT = {args.frames};",
+            f"static constexpr int PET_ASSET_FRAME_COUNT = {frame_count};",
             f"static const uint16_t PET_ASSET_FRAMES[PET_ASSET_FRAME_COUNT][PET_ASSET_FRAME_WIDTH * PET_ASSET_FRAME_HEIGHT] PROGMEM = {{",
             "  " + frame_blocks,
             "};",
@@ -208,7 +225,7 @@ def write_header(args: argparse.Namespace) -> None:
         encoding="utf-8",
     )
     scaled_message = f", {args.scale_levels} scale-specific frame sets" if args.scaled else ""
-    print(f"generated {output} from {pet_dir.name} ({args.frames} frames{scaled_message})")
+    print(f"generated {output} from {pet_dir.name} ({frame_count} frames{scaled_message})")
 
 
 def parse_args() -> argparse.Namespace:
@@ -216,7 +233,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pet-dir", required=True, help="Path to a hatch-pet package directory.")
     parser.add_argument("--output", default="firmware/include/pet_asset.local.h")
     parser.add_argument("--row", type=int, default=0, help="Spritesheet row to use. Row 0 is idle.")
-    parser.add_argument("--frames", type=int, default=4)
+    parser.add_argument("--frames", type=int, default=0, help="Number of frames to extract. 0 auto-detects non-empty cells in the selected row.")
     parser.add_argument("--width", type=int, default=36)
     parser.add_argument("--height", type=int, default=40)
     parser.add_argument("--scaled", action=argparse.BooleanOptionalAction, default=True)

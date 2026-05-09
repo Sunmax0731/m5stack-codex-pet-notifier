@@ -50,6 +50,7 @@ try {
   assert.match(index, /ABC 返信ワークフロー/);
   assert.match(index, /最近の Codex 回答/);
   assert.match(index, /M5Stack 表示プレビュー/);
+  assert.match(index, /animation FPS/);
   assert.match(index, /max="8"/);
 
   const app = await getText(`${baseUrl}/dashboard/app.js`);
@@ -94,13 +95,15 @@ try {
     deviceId,
     petScale: 8,
     uiTextScale: 3,
-    bodyTextScale: 4
+    bodyTextScale: 4,
+    animationFps: 12
   });
   assert.equal(display.ok, true);
   assert.equal(display.event.type, 'display.settings_updated');
   assert.equal(display.event.display.petScale, 8);
   assert.equal(display.event.display.uiTextScale, 3);
   assert.equal(display.event.display.bodyTextScale, 4);
+  assert.equal(display.event.display.animationFps, 12);
 
   const pet = await postJson(`${baseUrl}/codex/pet`, {
     deviceId,
@@ -165,6 +168,7 @@ try {
       latestSessionPublishEndpoint: true,
       displaySettingsEndpoint: true,
       displaySettingsEightStepControls: true,
+      displaySettingsAnimationFpsControl: true,
       m5StackPreviewPanel: true,
       sideNavigation: true,
       petEndpoint: true,

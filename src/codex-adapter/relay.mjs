@@ -105,6 +105,7 @@ export async function buildEvent(command, args, options = {}) {
       petScale: args['pet-scale'] ?? args.petScale,
       uiTextScale: args['ui-text-scale'] ?? args.uiTextScale,
       bodyTextScale: args['body-text-scale'] ?? args.bodyTextScale,
+      animationFps: args['animation-fps'] ?? args.animationFps,
       eventId: args['event-id'] ?? args.eventId
     });
   }
@@ -232,7 +233,7 @@ function buildHelp() {
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
     '  pet --name "Codex Pet" --state review',
-    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2',
+    '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12',
     '  watch --file .\\dist\\codex-answer.txt',
     '',
     'Common options: --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',

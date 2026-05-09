@@ -43,7 +43,11 @@ constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t POLL_INTERVAL_MS = 1200;
 constexpr uint32_t HEARTBEAT_INTERVAL_MS = 10000;
 constexpr uint32_t STATUS_INTERVAL_MS = 5000;
-constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 320;
+constexpr int DEFAULT_PET_ANIMATION_FPS = 12;
+constexpr int MIN_PET_ANIMATION_FPS = 4;
+constexpr int MAX_PET_ANIMATION_FPS = 20;
+constexpr uint32_t PET_ANIMATION_INTERVAL_MS = 1000 / DEFAULT_PET_ANIMATION_FPS;
+constexpr uint32_t LOOP_IDLE_DELAY_MS = 5;
 constexpr int ANSWER_CHARS_PER_PAGE = 90;
 constexpr int BODY_TEXT_WIDTH = 304;
 constexpr int BODY_LINE_HEIGHT = 18;
@@ -77,6 +81,7 @@ uint32_t petReactUntil = 0;
 int petDisplayScale = 2;
 int uiTextScale = 1;
 int bodyTextScale = 1;
+int petAnimationFps = DEFAULT_PET_ANIMATION_FPS;
 
 void pollHost();
 void sendPetInteraction(const char* interaction);
@@ -109,6 +114,15 @@ void markDraw() {
 
 int clampDisplayScale(int value) {
   return max(DISPLAY_SCALE_MIN, min(DISPLAY_SCALE_MAX, value));
+}
+
+int clampAnimationFps(int value) {
+  return max(MIN_PET_ANIMATION_FPS, min(MAX_PET_ANIMATION_FPS, value));
+}
+
+uint32_t petAnimationIntervalMs() {
+  const uint32_t computed = 1000 / max(1, petAnimationFps);
+  return computed < 50 ? 50 : computed;
 }
 
 void applyDisplayFont(int scale = 1) {
@@ -247,6 +261,7 @@ void applyDisplaySettings(JsonVariant display) {
   petDisplayScale = clampDisplayScale(display["petScale"] | petDisplayScale);
   uiTextScale = clampDisplayScale(display["uiTextScale"] | uiTextScale);
   bodyTextScale = clampDisplayScale(display["bodyTextScale"] | bodyTextScale);
+  petAnimationFps = clampAnimationFps(display["animationFps"] | petAnimationFps);
   answerPage = min(answerPage, pageCount(body, answerCharsPerPage()) - 1);
 }
 
@@ -989,8 +1004,10 @@ void handleTouch() {
 }
 
 void updatePetAnimation() {
-  if (millis() - lastPetFrame >= PET_ANIMATION_INTERVAL_MS) {
-    lastPetFrame = millis();
+  const uint32_t now = millis();
+  const uint32_t interval = petAnimationIntervalMs();
+  if (now - lastPetFrame >= interval) {
+    lastPetFrame = now;
     petFrame = (petFrame + 1) % 30;
     markDraw();
   }
@@ -1059,5 +1076,5 @@ void loop() {
   }
 
   drawScreen();
-  delay(20);
+  delay(LOOP_IDLE_DELAY_MS);
 }

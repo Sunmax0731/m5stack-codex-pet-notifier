@@ -21,7 +21,7 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - `Answer` tab から Codex の返答本文を M5Stack へ送る。
 - `Choice` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound で確認する。
 - `Pet` tab から pet name / state / spriteRef を更新し、M5Stack の avatar 表示を確認する。
-- `Display` tab から pet display area、UI text size、body text size を `1..8` の8段階で送信し、M5Stack 上の pet 表示面積と文字サイズを調整する。
+- `Display` tab から pet display area、UI text size、body text size を `1..8`、animation FPS を `4..20` で送信し、M5Stack 上の pet 表示面積、文字サイズ、アニメーション速度を調整する。
 - `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify の見え方を送信前に確認する。
 - `最近の Codex 回答` panel で local Codex session の最新 assistant 回答を確認し、`M5Stackへ送信` で直前 user message と合わせて Answer 画面へ送る。
 - `debug JSON` で redacted snapshot と導入コマンドを確認する。
@@ -73,6 +73,7 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。
 - pet display area は Dashboard の `Display` tab から `1..8` を切り替えられる。`8/8` は pet を画面全体に近い最大面積で表示する。
+- animation FPS は Dashboard の `Display` tab から `4..20` を切り替えられる。既定は `12fps` で、低くするとゆっくり、高くすると pet frame / bounce の更新が速くなる。
 - UI text と body text は Dashboard の `Display` tab から `1..8` を切り替えられる。body text を大きくすると1ページに入る文字量は少なくなる。
 - Answer 画面では swipe または footer touch で本文ページを移動する。
 - Answer 画面は日本語本文に対応し、Codex relay から送った日本語の summary / body を表示する。

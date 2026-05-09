@@ -153,7 +153,8 @@
     "assetSourcePackage": "Mira",
     "localHeader": "firmware/include/pet_asset.local.h",
     "localHeaderIgnoredByGit": true,
-    "assetFrames": 4,
+    "assetFrames": 6,
+    "assetFrameDetection": "idle row non-empty cells",
     "assetFrameSize": "36x40",
     "scaleSpecificFrames": true,
     "scaleSpecificFrameLevels": 8,
@@ -161,7 +162,9 @@
     "scaleSpecificCore2Only": true,
     "grayScaleFrameFallback": "base frame enlargement to stay within flash budget",
     "fallbackAvatarAvailable": true,
-    "frameIntervalMs": 320,
+    "defaultAnimationFps": 12,
+    "animationFpsRange": "4..20",
+    "frameIntervalMs": 83,
     "states": [
       "idle",
       "review",
@@ -182,7 +185,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes scale-specific Core2 frames and is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",
@@ -209,6 +212,7 @@
       "dashboard:smoke",
       "hatch-pet asset firmware upload",
       "display.settings_updated",
+      "animationFps=12",
       "petScale=8 fallback event queued and consumed"
     ]
   },
@@ -226,7 +230,7 @@
     "Codex session auto relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Codex hook relay visual confirmation on Core2 is prepared but still requires user manual check",
     "Dashboard latest Codex answer publish visual confirmation on Core2 is prepared but still requires user manual check",
-    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, and text size is prepared but still requires user manual check",
+    "Dashboard Display settings visual confirmation for fixed header removal, petScale=8, text size, and animation FPS is prepared but still requires user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",

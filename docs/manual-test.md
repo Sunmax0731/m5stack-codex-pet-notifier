@@ -34,9 +34,10 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-20 | Dashboard の `Display` tab で pet display area を `8/8`、UI text size と body text size を任意に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8` の設定に応じて変わる | 準備済み。ユーザー手動 |
-| C2-21 | Dashboard の `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify を切り替え、Display slider を `1..8` で変更する | 送信前の simulated display が pet 面積、body text、footer text size を即時反映する | `dashboard:smoke` 済み。ユーザー目視 |
+| C2-20 | Dashboard の `Display` tab で pet display area を `8/8`、UI text size と body text size を任意、animation FPS を `12fps` に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8`、animation FPS は `4..20` の設定に応じて変わる | 準備済み。ユーザー手動 |
+| C2-21 | Dashboard の `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify を切り替え、Display slider を変更する | 送信前の simulated display が pet 面積、body text、footer text size、animation FPS 設定を即時反映する | `dashboard:smoke` 済み。ユーザー目視 |
 | C2-22 | `pet:asset` 生成後の firmware で Display slider を `1/8`、`4/8`、`8/8` に変えて pet を見る | Core2 の pet は scale ごとの高解像度 frame に切り替わり、低解像度 base frame をブロック状に拡大した見た目にならない | 準備済み。ユーザー手動 |
+| C2-23 | Dashboard または `codex:display` で animation FPS を `4`、`12`、`20` の順に送る | `4fps` はゆっくり、`12fps` は既定の滑らかさ、`20fps` はより高速に pet frame / bounce が更新される。loop 待機短縮によりボタン操作は遅延しない | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -55,7 +56,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-10 | `Display` tab で pet display area、UI text size、body text size を `1..8` で変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
+| GUI-10 | `Display` tab で pet display area、UI text size、body text size を `1..8`、animation FPS を `4..20` で変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
 | GUI-11 | side menu で `状態`、`送信`、`プレビュー`、`ABC返信`、`Codex回答`、`ログ`、`デバッグ` へ移動する | 各 section に移動でき、現在選択した menu が強調表示される | `dashboard:smoke` 済み。ユーザー目視 |
 
 ## 記録項目
@@ -93,7 +94,7 @@ Codex relay:
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
-cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2
+cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
 cmd.exe /d /s /c npm run codex:sessions -- --phase final

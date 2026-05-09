@@ -82,7 +82,7 @@ Serial で確認するログ:
 M5Stack 画面で確認する状態:
 
 - Idle / Pet updated
-- Display settings applied
+- Display settings applied: petScale、text size、animationFps
 - Notification
 - Answer
 - Choice

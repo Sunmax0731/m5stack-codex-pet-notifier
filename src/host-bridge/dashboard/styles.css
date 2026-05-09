@@ -461,6 +461,18 @@ input[type="range"] {
   border-radius: 32% 32% 42% 42%;
   background: #72d6c9;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.26);
+  animation: petPreviewBounce var(--pet-animation-duration, 83ms) steps(2, end) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes petPreviewBounce {
+  from {
+    transform: translate(-50%, -54%);
+  }
+
+  to {
+    transform: translate(-50%, -60%);
+  }
 }
 
 .pet-ear {

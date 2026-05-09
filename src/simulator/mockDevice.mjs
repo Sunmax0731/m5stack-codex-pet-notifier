@@ -16,7 +16,8 @@ export class MockM5StackDevice {
     this.displaySettings = {
       petScale: 2,
       uiTextScale: 1,
-      bodyTextScale: 1
+      bodyTextScale: 1,
+      animationFps: 12
     };
     this.snapshots = [];
   }

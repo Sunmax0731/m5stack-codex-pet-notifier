@@ -80,7 +80,8 @@ export function createDisplaySettingsEvent(options = {}) {
     display: {
       petScale: clampInteger(options.petScale, 1, 8, 2),
       uiTextScale: clampInteger(options.uiTextScale, 1, 8, 1),
-      bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1)
+      bodyTextScale: clampInteger(options.bodyTextScale, 1, 8, 1),
+      animationFps: clampInteger(options.animationFps, 4, 20, 12)
     }
   };
 }

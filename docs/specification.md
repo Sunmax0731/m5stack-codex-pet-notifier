@@ -28,7 +28,7 @@
 | `POST` | `/codex/notification` | 通知本文から `notification.created` を生成して queue する |
 | `POST` | `/codex/choice` | 確認依頼から `prompt.choice_requested` を生成して queue する |
 | `POST` | `/codex/pet` | pet name / state / spriteRef から `pet.updated` を生成して queue する |
-| `POST` | `/codex/display` | pet 表示倍率と text size から `display.settings_updated` を生成して queue する |
+| `POST` | `/codex/display` | pet 表示倍率、text size、animation FPS から `display.settings_updated` を生成して queue する |
 | `GET` | `/codex/session/latest` | local Codex session JSONL から最新 assistant 回答を Dashboard 表示用に返す |
 | `POST` | `/codex/session/publish` | 最新 Codex session の user / assistant やり取りを `answer.completed` として queue する |
 | `POST` | `/codex/replay-samples` | sample event 一式を queue する |
@@ -45,7 +45,7 @@
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
-| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale` |
+| `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
 | `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
 | `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen` |
@@ -95,7 +95,7 @@
 - Host Bridge と同一 process で static HTML / CSS / JS を配信する。
 - Dashboard は `/health`、`/events`、`/debug/snapshot` を polling し、paired device、outbound、inbound、security rejection を表示する。
 - Answer / Choice / Pet / Notification はそれぞれ `/codex/answer`、`/codex/choice`、`/codex/pet`、`/codex/notification` を使う。
-- Display は `/codex/display` を使い、pet 表示倍率、UI text size、body text size を M5Stack へ送る。
+- Display は `/codex/display` を使い、pet 表示倍率、UI text size、body text size、pet animation FPS を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
 - command panel は `codex:sessions` を表示し、Codex 最新 session 自動送信の起動コマンドを確認できる。
@@ -108,7 +108,8 @@
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は描画しない。
 - `display.settings_updated.display.petScale` は `1..8` を受け付け、`8` を pet を画面全体に近い最大表示とする。
 - `display.settings_updated.display.uiTextScale` と `bodyTextScale` は `1..8` を受け付け、footer と本文の text size を個別に変更できる。
-- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積と text size の見え方を確認できる。
+- `display.settings_updated.display.animationFps` は `4..20` を受け付け、既定 `12fps` で pet animation interval を決める。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積、text size、animation FPS を確認できる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。
@@ -116,7 +117,7 @@
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` を受け付ける。
-- avatar は `PET_ANIMATION_INTERVAL_MS` ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
+- avatar は `animationFps` から算出した interval ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
 - `review`、`reacting`、`celebrate` は色または表情を変え、pet interaction 時は短時間 `reacting` として表示する。
 
 ## 保存方針

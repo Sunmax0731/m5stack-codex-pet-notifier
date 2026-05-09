@@ -67,6 +67,9 @@ assert(firmwareSource.includes('fonts::efontJA_12'), 'firmware must set a Japane
 assert(firmwareSource.includes('utf8SliceByCodepoints'), 'firmware must page text on UTF-8 codepoint boundaries');
 assert(!firmwareSource.includes('pageText(body, answerPage).substring'), 'firmware answer rendering must not split UTF-8 text by byte substring');
 assert(firmwareSource.includes('PET_ANIMATION_INTERVAL_MS'), 'firmware must animate the pet avatar on-device');
+assert(firmwareSource.includes('DEFAULT_PET_ANIMATION_FPS = 12'), 'firmware must default to a smoother 12 fps pet animation');
+assert(firmwareSource.includes('petAnimationFps'), 'firmware must store runtime-configurable pet animation fps');
+assert(firmwareSource.includes('display["animationFps"]'), 'firmware must accept animation fps in display settings');
 assert(firmwareSource.includes('drawPetAvatar'), 'firmware must draw a pet avatar on the M5Stack display');
 assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 8-step display scaling');
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
@@ -84,6 +87,7 @@ assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pe
 const petAssetGeneratorSource = fs.readFileSync('tools/generate-pet-firmware-asset.py', 'utf8');
 assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset generator must emit scale-specific frames');
 assert(petAssetGeneratorSource.includes('Image.Resampling.LANCZOS'), 'pet asset generator must resample scale-specific frames from source cells');
+assert(petAssetGeneratorSource.includes('detect_frame_count'), 'pet asset generator must auto-detect non-empty animation frames');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
@@ -114,10 +118,12 @@ assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side na
 assert(dashboardIndexSource.includes('M5Stack 表示プレビュー'), 'Dashboard must expose a M5Stack display preview');
 assert(dashboardIndexSource.includes('pet display area'), 'Dashboard must expose pet display area controls');
 assert(dashboardIndexSource.includes('body text size'), 'Dashboard must expose body text size controls');
+assert(dashboardIndexSource.includes('animation FPS'), 'Dashboard must expose animation fps controls');
 assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls must expose 8-step sliders');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
+assert(dashboardAppSource.includes('animationFps'), 'Dashboard must publish animation fps in display settings');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
 

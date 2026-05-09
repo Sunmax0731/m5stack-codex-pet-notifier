@@ -18,9 +18,9 @@
 - Core2 Codex answer 表示。
 - Core2 日本語 answer 表示の firmware 対応。
 - Dashboard Choice / Pet endpoint と GUI smoke。
-- Dashboard Display endpoint と pet 表示倍率 / text size controls。
+- Dashboard Display endpoint と pet 表示倍率 / text size / animation FPS controls。
 - Core2 hatch-pet asset animation の firmware 対応と upload。
-- Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、dynamic display settings の firmware 対応。
+- Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` animation、dynamic display settings の firmware 対応。
 - Core2 scale-specific pet asset frame selection。
 - Dashboard side menu、event tabs、M5Stack 表示プレビュー。
 - Runtime gate。
@@ -38,7 +38,7 @@
 - Codex session auto relay の Core2 実機目視確認。
 - Codex hook relay の Core2 実機目視確認。
 - Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
-- Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更の Core2 実機目視確認。
+- Display 設定による固定ヘッダーテキスト削除、pet `8/8` 最大表示、text size 変更、animation FPS 変更の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 
