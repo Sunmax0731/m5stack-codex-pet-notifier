@@ -1,4 +1,5 @@
 import { productProfile } from '../core/product-profile.mjs';
+import { createChoiceEvent } from '../codex-adapter/eventFactory.mjs';
 import { validateEvent } from '../protocol/validator.mjs';
 
 export class LocalLanBridge {
@@ -68,6 +69,18 @@ export class LocalLanBridge {
     }
 
     this.inboundLog.push({ deviceId, type: event.type, eventId: event.eventId, warnings: validation.warnings });
+    if (event.type === 'device.pet_interacted' && ['long-press', 'button-long-press'].includes(event.interaction)) {
+      const choiceEvent = createChoiceEvent({
+        prompt: 'M5Stack から長押しされました。次のCodex作業を選んでください。',
+        choices: 'continue:進める,revise:修正する,hold:保留する'
+      });
+      const choiceValidation = validateEvent(choiceEvent, this.schemas);
+      if (choiceValidation.valid) {
+        const record = this.devices.get(deviceId);
+        record.device.receive(choiceEvent);
+        this.outboundLog.push({ deviceId, type: choiceEvent.type, eventId: choiceEvent.eventId, warnings: choiceValidation.warnings });
+      }
+    }
     return { ok: true, validation };
   }
 

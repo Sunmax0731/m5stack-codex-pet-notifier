@@ -875,6 +875,93 @@ input[type="range"] {
   background: #101828;
 }
 
+.pet-mood-mark {
+  position: absolute;
+  right: 4%;
+  top: 4%;
+  display: grid;
+  min-width: 18px;
+  min-height: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(8, 12, 20, 0.72);
+  color: #ffffff;
+  font-size: clamp(10px, calc(var(--pet-width, 84px) / 9), 24px);
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.preview-pet[data-mood="idle"] .pet-mood-mark {
+  display: none;
+}
+
+.preview-pet[data-mood="listening"] .pet-mood-mark::before {
+  content: ")))";
+}
+
+.preview-pet[data-mood="thinking"] .pet-mood-mark::before {
+  content: "...";
+}
+
+.preview-pet[data-mood="happy"] .pet-mood-mark::before {
+  content: ":)";
+}
+
+.preview-pet[data-mood="surprised"] .pet-mood-mark::before {
+  content: "!";
+  color: #facc15;
+}
+
+.preview-pet[data-mood="confused"] .pet-mood-mark::before {
+  content: "?";
+  color: #fb923c;
+}
+
+.preview-pet[data-mood="sleepy"] .pet-mood-mark::before {
+  content: "z";
+}
+
+.preview-pet[data-mood="worried"] .pet-mood-mark::before {
+  content: "...";
+  color: #67e8f9;
+}
+
+.preview-pet[data-mood="alert"] .pet-mood-mark::before {
+  content: "!";
+  color: #f87171;
+}
+
+.preview-pet[data-mood="proud"] .pet-mood-mark::before {
+  content: "*";
+  color: #86efac;
+}
+
+.sprite-fallback[data-mood="happy"] .pet-mouth,
+.sprite-fallback[data-mood="proud"] .pet-mouth {
+  height: 10%;
+  background: transparent;
+  border-bottom: max(2px, calc(var(--pet-width, 84px) / 28)) solid #101828;
+}
+
+.sprite-fallback[data-mood="surprised"] .pet-mouth {
+  left: 45%;
+  width: 10%;
+  height: 10%;
+  border-radius: 999px;
+}
+
+.sprite-fallback[data-mood="sleepy"] .pet-eye {
+  top: 45%;
+  height: 3%;
+  border-radius: 2px;
+}
+
+.sprite-fallback[data-mood="worried"] .pet-mouth,
+.sprite-fallback[data-mood="alert"] .pet-mouth {
+  transform: rotate(-12deg);
+}
+
 .preview-body {
   position: absolute;
   left: 12px;

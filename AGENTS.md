@@ -6,7 +6,7 @@
 
 - Root: `D:\AI\IoT\m5stack-codex-pet-notifier`
 - Source idea: `D:\AI\IoT\created_idea_018_m5stack-codex-pet-notifier`
-- Product surface: Host Bridge、JSON event contract、M5Stack device profile、simulator、sample telemetry、firmware scaffold、closed alpha release docs
+- Product surface: Host Bridge、JSON event contract、M5Stack device profile、simulator、sample telemetry、firmware、Dashboard、Windows installer、beta release docs
 
 ## Working Rules
 
@@ -24,4 +24,4 @@
 
 ## Release Boundary
 
-`v0.1.0-alpha.1` は Host Bridge mock、protocol validation、simulator、sample telemetry の closed alpha です。実機 firmware build / flash / Wi-Fi / touch / IMU はユーザー手動テストへ残します。
+`v0.2.0-beta.1` は Host Bridge、Dashboard、Codex relay、M5Stack firmware、pet mood / gesture interaction、Windows user-local installer を含む beta prerelease です。stable release ではないため、GRAY 実機、長時間運用、実 Codex App 内部 API 連携、ユーザー環境での installer 実行確認は手動テストへ残します。

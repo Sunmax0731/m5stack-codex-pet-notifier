@@ -1,11 +1,11 @@
 {
   "name": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.10",
+  "version": "0.2.0-beta.1",
   "private": false,
   "type": "module",
-  "description": "M5Stack Codex pet notifier closed alpha prototype",
+  "description": "M5Stack Codex pet notifier beta",
   "scripts": {
-    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/codex-session-smoke.mjs && node scripts/dashboard-smoke.mjs && node scripts/validate.mjs && node tools/closed-alpha-guard.mjs",
+    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/codex-session-smoke.mjs && node scripts/dashboard-smoke.mjs && node scripts/validate.mjs && node tools/release-guard.mjs",
     "validate": "node scripts/validate.mjs",
     "bridge:smoke": "node scripts/bridge-smoke.mjs",
     "dashboard:smoke": "node scripts/dashboard-smoke.mjs",
@@ -25,15 +25,16 @@
     "codex:hook": "node src/codex-adapter/hookRelay.mjs",
     "pet:asset": "python tools/generate-pet-firmware-asset.py",
     "firmware:upload:core2": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/upload-firmware.ps1 -Environment m5stack-core2",
+    "installer:package": "node tools/package-beta.mjs",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
-    "closed-alpha:guard": "node tools/closed-alpha-guard.mjs",
+    "release:guard": "node tools/release-guard.mjs",
     "demo": "node src/cli/index.mjs demo"
   },
   "keywords": [
     "IoT",
     "M5Stack",
     "Codex",
-    "closed-alpha",
+    "beta",
     "qcds"
   ],
   "license": "MIT"

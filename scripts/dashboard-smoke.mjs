@@ -68,6 +68,10 @@ try {
   assert.match(index, /rgba-picker-preview/);
   assert.match(index, /ペットX位置/);
   assert.match(index, /ペットY位置/);
+  assert.match(index, /<span data-i18n="petMood">表情<\/span>/);
+  assert.match(index, /<option value="surprised">surprised<\/option>/);
+  assert.match(index, /previewMoodReadout/);
+  assert.match(index, /previewInteractionReadout/);
   assert.match(index, /文字枠/);
   assert.match(index, /テキスト枠を表示/);
   assert.match(index, /Codex回答のビープ通知/);
@@ -110,6 +114,9 @@ try {
   assert.match(app, /textBackgroundRgba/);
   assert.match(app, /petOffsetX/);
   assert.match(app, /petOffsetY/);
+  assert.match(app, /petMood/);
+  assert.match(app, /latestPetInteraction/);
+  assert.match(app, /moodFromState/);
   assert.match(app, /textBorderEnabled/);
   assert.match(app, /textBorderRgba/);
   assert.match(app, /scheduleAutoDisplaySync/);
@@ -141,6 +148,8 @@ try {
   assert.match(css, /--screen-bg/);
   assert.match(css, /--pet-x/);
   assert.match(css, /--overlay-border/);
+  assert.match(css, /pet-mood-mark/);
+  assert.match(css, /\[data-mood="surprised"\]/);
   assert.match(css, /\.preview-stage/);
   assert.match(css, /\.preview-settings-dock/);
   assert.match(css, /\.preview-column/);
@@ -249,6 +258,7 @@ try {
     deviceId,
     name: 'Dashboard Pet',
     state: 'celebrate',
+    mood: 'proud',
     spriteRef: 'host://pet/dashboard',
     display: {
       petScale: 4,
@@ -261,6 +271,7 @@ try {
   });
   assert.equal(pet.ok, true);
   assert.equal(pet.event.type, 'pet.updated');
+  assert.equal(pet.event.pet.mood, 'proud');
   assert.equal(pet.event.display.petScale, 4);
   assert.equal(pet.event.display.petOffsetX, 28);
   assert.equal(pet.event.display.petOffsetY, -12);
@@ -311,6 +322,21 @@ try {
   });
   assert.equal(reply.ok, true);
 
+  const petInteraction = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
+    type: 'device.pet_interacted',
+    eventId: 'evt-dashboard-smoke-pet-interaction',
+    createdAt: '2026-05-09T00:00:30+09:00',
+    deviceId,
+    petId: 'Dashboard Pet',
+    interaction: 'double-tap',
+    gesture: 'double-tap',
+    target: 'pet',
+    screen: 'Idle',
+    page: 0,
+    mood: 'happy'
+  });
+  assert.equal(petInteraction.ok, true);
+
   const heartbeat = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
     type: 'device.heartbeat',
     eventId: 'evt-dashboard-smoke-heartbeat',
@@ -337,6 +363,13 @@ try {
       visualProbe: true,
       applyCount: 2,
       lastEventId: display.event.eventId
+    },
+    pet: {
+      name: 'Dashboard Pet',
+      state: 'celebrate',
+      mood: 'proud',
+      lastInteraction: 'double-tap',
+      interactionCount: 1
     }
   });
   assert.equal(heartbeat.ok, true);
@@ -345,8 +378,12 @@ try {
   const latestReply = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-reply');
   assert.equal(latestReply.details.choiceId, 'yes');
   assert.equal(latestReply.details.input, 'button-a');
+  const latestPetInteraction = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-pet-interaction');
+  assert.equal(latestPetInteraction.details.interaction, 'double-tap');
+  assert.equal(latestPetInteraction.details.mood, 'happy');
   const latestHeartbeat = events.inbound.find((entry) => entry.eventId === 'evt-dashboard-smoke-heartbeat');
   assert.equal(latestHeartbeat.details.display.petScale, 32);
+  assert.equal(latestHeartbeat.details.pet.mood, 'proud');
   assert.equal(latestHeartbeat.details.display.petOffsetX, -800);
   assert.deepEqual(latestHeartbeat.details.display.screenBackgroundRgba, { r: 2, g: 4, b: 8, a: 255 });
   const latestDisplayOutbound = events.outbound.find((entry) => entry.eventId === display.event.eventId);
@@ -404,6 +441,8 @@ try {
       displaySettingsSyncIndicator: true,
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
+      m5StackPreviewPetMood: true,
+      m5StackPreviewInteractionReadout: true,
       m5StackPreviewDeviceSwitch: true,
       m5StackPreviewFullWidthLayout: true,
       sideNavigation: true,

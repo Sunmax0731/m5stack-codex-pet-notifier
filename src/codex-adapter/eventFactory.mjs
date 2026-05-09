@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { moodFromPetState, normalizePetMood, normalizePetState } from '../core/pet-mood.mjs';
 
 const maxAnswerBodyLength = 4000;
 const maxNotificationBodyLength = 600;
@@ -61,6 +62,8 @@ export function createPetEvent(options = {}) {
   const display = options.display && typeof options.display === 'object'
     ? normalizeDisplaySettings(options.display)
     : null;
+  const state = normalizePetState(options.state ?? 'review', 'review');
+  const mood = normalizePetMood(options.mood, moodFromPetState(state));
   return {
     type: 'pet.updated',
     eventId: options.eventId ?? generatedId('evt-pet'),
@@ -68,7 +71,8 @@ export function createPetEvent(options = {}) {
     pet: {
       id: options.petId ?? 'codex-pet',
       name: options.name ?? 'Codex Pet',
-      state: options.state ?? 'review',
+      state,
+      mood,
       spriteRef: options.spriteRef ?? 'host://pet/codex-default',
       ...(options.fallbackState ? { fallbackState: options.fallbackState } : {})
     },

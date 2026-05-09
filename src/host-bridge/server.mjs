@@ -117,7 +117,33 @@ export class LanHostBridge {
       return { ok: false, reason: 'not-device-to-host-event' };
     }
     this.inboundLog.push({ deviceId, type: event.type, eventId: event.eventId, event });
-    return { ok: true, validation };
+    const sideEffect = event.type === 'device.pet_interacted'
+      ? this.handlePetInteraction(deviceId, event)
+      : null;
+    return { ok: true, validation, ...(sideEffect ? { sideEffect } : {}) };
+  }
+
+  handlePetInteraction(deviceId, event) {
+    if (!['long-press', 'button-long-press'].includes(event.interaction)) {
+      return null;
+    }
+    const choiceEvent = createChoiceEvent({
+      eventId: `evt-device-choice-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
+      prompt: 'M5Stack から長押しされました。次のCodex作業を選んでください。',
+      choices: [
+        { id: 'continue', label: '進める' },
+        { id: 'revise', label: '修正する' },
+        { id: 'hold', label: '保留する' }
+      ],
+      timeoutSec: 300
+    });
+    const result = this.publish(choiceEvent, { deviceId });
+    return {
+      type: 'prompt.choice_requested',
+      eventId: choiceEvent.eventId,
+      queued: result.queued ?? 0,
+      sourceInteraction: event.interaction
+    };
   }
 
   replaySamples(options = {}) {
@@ -659,7 +685,12 @@ function summarizeDeviceEvent(event) {
   if (event.type === 'device.pet_interacted') {
     return {
       petId: event.petId,
-      interaction: event.interaction
+      interaction: event.interaction,
+      gesture: event.gesture ?? null,
+      target: event.target ?? null,
+      screen: event.screen ?? null,
+      page: event.page ?? null,
+      mood: event.mood ?? null
     };
   }
   if (event.type === 'device.heartbeat') {
@@ -667,7 +698,8 @@ function summarizeDeviceEvent(event) {
       battery: event.battery ?? null,
       wifiRssi: event.wifiRssi ?? null,
       screen: event.screen ?? null,
-      display: event.display ?? null
+      display: event.display ?? null,
+      pet: event.pet ?? null
     };
   }
   return {};
@@ -680,8 +712,11 @@ function summarizeHostEvent(event) {
   if (event.type === 'display.settings_updated') {
     return { display: event.display ?? null };
   }
-  if (event.type === 'pet.updated' && event.display) {
-    return { display: event.display };
+  if (event.type === 'pet.updated') {
+    return {
+      pet: event.pet ?? null,
+      ...(event.display ? { display: event.display } : {})
+    };
   }
   return {};
 }

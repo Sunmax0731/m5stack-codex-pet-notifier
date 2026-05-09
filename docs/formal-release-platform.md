@@ -1,8 +1,8 @@
 # 正式リリース向けプラットフォーム整備
 
-## MVP Baseline
+## Beta Baseline
 
-`v0.1.0-alpha.10` 時点の MVP は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
+`v0.2.0-beta.1` 時点の platform baseline は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携、pet mood / gesture interaction、Windows user-local installer で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
 
 ## 追加済み Platform Capability
 
@@ -15,6 +15,8 @@
 | Click help hints | 実装済み | `?` icon と `data-tooltip` field hints |
 | Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal。環境構築 / デバッグ送信のtabとlocalhost限定のallowlist command実行を含む。sample replay はデバッグ送信tabへ統合 |
 | Background bridge runtime | 実装済み | `npm run bridge:start:bg`、`/debug/runtime`、sidebar runtime status |
+| Pet mood / gesture workflow | 実装済み | `pet.updated.pet.mood`、Core2 touch gesture、`device.pet_interacted`、long press -> `prompt.choice_requested` |
+| Windows installer / launcher | 実装済み | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` |
 
 ## Release Candidate Workstreams
 

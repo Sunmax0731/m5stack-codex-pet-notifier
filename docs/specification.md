@@ -48,14 +48,14 @@
 
 | Event | Direction | Required Fields |
 | --- | --- | --- |
-| `pet.updated` | Host -> Device | `eventId`, `pet.id`, `pet.name`, `pet.state`, `pet.spriteRef` |
+| `pet.updated` | Host -> Device | `eventId`, `pet.id`, `pet.name`, `pet.state`, `pet.mood`, `pet.spriteRef` |
 | `notification.created` | Host -> Device | `eventId`, `title`, `body`, `severity`, `createdAt` |
 | `answer.completed` | Host -> Device | `eventId`, `threadId`, `summary`, `body`, `createdAt` |
 | `prompt.choice_requested` | Host -> Device | `eventId`, `threadId`, `prompt`, `choices[]`, `timeoutSec` |
 | `display.settings_updated` | Host -> Device | `eventId`, `display.petScale`, `display.uiTextScale`, `display.bodyTextScale`, `display.animationFps`, `display.motionStepMs`, `display.screenBackgroundRgba`, `display.petBackgroundRgba`, `display.textColorRgba`, `display.textBackgroundRgba`, `display.petOffsetX`, `display.petOffsetY`, `display.textBorderEnabled`, `display.textBorderRgba`, `display.beepOnAnswer`, `display.visualProbe` |
 | `device.reply_selected` | Device -> Host | `eventId`, `requestEventId`, `choiceId`, `deviceId` |
-| `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `deviceId` |
-| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.beepOnAnswer`、`display.visualProbe`、`display.applyCount`、`display.lastEventId` |
+| `device.pet_interacted` | Device -> Host | `eventId`, `petId`, `interaction`, `gesture`, `target`, `screen`, `page`, `mood`, `deviceId` |
+| `device.heartbeat` | Device -> Host | `eventId`, `deviceId`, `battery`, `wifiRssi`, `screen`、任意の `display.petScale`、`display.petOffsetX/Y`、`display.*Rgba`、`display.beepOnAnswer`、`display.visualProbe`、`display.applyCount`、`display.lastEventId`、`pet.mood`、`pet.lastInteraction`、`pet.interactionCount` |
 
 ## 画面状態
 
@@ -73,8 +73,8 @@
 | Operation | Core2 | GRAY |
 | --- | --- | --- |
 | 選択 A/B/C | 下部 touch button または画面領域 | 物理 A/B/C |
-| pet 反応 | pet 領域 tap | B 長押しまたは IMU tap |
-| 回答スクロール | swipe up/down | A/C 上下、B 決定 |
+| pet 反応 | pet 領域 single tap / double tap / long press / swipe | B click / double click / 長押しまたは IMU tap |
+| 回答スクロール | swipe up/down/left/right | A/C 上下、B 決定 |
 | 戻る | 画面左上 tap または B 長押し | B 長押し |
 
 ## Codex Relay
@@ -126,6 +126,9 @@
 - `display.settings_updated.display.petOffsetX` と `petOffsetY` はそれぞれ `-1280..1280`、`-960..960` を受け付け、pet を画面外にはみ出す位置まで動かせる。
 - `display.settings_updated.display.textBorderEnabled` は boolean を受け付け、文字パネルと footer の枠線を切り替える。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
+- `pet.updated.pet.mood` は `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` を受け付け、`state` と独立して pet の表情または marker に反映する。未指定時は `state` から安全な fallback mood を導出する。
+- `device.pet_interacted.interaction` は `tap / double-tap / long-press / button-long-press / imu-tap / swipe-up / swipe-down / swipe-left / swipe-right` を扱う。`gesture`、`target`、`screen`、`page`、`mood` は Dashboard 診断と Codex workflow の context として保持する。
+- Host Bridge は `long-press` または `button-long-press` を受け取った場合、同じ device に `prompt.choice_requested` を queue し、M5Stack から Codex 側の次アクションを A/B/C で返せるようにする。
 - Dashboard は side menu、環境構築コマンド modal、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / GRAY 表示を確認できる。表示パラメータは `変更を自動送信` がonならデバウンス付きで実機へ送信し、offなら `表示設定を送信` button で手動送信する。プレビューは1ペインで全幅表示し、最近の Codex 回答とイベントログは左右ペインで維持する。各項目の説明は `?` icon click で開く help popover とし、theme は既定で OS に追従しつつ light / dark を手動選択できる。label は既定日本語で、English へ切り替えできる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。text background は screen background に暗黙同期せず、alpha `0` ではパネル塗りを行わず文字だけを描画する。pet fullscreen layout の Answer / Decision / Notification でも本文パネルを描画して、text panel の塗りを screen background へfallbackしない。
@@ -135,12 +138,12 @@
 - GRAY target は flash 余裕を優先し、同じ header が存在しても scale-specific frame は参照せず base frame 拡大へ fallback する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
-- `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` を受け付ける。
+- `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` と mood 互換値を受け付ける。
 - avatar は `max(animationFps 由来 interval, motionStepMs)` ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
-- `review`、`reacting`、`celebrate` は色または表情を変え、pet interaction 時は短時間 `reacting` として表示する。
+- `review`、`reacting`、`celebrate` は mood fallback を通じて色または表情を変え、pet interaction 時は短時間 `surprised`、`happy`、`thinking`、`confused` などの mood として表示する。
 
 ## 保存方針
 
 - device 保存: `deviceId`、host URL、pairing token、表示設定。
 - device 非保存: 通知本文、回答本文、返信本文、個人 pet sprite。
-- host 保存: closed alpha では event type、eventId、device event summary のみを release evidence に残す。公開 Codex adapter API を追加する場合は保存期間と削除手順を再定義する。
+- host 保存: beta では event type、eventId、device event summary、display / pet diagnostics のみを release evidence に残す。公開 Codex adapter API を追加する場合は保存期間と削除手順を再定義する。

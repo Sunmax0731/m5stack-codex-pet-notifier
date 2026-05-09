@@ -20,8 +20,26 @@ cmd.exe /d /s /c npm test
 - `platform runtime gate passed for m5stack-codex-pet-notifier`
 - `dashboard smoke passed`
 - `validated m5stack-codex-pet-notifier`
-- `closed alpha guard passed for m5stack-codex-pet-notifier`
+- `release guard passed for m5stack-codex-pet-notifier`
+- `release guard passed for m5stack-codex-pet-notifier`
 - `dist/validation-result.json` と `dist/m5stack-codex-pet-notifier-docs.zip` が生成される。
+
+## Windows Installer
+
+一般ユーザーは release asset の `m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip` を展開し、`installer\M5StackCodexPetNotifier-Setup.bat` をダブルクリックします。インストーラーは管理者権限を要求せず、次の user-local 設定だけを作成します。
+
+- Desktop shortcut: `M5Stack Codex Pet Notifier.lnk`
+- Start Menu shortcut: `M5Stack Codex Pet Notifier`
+- install manifest: `%LOCALAPPDATA%\M5StackCodexPetNotifier\install.json`
+
+shortcut は repo 内の `start-dashboard.bat` を起動します。`start-dashboard.bat` は hidden PowerShell launcher に処理を渡し、Host Bridge を background process として起動してから既定ブラウザで `http://127.0.0.1:8080/` を開きます。
+
+installer zip を開発環境で再生成する場合:
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run installer:package
+```
 
 ## Demo
 
@@ -33,7 +51,7 @@ cmd.exe /d /s /c npm run demo
 
 ## Firmware
 
-closed alpha では動作 firmware を同梱します。Core2 target は接続中のUSB serial portへ upload し、2.4GHz Wi-Fi、Host Bridge pairing、Codex relay answer 表示を確認対象にします。Windows の COM 番号は接続状況で変わるため、通常は `firmware:upload:core2` の自動検出を使います。
+beta では動作 firmware source と upload helper を同梱します。Core2 target は接続中のUSB serial portへ upload し、2.4GHz Wi-Fi、Host Bridge pairing、Codex relay answer 表示を確認対象にします。Windows の COM 番号は接続状況で変わるため、通常は `firmware:upload:core2` の自動検出を使います。
 
 Codex Pets の素材を表示する場合は、build / upload の前に hatch-pet package から local asset header を生成します。`firmware/include/pet_asset.local.h` は `.gitignore` 対象で、個人 pet sprite を release asset に含めません。既定では Core2 向けに scale `1..8` ごとの高解像度 frame も生成します。
 
@@ -91,7 +109,7 @@ http://127.0.0.1:8080/
 
 Dashboard では health、event log、Answer / Decision / Notification 送信、Decision 返信確認、最近の Codex session 回答表示と M5Stack 送信を GUI から実行できます。状態確認は sidebar に常時表示し、side menu はプレビュー、最近の回答、ログの作業領域を切り替えます。`M5Stack 表示プレビュー` では現在の hatch-pet キャラ、pet 表示面積 `1..32`、text size `1..8`、render FPS `4..20`、motion step `120..800ms` を送信前に確認できます。pet はプレビュー上でドラッグして X/Y 位置を調整し、位置リセットで `0,0` に戻せます。`変更を自動送信` がonの場合は表示パラメータ変更後に自動で実機へ送信され、offの場合は `表示設定を送信` で手動送信します。環境構築と debug command は sidebar の modal から確認し、タブ内のフォームでパラメータを変更して localhost から実行できます。sidebar には Bridge の foreground / background、pid、uptime が表示されます。
 
-Windows では repo root の `start-dashboard.bat` をダブルクリックすると、background Bridge 起動と Dashboard 表示をまとめて実行できます。Dashboard の送信フォームは `環境構築コマンド` modal に統合され、`M5Stack 表示プレビュー` から screen / pet / text / border RGBA、pet X/Y offset、text border 表示を送信できます。Dashboard は既定でOS themeに追従し、label は日本語/Englishを切り替えできます。
+Windows では repo root の `start-dashboard.bat` をダブルクリックすると、PowerShell 画面を残さず background Bridge 起動と Dashboard 表示をまとめて実行できます。Dashboard の送信フォームは `環境構築コマンド` modal に統合され、`M5Stack 表示プレビュー` から screen / pet / text / border RGBA、pet X/Y offset、text border 表示、pet mood を送信できます。Dashboard は既定でOS themeに追従し、label は日本語/Englishを切り替えできます。
 
 別の PowerShell で sample event を送信します。
 
@@ -110,7 +128,7 @@ cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
 cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
-cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate --mood proud
 cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff"
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any

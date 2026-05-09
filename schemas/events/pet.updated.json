@@ -15,7 +15,28 @@
         "name": { "type": "string", "minLength": 1 },
         "state": {
           "type": "string",
-          "enum": ["idle", "waiting", "running", "failed", "review", "reacting", "celebrate"]
+          "enum": [
+            "idle",
+            "waiting",
+            "running",
+            "failed",
+            "review",
+            "reacting",
+            "celebrate",
+            "listening",
+            "thinking",
+            "happy",
+            "surprised",
+            "confused",
+            "sleepy",
+            "worried",
+            "alert",
+            "proud"
+          ]
+        },
+        "mood": {
+          "type": "string",
+          "enum": ["idle", "listening", "thinking", "happy", "surprised", "confused", "sleepy", "worried", "alert", "proud"]
         },
         "spriteRef": { "type": "string", "minLength": 1 },
         "fallbackState": { "type": "string" }

@@ -71,6 +71,26 @@ try {
   });
   assert.equal(reply.ok, true);
 
+  const petInteraction = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`, {
+    type: 'device.pet_interacted',
+    eventId: 'evt-bridge-smoke-long-press',
+    createdAt: '2026-05-09T00:00:20+09:00',
+    deviceId,
+    petId: 'codex-pet',
+    interaction: 'long-press',
+    gesture: 'long-press',
+    target: 'pet',
+    screen: 'Idle',
+    page: 0,
+    mood: 'confused'
+  });
+  assert.equal(petInteraction.ok, true);
+  assert.equal(petInteraction.sideEffect.type, 'prompt.choice_requested');
+
+  const sideEffectChoice = await getJson(`${baseUrl}/device/poll?deviceId=${encodeURIComponent(deviceId)}&token=${encodeURIComponent(pair.token)}`);
+  assert.equal(sideEffectChoice.ok, true);
+  assert.equal(sideEffectChoice.event.type, 'prompt.choice_requested');
+
   const unauthorizedReply = await postJson(`${baseUrl}/device/event?deviceId=${encodeURIComponent(deviceId)}&token=wrong-token`, {
     type: 'device.reply_selected',
     eventId: 'evt-bridge-smoke-rejected-reply',
@@ -85,8 +105,8 @@ try {
 
   const health = await getJson(`${baseUrl}/health`);
   assert.equal(health.ok, true);
-  assert.equal(health.outboundEvents, 5);
-  assert.equal(health.inboundEvents, 1);
+  assert.equal(health.outboundEvents, 6);
+  assert.equal(health.inboundEvents, 2);
   assert.equal(health.securityRejections, 2);
   console.log('bridge smoke passed');
 } finally {

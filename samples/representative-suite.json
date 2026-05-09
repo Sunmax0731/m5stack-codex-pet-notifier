@@ -12,14 +12,14 @@
         { "sample": "answer-completed-event.json" },
         { "sample": "choice-request-event.json" }
       ],
-      "actions": ["scroll-down", "select-yes", "pet-interact", "heartbeat"],
+      "actions": ["scroll-down", "select-yes", "pet-interact", "pet-long-press", "heartbeat"],
       "expected": {
         "status": "passed",
         "validEvents": 5,
         "invalidEvents": 0,
         "warningCount": 1,
         "replyCount": 1,
-        "interactionCount": 1,
+        "interactionCount": 2,
         "heartbeatCount": 1,
         "unauthorizedRejected": 1,
         "finalScreen": "Choice",
@@ -75,7 +75,7 @@
         "invalidEvents": 0,
         "warningCount": 1,
         "interactionCount": 1,
-        "finalScreen": "Idle"
+        "finalScreen": "Choice"
       }
     },
     {

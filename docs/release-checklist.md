@@ -14,6 +14,8 @@
 - [x] Dashboard で最新 Codex session 回答を表示し M5Stack へ送る手順がある。
 - [x] Dashboard の M5Stack 表示プレビューから pet 表示倍率、text size、render FPS、motion step を変更する手順がある。
 - [x] 正式リリースへ向けた Codex decision request、`codex:decision:wait`、A/B/C 返信 workflow の手順がある。
+- [x] pet mood、Core2 gesture、long press から Choice request への workflow の手動確認手順がある。
+- [x] Windows installer、hidden dashboard launcher、installer package の手順がある。
 
 ## Implementation
 
@@ -42,6 +44,11 @@
 - [x] `display.settings_updated` が pet 表示面積を `1..32`、text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で扱える。
 - [x] firmware が hatch-pet local asset を優先表示し、未生成時は fallback avatar を表示できる。
 - [x] firmware が Core2 / GRAY target を分け、Wi-Fi / HTTP polling / screen state / input event を実装している。
+- [x] firmware、simulator、schema、Dashboard が pet mood を state と分けて扱える。
+- [x] Core2 touch gesture と GRAY button fallback を `device.pet_interacted` として返せる。
+- [x] Host Bridge が long press / button long press から `prompt.choice_requested` を同一 device に queue できる。
+- [x] `start-dashboard.bat` が hidden PowerShell launcher 経由で background Bridge と browser open を実行できる。
+- [x] Windows user-local installer が Desktop / Start Menu shortcut と install manifest を作成できる。
 
 ## Verification
 
@@ -62,12 +69,15 @@
 - [ ] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Sprite buffer により pet animation 中の画面全体、本文、footer のちらつきが抑えられていることを目視確認した。ユーザー手動。
+- [ ] Core2 実機で pet mood、single tap、double tap、long press、swipe、long press Choice request を目視確認した。ユーザー手動。
+- [ ] Windows 実環境で installer shortcut と hidden dashboard launcher を確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
 ## Distribution
 
 - [x] docs ZIP を生成する。
+- [x] beta installer ZIP を生成する。
 - [x] firmware build / upload 証跡を redacted JSON と manual docs に残す。
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。

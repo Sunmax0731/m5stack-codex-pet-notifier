@@ -27,4 +27,4 @@ if (releaseEvidence.releaseStatus === 'created') {
   assert(releaseEvidence.isPrereleasePlanned === true, 'pending release evidence must plan prerelease');
 }
 
-console.log(`closed alpha guard passed for ${productProfile.repo}`);
+console.log(`release guard passed for ${productProfile.repo}`);

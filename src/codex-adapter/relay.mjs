@@ -157,6 +157,7 @@ export async function buildEvent(command, args, options = {}) {
       petId: args['pet-id'] ?? args.petId,
       name: args.name,
       state: args.state,
+      mood: args.mood,
       spriteRef: args.sprite ?? args.spriteRef,
       fallbackState: args.fallback
     });
@@ -317,7 +318,7 @@ function buildHelp() {
     '  clipboard [--summary "..."]',
     '  notification --title "..." --text "..."',
     '  choice --prompt "..." --choices yes:Yes,no:No,other:Other',
-    '  pet --name "Codex Pet" --state review',
+    '  pet --name "Codex Pet" --state review --mood thinking',
     '  display --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true',
     '  decision --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" [--wait]',
     '  watch --file .\\dist\\codex-answer.txt',

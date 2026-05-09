@@ -55,7 +55,7 @@ http://127.0.0.1:8080/
 - command modal は `環境構築`、`デバッグ送信` のタブを持つ。重複していた保守タブは廃止し、sample replay はデバッグ送信tabへ統合されている。
 - command modal で Bridge background 起動 / 再起動、pet asset 生成、Core2 upload、Codex answer、ABC Decision、Notification、Display settings、Codex session、sample replay を任意パラメータで実行できる。実行結果は modal 下部の output に表示される。
 - command modal の実行 button は各 card 下部に一定高さで表示され、入力欄の量によって極端に縦長にならない。
-- `/health` の `version` が `0.1.0-alpha.10` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `bridge:start:bg -- --port=18081` で最新Bridgeを起動し、Dashboardが最新Bridge APIを自動検出していることを確認する。
+- `/health` の `version` が `0.2.0-beta.1` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `bridge:start:bg -- --port=18081` で最新Bridgeを起動し、Dashboardが最新Bridge APIを自動検出していることを確認する。
 - Bridge 再起動直後に `security` が増えても、数秒後に paired が `1` へ戻り、`/events` の security log に `token-rehydrated` が出れば既存実機 token の再取り込みは成功です。
 
 ## 2. M5Stack の pairing と状態確認
@@ -235,4 +235,4 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8080/device/poll?deviceId=m5stack-sampl
 
 - GRAY 実機 flash / IMU。
 - 長時間運用。
-- 実 Codex App 内部 API 連携。closed alpha では clipboard / stdin / file relay と Dashboard 操作を実 adapter として扱う。
+- 実 Codex App 内部 API 連携。beta では clipboard / stdin / file relay、Codex session watcher、Codex hook relay、Dashboard 操作を実 adapter として扱う。

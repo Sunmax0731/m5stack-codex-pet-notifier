@@ -1,4 +1,5 @@
 import { productProfile } from '../core/product-profile.mjs';
+import { moodFromPetState, normalizePetMood } from '../core/pet-mood.mjs';
 import { getDeviceProfile } from '../device-adapter/deviceProfiles.mjs';
 import { moveScroll, paginateAnswer } from '../protocol/scrollModel.mjs';
 
@@ -9,6 +10,9 @@ export class MockM5StackDevice {
     this.token = null;
     this.screen = 'Pairing';
     this.pet = null;
+    this.petMood = 'idle';
+    this.lastInteraction = 'none';
+    this.interactionCount = 0;
     this.unread = 0;
     this.answerPages = [];
     this.currentPage = 0;
@@ -46,6 +50,7 @@ export class MockM5StackDevice {
   receive(event) {
     if (event.type === 'pet.updated') {
       this.pet = event.pet;
+      this.petMood = normalizePetMood(event.pet?.mood, moodFromPetState(event.pet?.state));
       this.screen = 'Idle';
     }
     if (event.type === 'notification.created') {
@@ -84,15 +89,29 @@ export class MockM5StackDevice {
     };
   }
 
-  interactWithPet() {
-    const interaction = this.profile.touch ? 'touch' : 'button-long-press';
+  interactWithPet(options = {}) {
+    const interaction = options.interaction ?? (this.profile.touch ? 'tap' : 'button-long-press');
+    const gesture = options.gesture ?? (interaction === 'tap' ? 'single-tap' : interaction);
+    const target = options.target ?? (this.profile.touch ? 'pet' : 'button');
+    this.lastInteraction = interaction;
+    this.interactionCount += 1;
+    this.petMood = interaction.includes('long-press')
+      ? 'confused'
+      : interaction === 'double-tap'
+        ? 'happy'
+        : 'surprised';
     return {
       type: 'device.pet_interacted',
       eventId: 'evt-pet-interacted-001',
       createdAt: '2026-05-09T00:00:11+09:00',
       deviceId: this.deviceId,
       petId: this.pet?.id ?? 'fallback-pet',
-      interaction
+      interaction,
+      gesture,
+      target,
+      screen: this.screen,
+      page: this.currentPage,
+      mood: this.petMood
     };
   }
 
@@ -105,7 +124,14 @@ export class MockM5StackDevice {
       battery: 88,
       wifiRssi: -48,
       screen: this.screen,
-      display: this.displaySettings
+      display: this.displaySettings,
+      pet: {
+        name: this.pet?.name ?? 'fallback',
+        state: this.pet?.state ?? 'idle',
+        mood: this.petMood,
+        lastInteraction: this.lastInteraction,
+        interactionCount: this.interactionCount
+      }
     };
   }
 

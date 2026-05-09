@@ -1,10 +1,10 @@
 # m5stack-codex-pet-notifier
 
-M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使うための closed alpha prototype です。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack firmware は安定した JSON event contract だけを処理します。
+M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使うための beta 版プロダクトです。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack firmware は安定した JSON event contract だけを処理します。
 
 ## Status
 
-- Version: `0.1.0-alpha.10`
+- Version: `0.2.0-beta.1`
 - Domain: IoT
 - Idea No: 18
 - Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
@@ -30,6 +30,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
 - `display.settings_updated` は画面全体の背景、pet 背景、文字色、文字背景、文字枠、pet X/Y offset を受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
+- `pet.updated.pet.mood` で `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` の表情を指定できる。Core2 の tap / double tap / long press / swipe は `device.pet_interacted` として Host Bridge へ返り、long press は Codex 側の三択 request を自動 queue する。
 - Dashboard は side menu、サイドバー内の状態確認 section、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。色と透明度は項目ごとの1つの RGBA picker で操作し、現在色の swatch と `#hex / alpha` を同時に表示する。表示パラメータは `変更を自動送信` で実機へデバウンス送信できる。
 - Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
@@ -50,7 +51,7 @@ cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:decision -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する"
 cmd.exe /d /s /c npm run codex:decision:wait -- --question "次の作業を選んでください" --a "進める" --b "修正する" --c "保留する" --wait-ms 300000
-cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
+cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate --mood proud
 cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body-text-scale 2 --animation-fps 12 --motion-step-ms 280 --screen-bg "#050b14ff" --pet-bg "#050b14ff" --text-color "#ffffffff" --text-bg "#000000b2" --pet-offset-x 0 --pet-offset-y 0 --text-border-enabled false --text-border-color "#ffffffff" --beep-on-answer true
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
@@ -117,8 +118,8 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 - [competitive-benchmark.md](docs/competitive-benchmark.md)
 - [qcds-evaluation.md](docs/qcds-evaluation.md)
 - [formal-release-platform.md](docs/formal-release-platform.md)
-- [releases/v0.1.0-alpha.10.md](docs/releases/v0.1.0-alpha.10.md)
+- [releases/v0.2.0-beta.1.md](docs/releases/v0.2.0-beta.1.md)
 
-## Closed Alpha Boundary
+## Beta Boundary
 
-この release は simulator、mock device、LAN Host Bridge smoke、Codex relay smoke、Core2 firmware build / upload / Wi-Fi / pairing / Codex 返答表示を検証対象にした prerelease です。GRAY 実機、長時間運用、実 Codex App 内部 API 連携は対象外です。
+この release は simulator、mock device、LAN Host Bridge smoke、Codex relay smoke、Dashboard smoke、Core2 firmware build を検証対象にした beta prerelease です。Core2 実機の mood / gesture / long press choice workflow、GRAY 実機、長時間運用、署名付き installer、実 Codex App 内部 API 連携は手動確認対象です。

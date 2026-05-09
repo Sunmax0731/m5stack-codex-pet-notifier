@@ -4,5 +4,10 @@
   "createdAt": "2026-05-09T00:00:11+09:00",
   "deviceId": "m5stack-sample-001",
   "petId": "astral-mender-codex-pet",
-  "interaction": "touch"
+  "interaction": "tap",
+  "gesture": "single-tap",
+  "target": "pet",
+  "screen": "Idle",
+  "page": 0,
+  "mood": "surprised"
 }

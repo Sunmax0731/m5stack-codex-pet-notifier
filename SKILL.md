@@ -29,6 +29,6 @@ cmd.exe /d /s /c npm test
 
 ## Release
 
-- release notes は `docs/releases/v0.1.0-alpha.1.md` を本文に使う。
-- release asset は `dist/m5stack-codex-pet-notifier-docs.zip`、`docs/manual-test.md`、`docs/strict-manual-test-addendum.md` を必須にする。
+- beta release notes は `docs/releases/v0.2.0-beta.1.md` を本文に使う。
+- release asset は `dist/m5stack-codex-pet-notifier-docs.zip`、`dist/m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip`、`docs/manual-test.md`、`docs/strict-manual-test-addendum.md` を必須にする。
 - release 作成後に `docs/release-evidence.json` を更新し、`npm test` を再実行して docs ZIP を再生成してから asset を再アップロードする。

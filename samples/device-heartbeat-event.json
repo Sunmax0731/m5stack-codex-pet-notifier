@@ -23,5 +23,12 @@
     "beepOnAnswer": true,
     "visualProbe": false,
     "applyCount": 0
+  },
+  "pet": {
+    "name": "Astral Mender",
+    "state": "waiting",
+    "mood": "listening",
+    "lastInteraction": "tap",
+    "interactionCount": 1
   }
 }

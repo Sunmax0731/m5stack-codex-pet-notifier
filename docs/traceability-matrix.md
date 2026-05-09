@@ -24,7 +24,9 @@
 | 長文回答スクロール | `src/protocol/scrollModel.mjs` | `mixed-batch.scrollPages=2` |
 | 3択返信 | `prompt.choice_requested`、`device.reply_selected` | `happy-path.replyCount=1` |
 | Dashboard ABC workflow | `/codex/choice`、Dashboard inbound summary | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
-| pet interaction | `device.pet_interacted` | `happy-path.interactionCount=1`、`warning.interactionCount=1` |
+| pet mood / expression | `src/core/pet-mood.mjs`、`pet.updated.pet.mood`、`firmware/src/main.cpp` | `scripts/bridge-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`scripts/validate.mjs` |
+| pet interaction / gesture | `device.pet_interacted`、Core2 touch gesture、long press side effect | `happy-path.interactionCount=2`、`warning.interactionCount=1`、`npm run bridge:smoke` |
+| Windows installer / background launcher | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` | `npm run installer:package`、`scripts/validate.mjs`、`docs/manual-test.md` |
 | Core2 / GRAY profile | `src/device-adapter/deviceProfiles.mjs` | `profileCovered=true` |
 | sample telemetry | `samples/sample-telemetry.json` | `docs/platform-runtime-gate.json` |
 | security/privacy boundary | checklist、bridge token check | runtime gate `securityPrivacy=true` |

@@ -32,6 +32,19 @@
         "applyCount": { "type": "integer", "minimum": 0 },
         "lastEventId": { "type": "string" }
       }
+    },
+    "pet": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "state": { "type": "string" },
+        "mood": {
+          "type": "string",
+          "enum": ["idle", "listening", "thinking", "happy", "surprised", "confused", "sleepy", "worried", "alert", "proud"]
+        },
+        "lastInteraction": { "type": "string" },
+        "interactionCount": { "type": "integer", "minimum": 0 }
+      }
     }
   },
   "$defs": {

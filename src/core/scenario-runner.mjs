@@ -80,6 +80,16 @@ export function runScenario(scenario, options) {
         interactionCount += 1;
       }
     }
+    if (action === 'pet-long-press') {
+      const result = bridge.receiveDeviceEvent(device.deviceId, device.interactWithPet({
+        interaction: 'long-press',
+        gesture: 'long-press',
+        target: 'pet'
+      }), device.token);
+      if (result.ok) {
+        interactionCount += 1;
+      }
+    }
     if (action === 'heartbeat') {
       const result = bridge.receiveDeviceEvent(device.deviceId, device.heartbeat(), device.token);
       if (result.ok) {

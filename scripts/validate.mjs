@@ -37,6 +37,11 @@ for (const required of productProfile.requiredDocs) {
 for (const required of [
   'package.json',
   'start-dashboard.bat',
+  'tools/start-dashboard-hidden.ps1',
+  'installer/M5StackCodexPetNotifier-Setup.bat',
+  'installer/install-windows.ps1',
+  'tools/package-beta.mjs',
+  'tools/release-guard.mjs',
   'schemas/events/pet.updated.json',
   'schemas/events/display.settings_updated.json',
   'src/host-adapter/localLanBridge.mjs',
@@ -56,6 +61,7 @@ for (const required of [
   'tools/generate-pet-firmware-asset.py',
   'src/host-bridge/dashboard/index.html',
   'src/host-bridge/dashboard/app.js',
+  'src/host-bridge/dashboard/display-utils.js',
   'src/host-bridge/dashboard/styles.css',
   'firmware/src/main.cpp',
   'firmware/platformio.ini',
@@ -111,6 +117,13 @@ assert(firmwareSource.includes('displayApplyCount'), 'firmware heartbeat must ex
 assert(firmwareSource.includes('invalidatePetSprite()'), 'firmware must rebuild the pet sprite after display setting changes');
 assert(firmwareSource.includes('triggerDisplayProbe'), 'firmware must show a visible display apply probe for end-to-end sync diagnosis');
 assert(firmwareSource.includes('screenState == SCREEN_ERROR'), 'firmware display settings events must recover from transient error screen state');
+assert(firmwareSource.includes('petMood'), 'firmware must track pet mood separately from pet state');
+assert(firmwareSource.includes('renderedPetMood'), 'firmware must render mood-specific pet expressions');
+assert(firmwareSource.includes('drawMoodOverlayTo'), 'firmware must draw mood overlays for local hatch-pet assets');
+assert(firmwareSource.includes('sendPetInteraction("double-tap"'), 'firmware must publish double-tap pet interactions');
+assert(firmwareSource.includes('sendPetInteraction("long-press"'), 'firmware must publish long-press pet interactions');
+assert(firmwareSource.includes('wasFlicked'), 'firmware must publish swipe interactions from touch flicks');
+assert(firmwareSource.includes('writePetDiagnostics'), 'firmware heartbeat must report pet mood and interaction diagnostics');
 assert(firmwareSource.includes('parseRgbaString'), 'firmware must accept string RGBA settings as well as object RGBA settings');
 assert(!firmwareSource.includes('target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor())'), 'local hatch-pet transparent pixels must reveal the configured pet background instead of a fixed accent card');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
@@ -127,6 +140,7 @@ assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset g
 
 const eventFactorySource = fs.readFileSync('src/codex-adapter/eventFactory.mjs', 'utf8');
 assert(eventFactorySource.includes('normalizeDisplaySettings(options.display)'), 'pet.updated events must preserve optional display settings for device updates');
+assert(eventFactorySource.includes('normalizePetMood'), 'pet.updated events must normalize pet mood');
 assert(petAssetGeneratorSource.includes('Image.Resampling.LANCZOS'), 'pet asset generator must resample scale-specific frames from source cells');
 assert(petAssetGeneratorSource.includes('detect_frame_count'), 'pet asset generator must auto-detect non-empty animation frames');
 
@@ -141,8 +155,17 @@ assert(backgroundBridgeSource.includes('windowsHide: true'), 'background bridge 
 assert(backgroundBridgeSource.includes('detached: true'), 'background bridge launcher must detach the server process');
 assert(backgroundBridgeSource.includes('M5STACK_BRIDGE_BACKGROUND'), 'background bridge launcher must mark the child process as background mode');
 const dashboardBatchSource = fs.readFileSync('start-dashboard.bat', 'utf8');
-assert(dashboardBatchSource.includes('bridge:start:bg'), 'dashboard batch file must start the hidden background bridge');
-assert(dashboardBatchSource.includes('http://127.0.0.1:8080/'), 'dashboard batch file must open the local dashboard URL');
+assert(dashboardBatchSource.includes('start-dashboard-hidden.ps1'), 'dashboard batch file must hand off to the hidden dashboard launcher');
+const hiddenDashboardSource = fs.readFileSync('tools/start-dashboard-hidden.ps1', 'utf8');
+assert(hiddenDashboardSource.includes('WindowStyle Hidden'), 'hidden dashboard launcher must run the bridge start command without a visible PowerShell window');
+assert(hiddenDashboardSource.includes('bridge:start:bg'), 'hidden dashboard launcher must start the background bridge');
+assert(hiddenDashboardSource.includes('http://127.0.0.1:$Port/'), 'hidden dashboard launcher must open the local dashboard URL');
+const installerSource = fs.readFileSync('installer/install-windows.ps1', 'utf8');
+assert(installerSource.includes('WScript.Shell'), 'Windows installer must create user shortcuts');
+assert(installerSource.includes('DesktopDirectory'), 'Windows installer must create a desktop shortcut');
+assert(installerSource.includes('LOCALAPPDATA'), 'Windows installer must write a user-local install manifest');
+const installerPackageSource = fs.readFileSync('tools/package-beta.mjs', 'utf8');
+assert(installerPackageSource.includes('windows-installer.zip'), 'beta packaging must create a Windows installer zip asset');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
@@ -182,9 +205,12 @@ assert(bridgeSource.includes('firmware:upload:core2'), 'Host Bridge debug comman
 assert(bridgeSource.includes("runProcess('cmd.exe', ['/d', '/s', '/c', 'npm'"), 'Host Bridge must run npm GUI commands through cmd.exe on Windows to avoid npm.cmd spawn EINVAL');
 assert(bridgeSource.includes('try {') && bridgeSource.includes('message: error.message'), 'Host Bridge command execution must return spawn errors as JSON instead of crashing the route');
 assert(bridgeSource.includes('cmd-wrapper-v1'), 'Host Bridge runtime must expose the Windows-safe GUI command runner version');
+assert(bridgeSource.includes('handlePetInteraction'), 'Host Bridge must turn long-press pet interactions into Codex choice requests');
+assert(bridgeSource.includes('sourceInteraction'), 'Host Bridge side effects must identify the source pet interaction');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
+const dashboardDisplayUtilsSource = fs.readFileSync('src/host-bridge/dashboard/display-utils.js', 'utf8');
 assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
 assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side navigation');
 assert(!/class="side-link[^"]*"[^>]*data-section="statusSection"/.test(dashboardIndexSource), 'Dashboard side navigation must not keep a status button after the status panel moved into the sidebar');
@@ -207,6 +233,9 @@ assert(dashboardIndexSource.includes('visualProbe'), 'Dashboard must expose a vi
 assert(dashboardIndexSource.includes('displaySyncCard'), 'Dashboard must show whether display settings are reflected on the device');
 assert(dashboardIndexSource.includes('ペットX位置'), 'Dashboard must expose horizontal pet position controls in Japanese by default');
 assert(dashboardIndexSource.includes('ペットY位置'), 'Dashboard must expose vertical pet position controls in Japanese by default');
+assert(dashboardIndexSource.includes('petMood'), 'Dashboard must expose pet mood controls in Japanese by default');
+assert(dashboardIndexSource.includes('previewMoodReadout'), 'Dashboard preview must show the current pet mood');
+assert(dashboardIndexSource.includes('previewInteractionReadout'), 'Dashboard preview must show the latest M5Stack interaction');
 assert(dashboardIndexSource.includes('文字枠'), 'Dashboard must expose text border color controls in Japanese by default');
 assert(dashboardIndexSource.includes('テキスト枠を表示'), 'Dashboard must expose text border visibility controls');
 assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboard must expose answer beep controls');
@@ -224,6 +253,7 @@ assert(dashboardIndexSource.includes('commandModal'), 'Dashboard setup/debug com
 assert(dashboardIndexSource.includes('commandTabs'), 'Dashboard command modal must use tabs');
 assert(dashboardIndexSource.includes('runtimeState'), 'Dashboard sidebar must display bridge runtime status');
 assert(fs.readFileSync('src/host-bridge/dashboard/styles.css', 'utf8').includes('.sidebar-status-panel'), 'Dashboard must style the sidebar status section');
+assert(fs.readFileSync('src/host-bridge/dashboard/styles.css', 'utf8').includes('.pet-mood-mark'), 'Dashboard preview must style mood marks');
 assert(!dashboardIndexSource.includes('data-section="sendSection"'), 'Dashboard must merge the standalone sender section into the command modal');
 assert(dashboardIndexSource.includes('command-shared-settings'), 'Dashboard command modal must keep shared device settings without duplicate direct sender forms');
 assert(!dashboardIndexSource.includes('debug-send-block'), 'Dashboard command modal must not duplicate direct outbound sender forms');
@@ -243,6 +273,9 @@ assert(dashboardAppSource.includes('rgbaOverBlackCss(textBackground)'), 'Dashboa
 assert(dashboardAppSource.includes('wirePreviewPetDrag'), 'Dashboard preview must support drag-based pet positioning');
 assert(dashboardAppSource.includes('petOffsetX'), 'Dashboard must publish horizontal pet offset in display settings');
 assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertical pet offset in display settings');
+assert(dashboardAppSource.includes('petMood'), 'Dashboard must publish pet mood in pet update events');
+assert(dashboardAppSource.includes('latestPetInteraction'), 'Dashboard must surface the latest pet interaction in the preview');
+assert(dashboardAppSource.includes('moodFromState'), 'Dashboard must derive a safe fallback mood from pet state');
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');
 assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
@@ -252,6 +285,8 @@ assert(dashboardAppSource.includes('compareDisplaySettings'), 'Dashboard must co
 assert(dashboardAppSource.includes('displayTargetDeviceIds'), 'Dashboard must use paired device heartbeats for display sync when the debug device field is stale');
 assert(dashboardAppSource.includes('scheduleAutoDisplaySync'), 'Dashboard must debounce and auto-send display setting changes');
 assert(dashboardAppSource.includes('updateRgbaVisual'), 'Dashboard must update RGBA swatches when color or alpha changes');
+assert(dashboardDisplayUtilsSource.includes('export function rgbaFromControls'), 'Dashboard RGBA handling must live in the display utility module');
+assert(dashboardDisplayUtilsSource.includes('export function moodFromState'), 'Dashboard mood fallback handling must live in the display utility module');
 assert(dashboardAppSource.includes('display: displaySettingsPayload()'), 'Dashboard pet updates must carry the current display settings to the device');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');

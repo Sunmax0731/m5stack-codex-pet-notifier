@@ -11,7 +11,43 @@
     "petId": { "type": "string", "minLength": 1 },
     "interaction": {
       "type": "string",
-      "enum": ["touch", "button-long-press", "imu-tap"]
+      "enum": [
+        "touch",
+        "tap",
+        "double-tap",
+        "long-press",
+        "button-long-press",
+        "imu-tap",
+        "swipe-up",
+        "swipe-down",
+        "swipe-left",
+        "swipe-right"
+      ]
+    },
+    "gesture": {
+      "type": "string",
+      "enum": [
+        "touch",
+        "single-tap",
+        "double-tap",
+        "long-press",
+        "button-long-press",
+        "imu-tap",
+        "swipe-up",
+        "swipe-down",
+        "swipe-left",
+        "swipe-right"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "enum": ["screen", "pet", "footer", "answer", "choice", "button", "imu"]
+    },
+    "screen": { "type": "string", "minLength": 1 },
+    "page": { "type": "integer", "minimum": 0 },
+    "mood": {
+      "type": "string",
+      "enum": ["idle", "listening", "thinking", "happy", "surprised", "confused", "sleepy", "worried", "alert", "proud"]
     }
   }
 }

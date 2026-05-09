@@ -59,11 +59,14 @@ constexpr int DISPLAY_SCALE_MIN = 1;
 constexpr int DISPLAY_SCALE_FULLSCREEN = 8;
 constexpr int DISPLAY_SCALE_MAX = 32;
 constexpr int MIN_PET_SURFACE_HEIGHT = 52;
+constexpr uint32_t PET_SLEEPY_AFTER_MS = 120000;
+constexpr uint32_t TOUCH_EVENT_DEBOUNCE_MS = 140;
 
 String authToken;
 ScreenState screenState = SCREEN_PAIRING;
 String petName = "Codex Pet";
 String petState = "idle";
+String petMood = "idle";
 String title = "";
 String body = "";
 String summary = "";
@@ -84,6 +87,9 @@ uint32_t lastTouchEvent = 0;
 uint32_t lastPetFrame = 0;
 uint32_t lastPetMotionStep = 0;
 uint32_t petReactUntil = 0;
+uint32_t lastHostEventAt = 0;
+String lastInteraction = "none";
+uint32_t interactionCount = 0;
 int petDisplayScale = 2;
 int uiTextScale = 1;
 int bodyTextScale = 1;
@@ -118,7 +124,7 @@ int petSpriteWidth = 0;
 int petSpriteHeight = 0;
 
 void pollHost();
-void sendPetInteraction(const char* interaction);
+void sendPetInteraction(const char* interaction, const char* gesture = nullptr, const char* target = nullptr);
 int pageCount(const String& value, int charsPerPage);
 int footerTop();
 int bodyLineHeight();
@@ -240,6 +246,79 @@ void applyTextColors() {
     // M5GFX skips glyph background fill when foreground and background match.
     M5.Display.setTextColor(foreground, foreground);
   }
+}
+
+bool petMoodEquals(const char* value) {
+  return petMood == value;
+}
+
+String moodFromState(const String& state) {
+  if (state == "waiting") {
+    return "listening";
+  }
+  if (state == "running") {
+    return "thinking";
+  }
+  if (state == "failed") {
+    return "alert";
+  }
+  if (state == "review") {
+    return "confused";
+  }
+  if (state == "reacting") {
+    return "happy";
+  }
+  if (state == "celebrate") {
+    return "proud";
+  }
+  if (
+    state == "listening" ||
+    state == "thinking" ||
+    state == "happy" ||
+    state == "surprised" ||
+    state == "confused" ||
+    state == "sleepy" ||
+    state == "worried" ||
+    state == "alert" ||
+    state == "proud"
+  ) {
+    return state;
+  }
+  return "idle";
+}
+
+String normalizePetMood(const String& value, const String& fallback = "idle") {
+  if (
+    value == "idle" ||
+    value == "listening" ||
+    value == "thinking" ||
+    value == "happy" ||
+    value == "surprised" ||
+    value == "confused" ||
+    value == "sleepy" ||
+    value == "worried" ||
+    value == "alert" ||
+    value == "proud"
+  ) {
+    return value;
+  }
+  return fallback;
+}
+
+String renderedPetMood() {
+  if (screenState == SCREEN_ERROR) {
+    return "alert";
+  }
+  if (WiFi.status() != WL_CONNECTED && screenState != SCREEN_PAIRING) {
+    return "worried";
+  }
+  if (petReactUntil && millis() < petReactUntil) {
+    return petMood.length() ? petMood : "happy";
+  }
+  if (lastHostEventAt && screenState == SCREEN_IDLE && millis() - lastHostEventAt > PET_SLEEPY_AFTER_MS) {
+    return "sleepy";
+  }
+  return normalizePetMood(petMood, moodFromState(petState));
 }
 
 uint8_t readColorChannel(JsonVariant source, const char* key, uint8_t fallback) {
@@ -380,6 +459,14 @@ void writeDisplayDiagnostics(JsonObject target) {
   writeRgba(target["textColorRgba"].to<JsonObject>(), textColorRgba);
   writeRgba(target["textBackgroundRgba"].to<JsonObject>(), textBackgroundRgba);
   writeRgba(target["textBorderRgba"].to<JsonObject>(), textBorderRgba);
+}
+
+void writePetDiagnostics(JsonObject target) {
+  target["name"] = petName;
+  target["state"] = petState;
+  target["mood"] = renderedPetMood();
+  target["lastInteraction"] = lastInteraction;
+  target["interactionCount"] = interactionCount;
 }
 
 uint32_t petAnimationIntervalMs() {
@@ -747,15 +834,21 @@ String renderedPetState() {
 }
 
 uint16_t petAccentColor() {
-  const String state = renderedPetState();
-  if (state == "review") {
+  const String mood = renderedPetMood();
+  if (mood == "thinking" || mood == "confused") {
     return TFT_ORANGE;
   }
-  if (state == "reacting") {
+  if (mood == "listening" || mood == "surprised") {
     return TFT_CYAN;
   }
-  if (state == "celebrate") {
+  if (mood == "happy" || mood == "proud") {
     return TFT_GREEN;
+  }
+  if (mood == "worried" || mood == "alert") {
+    return TFT_RED;
+  }
+  if (mood == "sleepy") {
+    return rgb565(116, 124, 150);
   }
   return TFT_SKYBLUE;
 }
@@ -843,10 +936,62 @@ void drawLocalPetAsset(int x, int y, int scale) {
 }
 
 template <typename Target>
+void drawMoodOverlayTo(Target& target, int x, int y, int width, int height) {
+  const String mood = renderedPetMood();
+  const int marker = max(4, min(width, height) / 10);
+  const int cx = x + width - marker * 2;
+  const int cy = y + marker * 2;
+  if (mood == "listening") {
+    target.drawCircle(cx, cy, marker, TFT_CYAN);
+    target.drawCircle(cx, cy, marker * 2, TFT_CYAN);
+    return;
+  }
+  if (mood == "thinking") {
+    target.fillCircle(cx - marker, cy, marker / 2 + 1, TFT_WHITE);
+    target.fillCircle(cx + marker / 2, cy - marker, marker / 2 + 1, TFT_WHITE);
+    target.fillCircle(cx + marker * 2, cy - marker * 2, marker / 2 + 1, TFT_WHITE);
+    return;
+  }
+  if (mood == "happy" || mood == "proud") {
+    target.fillTriangle(cx, cy - marker, cx - marker, cy + marker, cx + marker, cy + marker, TFT_GREEN);
+    target.drawLine(cx - marker, cy, cx + marker, cy, TFT_WHITE);
+    target.drawLine(cx, cy - marker, cx, cy + marker, TFT_WHITE);
+    return;
+  }
+  if (mood == "surprised") {
+    target.fillCircle(cx, cy, marker, TFT_YELLOW);
+    target.fillCircle(cx, cy, max(1, marker / 3), TFT_BLACK);
+    return;
+  }
+  if (mood == "confused") {
+    target.drawCircle(cx - marker / 2, cy - marker / 2, marker / 2, TFT_ORANGE);
+    target.drawLine(cx, cy, cx + marker, cy + marker, TFT_ORANGE);
+    target.fillCircle(cx + marker, cy + marker, max(1, marker / 4), TFT_ORANGE);
+    return;
+  }
+  if (mood == "sleepy") {
+    target.drawLine(cx - marker, cy - marker, cx + marker, cy - marker, TFT_WHITE);
+    target.drawLine(cx - marker, cy, cx + marker / 2, cy, TFT_WHITE);
+    target.drawLine(cx - marker, cy + marker, cx, cy + marker, TFT_WHITE);
+    return;
+  }
+  if (mood == "worried") {
+    target.fillTriangle(cx, cy - marker, cx - marker, cy + marker, cx + marker, cy + marker, TFT_CYAN);
+    return;
+  }
+  if (mood == "alert") {
+    target.fillTriangle(cx, cy - marker, cx - marker, cy + marker, cx + marker, cy + marker, TFT_RED);
+    target.drawFastVLine(cx, cy - marker / 2, marker, TFT_WHITE);
+    target.fillCircle(cx, cy + marker / 2, max(1, marker / 4), TFT_WHITE);
+  }
+}
+
+template <typename Target>
 void drawVectorPetAvatarTo(Target& target, int x, int y) {
   const int bounce = (petFrame % 4 == 1) ? -2 : ((petFrame % 4 == 3) ? 1 : 0);
   const bool blink = petFrame % 10 == 0;
   const String state = renderedPetState();
+  const String mood = renderedPetMood();
   const uint16_t accent = petAccentColor();
   const uint16_t shadow = TFT_DARKGREY;
   const int s = petPixelScale();
@@ -861,7 +1006,15 @@ void drawVectorPetAvatarTo(Target& target, int x, int y) {
   const int tail = petFrame % 6 < 3 ? 0 : 3;
   target.fillCircle(x + (50 + tail) * s, bodyY + 23 * s, 4 * s, accent);
 
-  if (blink) {
+  if (mood == "sleepy") {
+    target.drawFastHLine(x + 18 * s, bodyY + 18 * s, 7 * s, TFT_BLACK);
+    target.drawFastHLine(x + 32 * s, bodyY + 18 * s, 7 * s, TFT_BLACK);
+  } else if (mood == "surprised" || mood == "alert") {
+    target.fillCircle(x + 21 * s, bodyY + 18 * s, 4 * s, TFT_BLACK);
+    target.fillCircle(x + 35 * s, bodyY + 18 * s, 4 * s, TFT_BLACK);
+    target.fillCircle(x + 22 * s, bodyY + 17 * s, s, TFT_WHITE);
+    target.fillCircle(x + 36 * s, bodyY + 17 * s, s, TFT_WHITE);
+  } else if (blink) {
     target.drawFastHLine(x + 18 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
     target.drawFastHLine(x + 32 * s, bodyY + 18 * s, 6 * s, TFT_BLACK);
   } else {
@@ -869,14 +1022,22 @@ void drawVectorPetAvatarTo(Target& target, int x, int y) {
     target.fillCircle(x + 35 * s, bodyY + 18 * s, 3 * s, TFT_BLACK);
   }
 
-  if (state == "reacting" || state == "celebrate") {
+  if (mood == "happy" || mood == "proud" || state == "reacting" || state == "celebrate") {
     target.drawArc(x + 28 * s, bodyY + 23 * s, 8 * s, 5 * s, 15, 165, TFT_BLACK);
-  } else if (state == "review") {
+  } else if (mood == "surprised") {
+    target.drawCircle(x + 29 * s, bodyY + 25 * s, 3 * s, TFT_BLACK);
+  } else if (mood == "worried" || mood == "alert") {
+    target.drawLine(x + 24 * s, bodyY + 27 * s, x + 34 * s, bodyY + 24 * s, TFT_BLACK);
+  } else if (mood == "confused" || state == "review") {
     target.drawFastHLine(x + 24 * s, bodyY + 26 * s, 10 * s, TFT_BLACK);
+    target.drawFastHLine(x + 35 * s, bodyY + 24 * s, 3 * s, TFT_BLACK);
+  } else if (mood == "sleepy") {
+    target.drawFastHLine(x + 24 * s, bodyY + 25 * s, 10 * s, TFT_BLACK);
   } else {
     target.fillRect(x + 27 * s, bodyY + 26 * s, s, s, TFT_BLACK);
     target.fillRect(x + 28 * s, bodyY + 26 * s, s, s, TFT_BLACK);
   }
+  drawMoodOverlayTo(target, x, y, petBoxWidth(), petBoxHeight());
 }
 
 void drawVectorPetAvatar(int x, int y) {
@@ -890,6 +1051,7 @@ void drawPetAvatarTo(Target& target, int x, int y) {
   const int s = petAssetRenderScale();
   const int inset = (petBoxPadding() / 2) * s;
   drawLocalPetAssetTo(target, x + inset, y + inset + bounce * s, s);
+  drawMoodOverlayTo(target, x, y, petBoxWidth(), petBoxHeight());
 #else
   drawVectorPetAvatarTo(target, x, y);
 #endif
@@ -1176,6 +1338,7 @@ bool pairDevice() {
   }
   authToken = String(reply["token"] | "");
   screenState = SCREEN_IDLE;
+  petMood = "idle";
   markDraw();
   Serial.printf("pair_ok device=%s\n", DEVICE_ID);
   return true;
@@ -1184,6 +1347,7 @@ bool pairDevice() {
 void setError(const String& message) {
   lastError = message;
   screenState = SCREEN_ERROR;
+  petMood = "alert";
   markDraw();
   Serial.printf("device_error %s\n", message.c_str());
 }
@@ -1209,6 +1373,7 @@ void sendHeartbeat() {
   doc["wifiRssi"] = WiFi.RSSI();
   doc["screen"] = screenName();
   writeDisplayDiagnostics(doc["display"].to<JsonObject>());
+  writePetDiagnostics(doc["pet"].to<JsonObject>());
   sendDeviceEvent(doc);
 }
 
@@ -1265,14 +1430,30 @@ void handleFooterTouch(int x) {
   if (index == 0) {
     pollHost();
   } else if (index == 1) {
-    sendPetInteraction("touch");
+    sendPetInteraction("tap", "single-tap", "footer");
   } else {
     screenState = SCREEN_IDLE;
     markDraw();
   }
 }
 
-void sendPetInteraction(const char* interaction) {
+const char* currentTouchTarget(int x, int y) {
+  if (y >= footerTop()) {
+    return "footer";
+  }
+  if (screenState == SCREEN_CHOICE) {
+    return "choice";
+  }
+  if (screenState == SCREEN_ANSWER) {
+    return "answer";
+  }
+  if (y < headerHeight()) {
+    return "pet";
+  }
+  return "screen";
+}
+
+void sendPetInteraction(const char* interaction, const char* gesture, const char* target) {
   JsonDocument doc;
   doc["type"] = "device.pet_interacted";
   doc["eventId"] = String("evt-pet-interacted-") + millis();
@@ -1280,8 +1461,26 @@ void sendPetInteraction(const char* interaction) {
   doc["deviceId"] = DEVICE_ID;
   doc["petId"] = petName.length() ? petName : "fallback-pet";
   doc["interaction"] = interaction;
+  doc["gesture"] = gesture ? gesture : interaction;
+  doc["target"] = target ? target : "pet";
+  doc["screen"] = screenName();
+  doc["page"] = answerPage;
+  doc["mood"] = renderedPetMood();
   sendDeviceEvent(doc);
-  petState = "reacting";
+  lastInteraction = interaction;
+  interactionCount += 1;
+  if (String(interaction) == "long-press" || String(interaction) == "button-long-press") {
+    petMood = "confused";
+  } else if (String(interaction) == "double-tap") {
+    petMood = "happy";
+    if (body.length()) {
+      screenState = SCREEN_ANSWER;
+    }
+  } else if (String(interaction).startsWith("swipe")) {
+    petMood = "thinking";
+  } else {
+    petMood = "surprised";
+  }
   petReactUntil = millis() + 2500;
   markDraw();
 }
@@ -1295,11 +1494,13 @@ void notifyAnswerBeep() {
 
 void handleHostEvent(JsonVariant event) {
   const String type = event["type"] | "";
+  lastHostEventAt = millis();
   Serial.printf("host_event type=%s\n", type.c_str());
 
   if (type == "pet.updated") {
     petName = String(event["pet"]["name"] | "Codex Pet");
     petState = String(event["pet"]["state"] | "idle");
+    petMood = normalizePetMood(String(event["pet"]["mood"] | ""), moodFromState(petState));
     title = "Pet updated";
     body = String(event["pet"]["spriteRef"] | "fallback");
     if (applyDisplaySettings(event["display"])) {
@@ -1312,16 +1513,19 @@ void handleHostEvent(JsonVariant event) {
   } else if (type == "notification.created") {
     title = String(event["title"] | "Notification");
     body = String(event["body"] | "");
+    petMood = "surprised";
     unreadCount += 1;
     screenState = SCREEN_NOTIFICATION;
   } else if (type == "answer.completed") {
     summary = String(event["summary"] | "Answer completed");
     body = String(event["body"] | "");
+    petMood = "happy";
     answerPage = 0;
     screenState = SCREEN_ANSWER;
     notifyAnswerBeep();
   } else if (type == "prompt.choice_requested") {
     title = String(event["prompt"] | "Choose");
+    petMood = "confused";
     currentRequestEventId = String(event["eventId"] | "");
     choiceCount = 0;
     JsonArray choices = event["choices"].as<JsonArray>();
@@ -1343,10 +1547,12 @@ void handleHostEvent(JsonVariant event) {
     }
     if (screenState == SCREEN_ERROR) {
       lastError = "";
+      petMood = moodFromState(petState);
       screenState = SCREEN_IDLE;
     }
   } else {
     lastError = String("unknown event: ") + type;
+    petMood = "alert";
     screenState = SCREEN_ERROR;
   }
   markDraw();
@@ -1372,6 +1578,7 @@ void pollHost() {
       Serial.printf("pairing_token_reset reason=%s\n", reason.c_str());
       authToken = "";
       screenState = SCREEN_PAIRING;
+      petMood = "listening";
       markDraw();
       return;
     }
@@ -1423,6 +1630,7 @@ void connectWifi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   screenState = SCREEN_PAIRING;
+  petMood = "listening";
   markDraw();
   Serial.printf("wifi_connecting ssid=%s\n", WIFI_SSID);
 
@@ -1435,8 +1643,10 @@ void connectWifi() {
   Serial.println();
 
   if (WiFi.status() == WL_CONNECTED) {
+    petMood = "idle";
     Serial.printf("wifi_connected ip=%s rssi=%d host=%s:%u\n", WiFi.localIP().toString().c_str(), WiFi.RSSI(), HOST_BRIDGE_HOST, HOST_BRIDGE_PORT);
   } else {
+    petMood = "worried";
     Serial.printf("wifi_failed status=%d\n", WiFi.status());
     printWifiScanHints();
     setError("Wi-Fi failed");
@@ -1461,8 +1671,6 @@ void handleButtons() {
     } else if (screenState == SCREEN_ANSWER) {
       screenState = SCREEN_IDLE;
       markDraw();
-    } else {
-      sendPetInteraction(profile.touch ? "touch" : "button-long-press");
     }
   }
 
@@ -1478,8 +1686,16 @@ void handleButtons() {
     }
   }
 
-  if (!profile.touch && M5.BtnB.wasHold()) {
-    sendPetInteraction("button-long-press");
+  if (screenState != SCREEN_CHOICE && screenState != SCREEN_ANSWER && M5.BtnB.wasClicked()) {
+    if (M5.BtnB.getClickCount() >= 2) {
+      sendPetInteraction("double-tap", "double-tap", "button");
+    } else {
+      sendPetInteraction("tap", "single-tap", "button");
+    }
+  }
+
+  if (screenState != SCREEN_CHOICE && screenState != SCREEN_ANSWER && M5.BtnB.wasHold()) {
+    sendPetInteraction(profile.touch ? "long-press" : "button-long-press", "long-press", "button");
   }
 }
 
@@ -1488,24 +1704,50 @@ void handleTouch() {
     return;
   }
   auto detail = M5.Touch.getDetail();
-  if (detail.wasReleased() && millis() - lastTouchEvent > 600) {
+  if (millis() - lastTouchEvent <= TOUCH_EVENT_DEBOUNCE_MS) {
+    return;
+  }
+
+  if (detail.wasHold()) {
     lastTouchEvent = millis();
+    sendPetInteraction("long-press", "long-press", currentTouchTarget(detail.x, detail.y));
+    return;
+  }
+
+  if (detail.wasFlicked()) {
+    lastTouchEvent = millis();
+    const int dx = detail.distanceX();
+    const int dy = detail.distanceY();
+    const char* interaction = abs(dx) > abs(dy)
+      ? (dx < 0 ? "swipe-left" : "swipe-right")
+      : (dy < 0 ? "swipe-up" : "swipe-down");
+    if (screenState == SCREEN_ANSWER) {
+      if (String(interaction) == "swipe-up" || String(interaction) == "swipe-left") {
+        answerPage = min(pageCount(body, answerCharsPerPage()) - 1, answerPage + 1);
+      } else {
+        answerPage = max(0, answerPage - 1);
+      }
+      Serial.printf("touch_answer_swipe interaction=%s page=%d\n", interaction, answerPage);
+    }
+    sendPetInteraction(interaction, interaction, currentTouchTarget(detail.x, detail.y));
+    return;
+  }
+
+  if (detail.wasClicked()) {
+    lastTouchEvent = millis();
+    const char* target = currentTouchTarget(detail.x, detail.y);
     if (detail.y >= footerTop()) {
       handleFooterTouch(detail.x);
     } else if (screenState == SCREEN_CHOICE && detail.y >= contentTop() + BODY_LINE_HEIGHT * uiTextScale * 3) {
       const int row = min(choiceCount - 1, max(0, (detail.y - (contentTop() + BODY_LINE_HEIGHT * uiTextScale * 3)) / (24 * uiTextScale)));
       Serial.printf("touch_choice_row index=%d\n", row);
       sendReply(row, "touch-row");
-    } else if (screenState == SCREEN_ANSWER && abs(detail.deltaY()) > 20) {
-      if (detail.deltaY() < 0) {
-        answerPage = min(pageCount(body, answerCharsPerPage()) - 1, answerPage + 1);
-      } else {
-        answerPage = max(0, answerPage - 1);
-      }
-      Serial.printf("touch_answer_swipe page=%d\n", answerPage);
-      markDraw();
+    } else if (detail.getClickCount() >= 2) {
+      sendPetInteraction("double-tap", "double-tap", target);
     } else if (detail.y < headerHeight()) {
-      sendPetInteraction("touch");
+      sendPetInteraction("tap", "single-tap", "pet");
+    } else {
+      sendPetInteraction("tap", "single-tap", target);
     }
   }
 }
@@ -1519,9 +1761,12 @@ void updatePetAnimation() {
     petFrame = (petFrame + 1) % 30;
     markPetDraw();
   }
-  if (petReactUntil && millis() > petReactUntil && petState == "reacting") {
+  if (petReactUntil && millis() > petReactUntil) {
     petReactUntil = 0;
-    petState = "idle";
+    if (petState == "reacting") {
+      petState = "idle";
+    }
+    petMood = moodFromState(petState);
     markDraw();
   }
 }

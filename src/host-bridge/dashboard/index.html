@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja" data-version="0.1.0-alpha.10">
+<html lang="ja" data-version="0.2.0-beta.1">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -128,6 +128,7 @@
                         <span class="pet-eye left"></span>
                         <span class="pet-eye right"></span>
                         <span class="pet-mouth"></span>
+                        <span class="pet-mood-mark" aria-hidden="true"></span>
                       </div>
                       <div id="previewBody" class="preview-body">Pet only preview</div>
                       <div id="previewFooter" class="preview-footer">
@@ -144,6 +145,8 @@
                     <div class="readout-row"><span data-i18n="readoutBodyText">本文文字</span><strong id="previewBodyReadout">1/8</strong></div>
                     <div class="readout-row"><span data-i18n="readoutRender">描画</span><strong id="previewFpsReadout">12 fps</strong></div>
                     <div class="readout-row"><span data-i18n="readoutMotion">動き</span><strong id="previewMotionReadout">280 ms</strong></div>
+                    <div class="readout-row"><span data-i18n="readoutMood">表情</span><strong id="previewMoodReadout">idle</strong></div>
+                    <div class="readout-row"><span data-i18n="readoutInteraction">操作</span><strong id="previewInteractionReadout">-</strong></div>
                     <div id="displaySyncCard" class="display-sync-card sync-idle" role="status" aria-live="polite">
                       <div class="display-sync-heading">
                         <span data-i18n="displaySyncHeading">実機反映</span>
@@ -201,9 +204,27 @@
                         <span data-i18n="petState">状態</span>
                         <select id="petState">
                           <option value="idle">idle</option>
+                          <option value="waiting">waiting</option>
+                          <option value="running">running</option>
+                          <option value="failed">failed</option>
                           <option value="review">review</option>
                           <option value="reacting">reacting</option>
                           <option value="celebrate">celebrate</option>
+                        </select>
+                      </label>
+                      <label class="field hint" data-tooltip="petの表情です。stateと独立してM5Stack上の表示ニュアンスに使います。">
+                        <span data-i18n="petMood">表情</span>
+                        <select id="petMood">
+                          <option value="idle">idle</option>
+                          <option value="listening">listening</option>
+                          <option value="thinking">thinking</option>
+                          <option value="happy">happy</option>
+                          <option value="surprised">surprised</option>
+                          <option value="confused">confused</option>
+                          <option value="sleepy">sleepy</option>
+                          <option value="worried">worried</option>
+                          <option value="alert">alert</option>
+                          <option value="proud">proud</option>
                         </select>
                       </label>
                     </div>

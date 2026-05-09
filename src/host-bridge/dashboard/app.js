@@ -1,3 +1,11 @@
+import {
+  moodFromState,
+  rgbaCss,
+  rgbaFromControls,
+  rgbaOverBlackCss,
+  updateRgbaVisual
+} from './display-utils.js';
+
 const state = {
   health: null,
   events: null,
@@ -22,7 +30,7 @@ const state = {
   themeMode: localStorage.getItem('m5pet-theme') || 'system'
 };
 
-const expectedVersion = document.documentElement.dataset.version || '0.1.0-alpha.10';
+const expectedVersion = document.documentElement.dataset.version || '0.2.0-beta.1';
 const compatibleCommandRunners = new Set(['cmd-wrapper-v1', 'direct-npm-v1']);
 const displaySyncFields = [
   'petScale',
@@ -68,6 +76,7 @@ const elements = {
   sessionUser: $('#sessionUser'),
   petName: $('#petName'),
   petState: $('#petState'),
+  petMood: $('#petMood'),
   petSprite: $('#petSprite'),
   petPackage: $('#petPackage'),
   petPackagePath: $('#petPackagePath'),
@@ -127,6 +136,8 @@ const elements = {
   previewBodyReadout: $('#previewBodyReadout'),
   previewFpsReadout: $('#previewFpsReadout'),
   previewMotionReadout: $('#previewMotionReadout'),
+  previewMoodReadout: $('#previewMoodReadout'),
+  previewInteractionReadout: $('#previewInteractionReadout'),
   displaySyncCard: $('#displaySyncCard'),
   displaySyncStatus: $('#displaySyncStatus'),
   displaySyncDetail: $('#displaySyncDetail'),
@@ -167,6 +178,8 @@ const labels = {
     readoutBodyText: '本文文字',
     readoutRender: '描画',
     readoutMotion: '動き',
+    readoutMood: '表情',
+    readoutInteraction: '操作',
     displaySyncHeading: '実機反映',
     displaySyncIdle: '未送信',
     displaySyncDirty: '未送信の変更あり',
@@ -185,6 +198,7 @@ const labels = {
     reloadAsset: 'asset 再読み込み',
     petName: 'ペット名',
     petState: '状態',
+    petMood: '表情',
     petDisplayArea: 'ペット表示面積',
     uiTextSize: 'UI文字サイズ',
     bodyTextSize: '本文文字サイズ',
@@ -260,6 +274,8 @@ const labels = {
     readoutBodyText: 'body text',
     readoutRender: 'render',
     readoutMotion: 'motion',
+    readoutMood: 'mood',
+    readoutInteraction: 'interaction',
     displaySyncHeading: 'Device sync',
     displaySyncIdle: 'Not sent',
     displaySyncDirty: 'Unsaved changes',
@@ -278,6 +294,7 @@ const labels = {
     reloadAsset: 'Reload asset',
     petName: 'pet name',
     petState: 'pet state',
+    petMood: 'pet mood',
     petDisplayArea: 'pet display area',
     uiTextSize: 'UI text size',
     bodyTextSize: 'body text size',
@@ -766,6 +783,10 @@ function render() {
   elements.latestReply.innerHTML = latestReply
     ? `<strong>choiceId: ${escapeHtml(latestReply.details.choiceId)}</strong><br>request: ${escapeHtml(latestReply.details.requestEventId)}<br>input: ${escapeHtml(latestReply.details.input ?? '')}`
     : t('noReply');
+  const latestInteraction = latestPetInteraction();
+  if (latestInteraction?.details?.mood && elements.petMood) {
+    elements.petMood.value = latestInteraction.details.mood;
+  }
   renderLatestSession();
   renderRuntimeStatus();
   renderCommands();
@@ -1033,6 +1054,10 @@ function latestHeartbeatDisplayEvent(expected = null) {
   return heartbeats.find((entry) => targetIds.includes(entry.deviceId)) ?? heartbeats[0] ?? null;
 }
 
+function latestPetInteraction() {
+  return [...(state.events?.inbound ?? [])].reverse().find((entry) => entry.type === 'device.pet_interacted') ?? null;
+}
+
 function latestExpectedDisplayEvent() {
   return latestOutboundDisplayEvent() ?? state.displaySync;
 }
@@ -1111,47 +1136,6 @@ function renderDisplaySyncStatus() {
     : 'event -';
 }
 
-function rgbaFromControls(colorInput, alphaInput) {
-  const hex = colorInput.value.replace('#', '');
-  return {
-    r: Number.parseInt(hex.slice(0, 2), 16),
-    g: Number.parseInt(hex.slice(2, 4), 16),
-    b: Number.parseInt(hex.slice(4, 6), 16),
-    a: Number(alphaInput.value)
-  };
-}
-
-function rgbaCss(value) {
-  return `rgba(${value.r}, ${value.g}, ${value.b}, ${value.a / 255})`;
-}
-
-function rgbaOverBlackCss(value) {
-  if (value.a <= 0) {
-    return 'transparent';
-  }
-  const alpha = value.a / 255;
-  const r = Math.round(value.r * alpha);
-  const g = Math.round(value.g * alpha);
-  const b = Math.round(value.b * alpha);
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-function rgbaLabel(colorInput, alphaInput) {
-  return `${colorInput.value} / ${alphaInput.value}`;
-}
-
-function updateRgbaVisual(swatch, preview, colorInput, alphaInput) {
-  const value = rgbaFromControls(colorInput, alphaInput);
-  const css = rgbaCss(value);
-  [swatch, preview].forEach((item) => {
-    if (!item) {
-      return;
-    }
-    item.style.setProperty('--rgba-preview', css);
-    item.title = rgbaLabel(colorInput, alphaInput);
-  });
-}
-
 function displaySettingsPayload() {
   return {
     deviceId: deviceId(),
@@ -1202,6 +1186,7 @@ function createDisplayFallbackPetEvent(payload) {
       id: 'display-settings',
       name: elements.petName.value || 'Codex Pet',
       state: elements.petState.value || 'idle',
+      mood: elements.petMood.value || 'idle',
       spriteRef: elements.petSprite.value || 'host://display/settings'
     },
     display: {
@@ -1251,6 +1236,7 @@ function petPayload() {
     deviceId: deviceId(),
     name: elements.petName.value || state.petManifest?.displayName || 'Codex Pet',
     state: elements.petState.value,
+    mood: elements.petMood.value,
     spriteRef: elements.petSprite.value || 'host://pet/current',
     display: displaySettingsPayload()
   };
@@ -1308,6 +1294,7 @@ function renderM5Preview() {
   const motionStepMs = Number(elements.motionStepMs.value);
   const petOffsetX = Number(elements.petOffsetX.value);
   const petOffsetY = Number(elements.petOffsetY.value);
+  const petMood = elements.petMood?.value || moodFromState(elements.petState.value);
   const mode = elements.previewMode.value;
   const device = elements.previewDevice.value;
   const screenBackground = rgbaFromControls(elements.screenBgColor, elements.screenBgAlpha);
@@ -1324,6 +1311,8 @@ function renderM5Preview() {
 
   elements.m5Preview.dataset.mode = mode;
   elements.m5Preview.dataset.device = device;
+  elements.m5Preview.dataset.mood = petMood;
+  elements.previewPet.dataset.mood = petMood;
   elements.m5Preview.style.setProperty('--pet-width', `${petWidth}px`);
   elements.m5Preview.style.setProperty('--pet-height', `${petHeight}px`);
   elements.m5Preview.style.setProperty('--pet-x', `${petOffsetX}px`);
@@ -1342,6 +1331,11 @@ function renderM5Preview() {
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;
   elements.previewFpsReadout.textContent = `${animationFps} fps`;
   elements.previewMotionReadout.textContent = `${motionStepMs} ms`;
+  elements.previewMoodReadout.textContent = petMood;
+  const latestInteraction = latestPetInteraction();
+  elements.previewInteractionReadout.textContent = latestInteraction?.details
+    ? `${latestInteraction.details.interaction ?? '-'} / ${latestInteraction.details.target ?? '-'}`
+    : '-';
 
   if (manifest?.ok) {
     elements.previewPet.classList.add('sprite-pet');
@@ -1580,6 +1574,7 @@ function wireActions() {
     elements.previewMode,
     elements.petName,
     elements.petState,
+    elements.petMood,
     elements.petSprite
   ].filter(Boolean).forEach((control) => {
     control.addEventListener('input', renderM5Preview);

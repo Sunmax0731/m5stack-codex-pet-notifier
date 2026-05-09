@@ -19,4 +19,4 @@
 
 ## Evaluation Ceiling
 
-実機確認は Core2 target の upload、Wi-Fi 接続、pairing、A button reply、Codex relay answer までです。Core2 touch / swipe、GRAY、長時間運用、実 Codex App 内部 API 連携が未確認または対象外のため `S+` は付けません。ただし platform runtime gate は simulator / mock device / telemetry / adapter / safety boundary を通しており、Core2 target の LAN 接続も確認できたため、closed alpha prerelease として `A-` 以上は許容します。
+実機確認は Core2 target の upload、Wi-Fi 接続、pairing、A button reply、Codex relay answer までです。Core2 touch / swipe の追加UX、GRAY、長時間運用、実 Codex App 内部 API 連携、Windows installer のユーザー環境実行が未確認または対象外のため `S+` は付けません。ただし platform runtime gate は simulator / mock device / telemetry / adapter / safety boundary を通しており、Core2 target の LAN 接続も確認できたため、beta prerelease として `A-` 以上は許容します。

@@ -1,6 +1,6 @@
 # 手動テスト
 
-Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。closed alpha では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機、GRAY IMU、長時間運用、Codex App 非公開内部 API 連携は今回対象外です。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Dashboard smoke の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機、GRAY IMU、長時間運用、Codex App 非公開内部 API 連携は今回対象外です。
 
 ## 共通前提
 
@@ -45,6 +45,9 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-28 | Dashboard または `codex:display` で `screen background`、`pet background`、`text background` をそれぞれ異なる色にして送る。pet display area は `6/32` 以上、`text background alpha` は `0`、`128`、`255` の順にして Answer または Choice 画面で確認する | LCD 全体の背景、pet 透明ピクセル背面、本文パネル / footer 背景がそれぞれ別設定として見える。alpha `0` では本文パネル / footer の塗りが消え、文字だけが表示される。alpha `128` / `255` では text background が画面背景に同期せず別色で表示される | 準備済み。ユーザー手動 |
 | C2-29 | Dashboard または `codex:display` で `pet X/Y offset` を `-80`、`80`、大きな負値 / 正値に変えて送る | pet が上下左右へ移動し、値によって画面外にはみ出して頭や一部だけが見える | 準備済み。ユーザー手動 |
 | C2-30 | Dashboard または `codex:display` で `text border` を有効化し、色 / alpha を変える | Answer / Decision / Notification の本文パネルと footer に枠線が出る。無効化すると枠線が消える | 準備済み。ユーザー手動 |
+| C2-31 | Dashboard の `表情` を `happy`、`confused`、`alert`、`sleepy` に切り替えて `ペット更新を送信` を押す | Core2 の hatch-pet または fallback pet 上に mood marker / 表情差分が表示され、Dashboard outbound の `pet.updated.pet.mood` と一致する | 準備済み。ユーザー手動 |
+| C2-32 | Pet 表示領域を single tap / double tap / long press / swipe up / swipe down / swipe left / swipe right する | Host Bridge inbound に `device.pet_interacted` が追加され、`interaction`、`gesture`、`target`、`screen`、`page`、`mood` が Dashboard event log と preview readout に表示される | 準備済み。ユーザー手動 |
+| C2-33 | Pet 表示領域を long press し、その後 Core2 の A/B/C を押す | Host Bridge が side effect として `prompt.choice_requested` を queue し、Core2 が Choice 画面へ遷移する。A/B/C 押下後、inbound に `device.reply_selected` が出る | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -76,6 +79,8 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-20 | topbar の `テーマ` を `OSに追従`、`ライト`、`ダーク` に切り替える | Dashboard 全体が選択 theme に切り替わる。既定は `OSに追従` | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-21 | topbar の `言語` を `日本語` / `English` に切り替える | 項目名、主要ボタン、command modal の代表 label が選択言語に切り替わる。既定は日本語 | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-22 | `環境構築コマンド` modal の `環境構築` tab で `Bridge を再起動` を実行する | 実行結果に `restarting: true` が出る。数秒後にDashboardが再接続し、sidebar runtime status の pid / uptime が更新される | ユーザー手動 |
+| GUI-23 | release asset の installer zip を展開し、`installer\M5StackCodexPetNotifier-Setup.bat` をダブルクリックする | Desktop と Start Menu に shortcut が作成され、`%LOCALAPPDATA%\M5StackCodexPetNotifier\install.json` が保存される。`LaunchAfterInstall` により Dashboard が開く | 準備済み。ユーザー手動 |
+| GUI-24 | Desktop shortcut または repo root の `start-dashboard.bat` をダブルクリックする | PowerShell 画面を残さず Host Bridge が background 起動し、既定ブラウザで Dashboard が開く。sidebar runtime status が `Bridge running / background` を示す | 準備済み。ユーザー手動 |
 
 ## 記録項目
 

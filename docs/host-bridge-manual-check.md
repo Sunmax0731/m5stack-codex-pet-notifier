@@ -1,6 +1,6 @@
 # Host Bridge 手動確認
 
-この手順は closed alpha の手動確認準備です。SSID、password、local IP、MAC address、token は公開 docs と release asset に残しません。
+この手順は beta prerelease の手動確認準備です。SSID、password、local IP、MAC address、token は公開 docs と release asset に残しません。
 
 ## 1. Wi-Fi local config
 
@@ -30,7 +30,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/health
 期待結果:
 
 - `ok` が `true`。
-- `version` が `0.1.0-alpha.10`。
+- `version` が `0.2.0-beta.1`。
 
 Dashboard を開きます。
 
@@ -43,7 +43,7 @@ http://127.0.0.1:8080/
 - topbar に言語、テーマ、更新、debug JSON の操作が表示され、旧ヘッダー文言やBridge行は表示されない。
 - paired、outbound、inbound、security の状態が見える。
 - `debug JSON` から `/debug/snapshot` を確認できる。
-- `/health` の `version` が `0.1.0-alpha.10` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `--port=18081` で最新Bridgeを起動する。
+- `/health` の `version` が `0.2.0-beta.1` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が残っているため、その PowerShell を閉じてから再起動する。8080を閉じられない場合は `--port=18081` で最新Bridgeを起動する。
 
 ## 3. Firmware upload
 

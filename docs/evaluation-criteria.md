@@ -9,4 +9,4 @@ QCDS は Quality、Cost、Delivery、Satisfaction で評価します。grade は
 | Delivery | prerelease、docs ZIP、release evidence が揃う | stable release へ昇格できる証跡が揃う |
 | Satisfaction | ユーザーが導入、操作、未実施範囲を理解できる | 実機 UX の写真または動画と改善済み feedback がある |
 
-closed alpha では手動実機テスト未実施のため `S+` は付けません。
+beta では未完了の手動実機テストが残るため `S+` は付けません。

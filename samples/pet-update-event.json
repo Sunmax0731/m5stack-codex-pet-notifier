@@ -6,6 +6,7 @@
     "id": "astral-mender-codex-pet",
     "name": "Astral Mender",
     "state": "waiting",
+    "mood": "listening",
     "spriteRef": "host://pets/astral-mender/spritesheet.webp",
     "fallbackState": "idle"
   }
