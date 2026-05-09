@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | Host Bridge pairing token | `src/host-adapter/localLanBridge.mjs` | `happy-path.unauthorizedRejected=1` |
 | LAN Host Bridge 起動 | `src/host-bridge/server.mjs` | `npm run bridge:smoke` |
-| Dashboard GUI | `src/host-bridge/dashboard/`、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、Debug 統合送信フォーム | `npm run dashboard:smoke`、browser screenshot |
+| Dashboard GUI | `src/host-bridge/dashboard/`、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、環境構築コマンド modal 統合送信フォーム、theme / language controls、click help | `npm run dashboard:smoke`、browser screenshot |
 | Codex 返答表示 | `src/codex-adapter/relay.mjs`、`/codex/answer`、`answer.completed` | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Codex 最近 session 自動送信 | `src/codex-adapter/sessionWatcher.mjs`、`npm run codex:sessions`、`answer.completed` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Dashboard 最新 Codex 回答表示 | `/codex/session/latest`、`/codex/session/publish`、`src/host-bridge/dashboard/` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |

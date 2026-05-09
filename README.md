@@ -15,7 +15,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 
 - `schemas/events/*.json` で pet、通知、回答、選択肢、返信、heartbeat のイベント契約を定義する。
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
-- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Debug 統合の Answer / Decision / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグの代表コマンドはモーダル内のタブからパラメータを変えて実行できる。
+- Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Decision / Notification 送信、ABC 返信確認、最近の Codex session 回答の表示と M5Stack 送信を GUI から扱う。環境構築とデバッグ送信はサイドバーのモーダル内タブへ集約し、任意パラメータで実行できる。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
 - `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
 - `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。
@@ -30,7 +30,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - UI / body text size も Dashboard または `codex:display` から `1..8` の8段階で動的に変更する。
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
 - `display.settings_updated` は画面全体の背景、pet 背景、文字色、文字背景、文字枠、pet X/Y offset を受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
-- Dashboard は side menu、event tabs、折りたたみ可能な section、focus tooltip、2カラムのM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。
+- Dashboard は side menu、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。
 - Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
 - Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
 - `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。

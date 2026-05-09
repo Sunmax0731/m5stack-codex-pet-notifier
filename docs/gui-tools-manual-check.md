@@ -39,14 +39,16 @@ http://127.0.0.1:8080/
 - 状態確認に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
-- side menu があり、状態、プレビュー、Codex回答、ログ、デバッグへ移動できる。送信フォームは Debug section に統合され、独立した `送信` menu は表示されない。
+- side menu があり、状態、プレビュー、最近の回答、ログへ移動できる。`状態` は必ず表示され、独立した `送信` menu と `デバッグ` menu は表示されない。
+- Answer / Decision / Notify の送信、sample replay、各種 debug command は `環境構築コマンド` modal に集約されている。
 - `M5Stack 表示プレビュー` に Pet 設定、pet display area、UI text size、body text size、render FPS、motion step が統合されている。
 - `M5Stack 表示プレビュー` があり、現在の hatch-pet キャラで Pet / Answer / Decision / Notify の simulated display を送信前に確認できる。
 - `M5Stack 表示プレビュー` で Core2 / GRAY、local hatch-pet asset、screen background RGBA、pet background RGBA、text color RGBA、text background RGBA、text border RGBA、pet X/Y offset、Codex answer beep を変更できる。
-- `M5Stack 表示プレビュー` は画面プレビューと設定フォームが2カラムで並び、同じ設定量でも以前より縦方向の占有が少ない。
-- 状態確認、プレビュー、最近の Codex 回答、イベントログ、デバッグが2カラムで並び、状態確認、イベントログ、デバッグだけが全幅を占有していない。
+- `M5Stack 表示プレビュー` は1ペインで全幅表示され、画面プレビュー、readout、asset、表示設定が同じ section 内で見通せる。
+- 最近の Codex 回答とイベントログは左右ペインで並ぶ。
 - sidebar に Bridge runtime status があり、foreground / background、pid、uptime が見える。
-- 主要項目に focus すると tooltip hint が表示される。
+- 主要項目の `?` icon を click すると tooltip hint が表示される。
+- topbar に `言語` と `テーマ` があり、既定は日本語、テーマはOSに追従する。手動でEnglish / light / darkへ切り替えできる。
 - 各 section の `Hide` / `View` で折りたたみできる。
 - sidebar の `環境構築コマンド` から setup / debug command modal を開ける。
 - command modal は `環境構築`、`デバッグ送信`、`保守` のタブを持つ。
@@ -195,7 +197,7 @@ Dashboard の `Decision` tab で prompt と A/B/C label を入力し、`Decision
 - outbound に `prompt.choice_requested` が出る。
 - Core2 が Choice 画面へ遷移し、A/B/C の label が表示される。
 - Core2 の A/B/C のいずれかを押すと、Dashboard の inbound に `device.reply_selected` が出る。
-- Debug section に `choiceId`、`requestEventId`、`input` が表示される。
+- `環境構築コマンド` modal の `Decision 返信` に `choiceId`、`requestEventId`、`input` が表示される。
 
 ## 7. Sample replay
 

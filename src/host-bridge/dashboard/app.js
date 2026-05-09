@@ -14,7 +14,9 @@ const state = {
   activeCommandTab: 'setup',
   previewPetFrame: 0,
   previewAnimationInterval: null,
-  previewAnimationDelay: null
+  previewAnimationDelay: null,
+  language: localStorage.getItem('m5pet-language') || 'ja',
+  themeMode: localStorage.getItem('m5pet-theme') || 'system'
 };
 
 const expectedVersion = document.documentElement.dataset.version || '0.1.0-alpha.10';
@@ -98,8 +100,383 @@ const elements = {
   commandList: $('#commandList'),
   commandOutput: $('#commandOutput'),
   commandModal: $('#commandModal'),
-  debugSnapshotLink: $('#debugSnapshotLink')
+  debugSnapshotLink: $('#debugSnapshotLink'),
+  languageMode: $('#languageMode'),
+  themeMode: $('#themeMode')
 };
+
+const labels = {
+  ja: {
+    navStatus: '状態',
+    navPreview: 'プレビュー',
+    navSession: '最近の回答',
+    navLog: 'ログ',
+    openCommands: '環境構築コマンド',
+    eyebrow: 'ローカルデバイス操作',
+    languageLabel: '言語',
+    themeLabel: 'テーマ',
+    refresh: '更新',
+    statusHeading: '状態確認',
+    hide: '隠す',
+    view: '表示',
+    metricPaired: '接続',
+    metricOutbound: '送信',
+    metricInbound: '受信',
+    metricSecurity: '拒否',
+    previewHeading: 'M5Stack 表示プレビュー',
+    deviceType: 'デバイス',
+    screenMode: '画面',
+    readoutDevice: 'デバイス',
+    readoutPetArea: 'ペット面積',
+    readoutUiText: 'UI文字',
+    readoutBodyText: '本文文字',
+    readoutRender: '描画',
+    readoutMotion: '動き',
+    currentPet: '現在のペット',
+    assetPathOverride: 'アセットパス指定',
+    spriteRef: 'スプライト参照',
+    sendPet: 'ペット更新を送信',
+    sendDisplay: '表示設定を送信',
+    localPetAsset: 'local hatch-pet アセット',
+    reloadAsset: 'asset 再読み込み',
+    petName: 'ペット名',
+    petState: '状態',
+    petDisplayArea: 'ペット表示面積',
+    uiTextSize: 'UI文字サイズ',
+    bodyTextSize: '本文文字サイズ',
+    renderFps: '描画FPS',
+    motionStep: 'アニメ間隔',
+    petOffsetX: 'ペットX位置',
+    petOffsetY: 'ペットY位置',
+    screenBackground: '画面背景',
+    petBackground: 'ペット背景',
+    textColor: '文字色',
+    textBackground: '文字背景',
+    textBorder: '文字枠',
+    showTextBorder: 'テキスト枠を表示',
+    beepOnAnswer: 'Codex回答のビープ通知',
+    sessionHeading: '最近の Codex 回答',
+    load: '読込',
+    sendToM5: 'M5Stackへ送信',
+    latestAnswer: '最新回答',
+    previousUserMessage: '直前のuser message',
+    logHeading: 'イベントログ',
+    redraw: '表示を再描画',
+    commandModalHeading: '環境構築とデバッグコマンド',
+    reload: '再読込',
+    close: '閉じる',
+    debugSendHeading: 'Codex から M5Stack へ送る',
+    debugSendNote: 'Answer / Decision / Notify はデバッグ操作として送信します。',
+    deviceId: 'デバイスID',
+    summary: '要約',
+    body: '本文',
+    sendAnswer: 'Answer を送信',
+    prompt: '質問',
+    sendDecision: 'Decision を送信',
+    title: 'タイトル',
+    severity: '重要度',
+    sendNotification: 'Notification を送信',
+    sendResult: '送信結果',
+    decisionReply: 'Decision 返信',
+    sampleReplay: 'sample replay',
+    run: '実行',
+    help: 'ヘルプ',
+    commandNotRun: 'コマンド未実行',
+    noPaired: 'paired device なし。M5Stack 起動または /pair を待機中。',
+    noReply: 'まだ返信はありません。',
+    eventNone: 'event なし',
+    bridgeUnchecked: 'Bridge未確認',
+    latestBridgeSearch: 'latest Bridge API を探索中',
+    noSession: '最近の Codex session を読み込んでいません。',
+    noUserMessage: '直前の user message はありません。',
+    sessionUnread: '未読込',
+    sessionLoadFailed: '読み込み失敗',
+    noRecentAnswer: '最近の Codex 回答を取得できません。'
+  },
+  en: {
+    navStatus: 'Status',
+    navPreview: 'Preview',
+    navSession: 'Recent answer',
+    navLog: 'Logs',
+    openCommands: 'Setup commands',
+    eyebrow: 'Local device operations',
+    languageLabel: 'Language',
+    themeLabel: 'Theme',
+    refresh: 'Refresh',
+    statusHeading: 'Status',
+    hide: 'Hide',
+    view: 'View',
+    metricPaired: 'paired',
+    metricOutbound: 'outbound',
+    metricInbound: 'inbound',
+    metricSecurity: 'security',
+    previewHeading: 'M5Stack display preview',
+    deviceType: 'device',
+    screenMode: 'screen',
+    readoutDevice: 'device',
+    readoutPetArea: 'pet area',
+    readoutUiText: 'UI text',
+    readoutBodyText: 'body text',
+    readoutRender: 'render',
+    readoutMotion: 'motion',
+    currentPet: 'current pet',
+    assetPathOverride: 'asset path override',
+    spriteRef: 'spriteRef',
+    sendPet: 'Send pet update',
+    sendDisplay: 'Send display settings',
+    localPetAsset: 'local hatch-pet asset',
+    reloadAsset: 'Reload asset',
+    petName: 'pet name',
+    petState: 'pet state',
+    petDisplayArea: 'pet display area',
+    uiTextSize: 'UI text size',
+    bodyTextSize: 'body text size',
+    renderFps: 'render FPS',
+    motionStep: 'motion step',
+    petOffsetX: 'pet X offset',
+    petOffsetY: 'pet Y offset',
+    screenBackground: 'screen background',
+    petBackground: 'pet background',
+    textColor: 'text color',
+    textBackground: 'text background',
+    textBorder: 'text border',
+    showTextBorder: 'Show text border',
+    beepOnAnswer: 'Beep on Codex answer',
+    sessionHeading: 'Recent Codex answer',
+    load: 'Load',
+    sendToM5: 'Send to M5Stack',
+    latestAnswer: 'latest answer',
+    previousUserMessage: 'previous user message',
+    logHeading: 'Event log',
+    redraw: 'Redraw',
+    commandModalHeading: 'Setup and debug commands',
+    reload: 'Reload',
+    close: 'Close',
+    debugSendHeading: 'Send from Codex to M5Stack',
+    debugSendNote: 'Answer / Decision / Notify are sent as debug operations.',
+    deviceId: 'deviceId',
+    summary: 'summary',
+    body: 'body',
+    sendAnswer: 'Send Answer',
+    prompt: 'prompt',
+    sendDecision: 'Send Decision',
+    title: 'title',
+    severity: 'severity',
+    sendNotification: 'Send Notification',
+    sendResult: 'Send result',
+    decisionReply: 'Decision reply',
+    sampleReplay: 'sample replay',
+    run: 'Run',
+    help: 'Help',
+    commandNotRun: 'Command not run',
+    noPaired: 'No paired device. Waiting for M5Stack boot or /pair.',
+    noReply: 'No reply yet.',
+    eventNone: 'no event',
+    bridgeUnchecked: 'Bridge unchecked',
+    latestBridgeSearch: 'Searching latest Bridge API',
+    noSession: 'No recent Codex session loaded.',
+    noUserMessage: 'No previous user message.',
+    sessionUnread: 'not loaded',
+    sessionLoadFailed: 'load failed',
+    noRecentAnswer: 'Unable to read a recent Codex answer.'
+  }
+};
+
+const optionLabels = {
+  themeMode: {
+    system: { ja: 'OSに追従', en: 'System' },
+    light: { ja: 'ライト', en: 'Light' },
+    dark: { ja: 'ダーク', en: 'Dark' }
+  },
+  previewMode: {
+    pet: { ja: 'ペット', en: 'Pet' },
+    answer: { ja: '回答', en: 'Answer' },
+    choice: { ja: '三択', en: 'Decision' },
+    notification: { ja: '通知', en: 'Notify' }
+  }
+};
+
+const commandText = {
+  bridgeStartBackground: {
+    en: {
+      label: 'Start Bridge in background',
+      description: 'Start Host Bridge without leaving a PowerShell window. If the port is already active, only returns status.'
+    }
+  },
+  petAsset: {
+    en: {
+      label: 'Generate pet asset',
+      description: 'Generate firmware/include/pet_asset.local.h from a local hatch-pet package.'
+    }
+  },
+  core2Upload: {
+    en: {
+      label: 'Upload Core2 firmware',
+      description: 'Auto-detect USB serial and upload firmware to Core2. Specify COM only when needed.'
+    }
+  },
+  codexAnswer: {
+    en: {
+      label: 'Send Answer',
+      description: 'Send arbitrary Codex answer text to M5Stack.'
+    }
+  },
+  codexDecision: {
+    en: {
+      label: 'Send ABC Decision',
+      description: 'Send a three-choice prompt that M5Stack can answer with A/B/C.'
+    }
+  },
+  codexDisplay: {
+    en: {
+      label: 'Send display settings',
+      description: 'Send pet area, text size, FPS, RGBA, offset, border, and beep settings to M5Stack.'
+    }
+  },
+  codexSessions: {
+    en: {
+      label: 'Send recent Codex session',
+      description: 'One-shot send of the latest exchange from a recent Codex session.'
+    }
+  },
+  sampleReplay: {
+    en: {
+      label: 'sample replay',
+      description: 'Queue representative sample events on the Host Bridge.'
+    }
+  }
+};
+
+const commandTabLabels = {
+  setup: { ja: '環境構築', en: 'Setup' },
+  debug: { ja: 'デバッグ送信', en: 'Debug send' },
+  maintenance: { ja: '保守', en: 'Maintenance' }
+};
+
+const commandParamLabels = {
+  host: { ja: 'host', en: 'host' },
+  port: { ja: 'port', en: 'port' },
+  petDir: { ja: 'petDir', en: 'petDir' },
+  output: { ja: 'output', en: 'output' },
+  uploadPort: { ja: 'uploadPort', en: 'uploadPort' },
+  bridge: { ja: 'bridge', en: 'bridge' },
+  deviceId: { ja: 'デバイスID', en: 'deviceId' },
+  summary: { ja: '要約', en: 'summary' },
+  text: { ja: '本文', en: 'text' },
+  question: { ja: '質問', en: 'question' },
+  phase: { ja: 'phase', en: 'phase' },
+  petScale: { ja: 'ペット表示面積', en: 'pet scale' },
+  uiTextScale: { ja: 'UI文字サイズ', en: 'UI text scale' },
+  bodyTextScale: { ja: '本文文字サイズ', en: 'body text scale' },
+  animationFps: { ja: '描画FPS', en: 'animation FPS' },
+  motionStepMs: { ja: 'アニメ間隔(ms)', en: 'motion step ms' },
+  screenBg: { ja: '画面背景', en: 'screen background' },
+  petBg: { ja: 'ペット背景', en: 'pet background' },
+  textColor: { ja: '文字色', en: 'text color' },
+  textBg: { ja: '文字背景', en: 'text background' },
+  petOffsetX: { ja: 'ペットX位置', en: 'pet X offset' },
+  petOffsetY: { ja: 'ペットY位置', en: 'pet Y offset' },
+  textBorderEnabled: { ja: '文字枠を表示', en: 'show text border' },
+  textBorderColor: { ja: '文字枠色', en: 'text border color' },
+  beepOnAnswer: { ja: 'ビープ通知', en: 'beep on answer' }
+};
+
+function t(key) {
+  return labels[state.language]?.[key] ?? labels.ja[key] ?? key;
+}
+
+function applyTheme() {
+  const mode = state.themeMode === 'dark' || state.themeMode === 'light' ? state.themeMode : 'system';
+  const resolved = mode === 'system'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : mode;
+  document.documentElement.dataset.theme = resolved;
+  document.documentElement.dataset.themeMode = mode;
+  if (elements.themeMode) {
+    elements.themeMode.value = mode;
+  }
+}
+
+function applyLanguage() {
+  document.documentElement.lang = state.language;
+  if (elements.languageMode) {
+    elements.languageMode.value = state.language;
+  }
+  $$('[data-i18n]').forEach((item) => {
+    item.textContent = t(item.dataset.i18n);
+  });
+  Object.entries(optionLabels.themeMode).forEach(([value, text]) => {
+    const option = elements.themeMode?.querySelector(`option[value="${CSS.escape(value)}"]`);
+    if (option) {
+      option.textContent = text[state.language] ?? text.ja;
+    }
+  });
+  Object.entries(optionLabels.previewMode).forEach(([value, text]) => {
+    const option = elements.previewMode?.querySelector(`option[value="${CSS.escape(value)}"]`);
+    if (option) {
+      option.textContent = text[state.language] ?? text.ja;
+    }
+  });
+  updateHelpTexts();
+  renderDisplayControls();
+  renderLatestSession();
+}
+
+function enhanceHints() {
+  $$('.hint[data-tooltip]').forEach((item, index) => {
+    if (item.querySelector('.help-control')) {
+      return;
+    }
+    item.dataset.tooltipJa = item.dataset.tooltipJa || item.dataset.tooltip;
+    const control = document.createElement('span');
+    control.className = 'help-control';
+    control.innerHTML = `<span class="help-button" role="button" tabindex="0" aria-label="${escapeHtml(t('help'))}" aria-expanded="false">?</span><span class="help-popover" role="tooltip" id="help-${index}"></span>`;
+    item.append(control);
+    const button = control.querySelector('.help-button');
+    button.setAttribute('aria-describedby', `help-${index}`);
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      closeHelpPopovers(item);
+      const open = !item.classList.contains('help-open');
+      item.classList.toggle('help-open', open);
+      button.setAttribute('aria-expanded', String(open));
+    });
+    button.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+      event.preventDefault();
+      button.click();
+    });
+  });
+  updateHelpTexts();
+}
+
+function updateHelpTexts() {
+  $$('.hint[data-tooltip]').forEach((item) => {
+    const text = state.language === 'en'
+      ? (item.dataset.tooltipEn || item.dataset.tooltipJa || item.dataset.tooltip)
+      : (item.dataset.tooltipJa || item.dataset.tooltip);
+    const popover = item.querySelector('.help-popover');
+    if (popover) {
+      popover.textContent = text;
+    }
+  });
+  $$('.help-button').forEach((button) => {
+    button.setAttribute('aria-label', t('help'));
+  });
+}
+
+function closeHelpPopovers(except = null) {
+  $$('.hint.help-open').forEach((item) => {
+    if (item === except) {
+      return;
+    }
+    item.classList.remove('help-open');
+    item.querySelector('.help-button')?.setAttribute('aria-expanded', 'false');
+  });
+}
 
 async function api(path, options = {}) {
   await ensureApiBase();
@@ -308,7 +685,7 @@ function render() {
     ? health.pairedDevices.map((device) => (
       `<span class="device-chip">${escapeHtml(device.deviceId)} / pending ${device.pending} / ws ${device.websocket ? 'on' : 'off'}</span>`
     )).join('')
-    : '<span class="muted">paired device なし。M5Stack 起動または /pair を待機中。</span>';
+    : `<span class="muted">${escapeHtml(t('noPaired'))}</span>`;
 
   renderLog(elements.outboundLog, events.outbound, (entry) => (
     `<code>${escapeHtml(entry.type)}</code><br>${escapeHtml(entry.eventId)}<br><span class="muted">${escapeHtml(entry.deviceId)}</span>`
@@ -323,7 +700,7 @@ function render() {
   const latestReply = [...events.inbound].reverse().find((entry) => entry.type === 'device.reply_selected');
   elements.latestReply.innerHTML = latestReply
     ? `<strong>choiceId: ${escapeHtml(latestReply.details.choiceId)}</strong><br>request: ${escapeHtml(latestReply.details.requestEventId)}<br>input: ${escapeHtml(latestReply.details.input ?? '')}`
-    : 'まだ返信はありません。';
+    : t('noReply');
   renderLatestSession();
   renderRuntimeStatus();
   renderCommands();
@@ -333,14 +710,14 @@ function render() {
 function renderLog(target, entries, template) {
   target.innerHTML = entries.length
     ? [...entries].reverse().slice(0, 20).map((entry) => `<li>${template(entry)}</li>`).join('')
-    : '<li class="muted">event なし</li>';
+    : `<li class="muted">${escapeHtml(t('eventNone'))}</li>`;
 }
 
 function renderRuntimeStatus() {
   const current = state.runtime?.currentProcess;
   if (!current) {
-    elements.runtimeState.textContent = state.apiBaseWarning || 'Bridge未確認';
-    elements.runtimePid.textContent = 'latest Bridge API を探索中';
+    elements.runtimeState.textContent = state.apiBaseWarning || t('bridgeUnchecked');
+    elements.runtimePid.textContent = t('latestBridgeSearch');
     elements.runtimeDot.className = 'status-dot warn';
     return;
   }
@@ -364,22 +741,38 @@ function renderCommands() {
   }
 
   elements.commandTabs.innerHTML = definitions.tabs.map((tab) => (
-    `<button class="command-tab ${tab.id === state.activeCommandTab ? 'active' : ''}" type="button" data-command-tab="${escapeHtml(tab.id)}">${escapeHtml(tab.label)}</button>`
+    `<button class="command-tab ${tab.id === state.activeCommandTab ? 'active' : ''}" type="button" data-command-tab="${escapeHtml(tab.id)}">${escapeHtml(localizedCommandTab(tab))}</button>`
   )).join('');
 
   const activeCommands = definitions.commands.filter((command) => command.tab === state.activeCommandTab);
   elements.commandList.innerHTML = activeCommands.map((command) => (
     `<article class="command-card" data-command-id="${escapeHtml(command.id)}">
       <div>
-        <h3>${escapeHtml(command.label)}</h3>
-        <p>${escapeHtml(command.description ?? '')}</p>
+        <h3>${escapeHtml(localizedCommandLabel(command))}</h3>
+        <p>${escapeHtml(localizedCommandDescription(command))}</p>
       </div>
       <div class="command-param-grid">
         ${(command.params ?? []).map((param) => renderCommandParam(command.id, param)).join('')}
       </div>
-      <button class="run-command" type="button" data-command-id="${escapeHtml(command.id)}">実行</button>
+      <button class="run-command" type="button" data-command-id="${escapeHtml(command.id)}">${escapeHtml(t('run'))}</button>
     </article>`
   )).join('');
+}
+
+function localizedCommandTab(tab) {
+  return commandTabLabels[tab.id]?.[state.language] ?? tab.label;
+}
+
+function localizedCommandLabel(command) {
+  return commandText[command.id]?.[state.language]?.label ?? command.label;
+}
+
+function localizedCommandDescription(command) {
+  return commandText[command.id]?.[state.language]?.description ?? command.description ?? '';
+}
+
+function localizedCommandParamLabel(param) {
+  return commandParamLabels[param.name]?.[state.language] ?? param.label;
 }
 
 function renderCommandParam(commandId, param) {
@@ -387,13 +780,13 @@ function renderCommandParam(commandId, param) {
   const value = readCommandParamValue(commandId, param) ?? param.defaultValue ?? '';
   if (param.type === 'textarea') {
     return `<label class="field">
-      <span>${escapeHtml(param.label)}</span>
+      <span>${escapeHtml(localizedCommandParamLabel(param))}</span>
       <textarea id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" rows="3">${escapeHtml(value)}</textarea>
     </label>`;
   }
   if (param.type === 'select') {
     return `<label class="field">
-      <span>${escapeHtml(param.label)}</span>
+      <span>${escapeHtml(localizedCommandParamLabel(param))}</span>
       <select id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}">
         ${(param.options ?? []).map((option) => `<option value="${escapeHtml(option)}" ${String(value) === option ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}
       </select>
@@ -402,11 +795,11 @@ function renderCommandParam(commandId, param) {
   if (param.type === 'checkbox') {
     return `<label class="check-field">
       <input id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" type="checkbox" ${value === true || value === 'true' ? 'checked' : ''}>
-      <span>${escapeHtml(param.label)}</span>
+      <span>${escapeHtml(localizedCommandParamLabel(param))}</span>
     </label>`;
   }
   return `<label class="field">
-    <span>${escapeHtml(param.label)}</span>
+    <span>${escapeHtml(localizedCommandParamLabel(param))}</span>
     <input id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" type="${escapeHtml(param.type ?? 'text')}" value="${escapeHtml(value)}" placeholder="${escapeHtml(param.placeholder ?? '')}">
   </label>`;
 }
@@ -449,23 +842,23 @@ async function runDashboardCommand(commandId) {
 function renderLatestSession() {
   const latest = state.latestSession;
   if (!latest) {
-    elements.sessionName.textContent = 'session 未読込';
+    elements.sessionName.textContent = `session ${t('sessionUnread')}`;
     elements.sessionPhase.textContent = 'phase -';
-    elements.sessionAnswer.textContent = '最近の Codex session を読み込んでいません。';
-    elements.sessionUser.textContent = '未読込';
+    elements.sessionAnswer.textContent = t('noSession');
+    elements.sessionUser.textContent = t('sessionUnread');
     return;
   }
   if (latest.ok === false) {
-    elements.sessionName.textContent = latest.reason ?? '読み込み失敗';
+    elements.sessionName.textContent = latest.reason ?? t('sessionLoadFailed');
     elements.sessionPhase.textContent = 'phase -';
-    elements.sessionAnswer.textContent = latest.message ?? latest.reason ?? '最近の Codex 回答を取得できません。';
-    elements.sessionUser.textContent = '未読込';
+    elements.sessionAnswer.textContent = latest.message ?? latest.reason ?? t('noRecentAnswer');
+    elements.sessionUser.textContent = t('sessionUnread');
     return;
   }
   elements.sessionName.textContent = latest.sessionName ?? 'session';
   elements.sessionPhase.textContent = `phase ${latest.phase ?? '-'}`;
   elements.sessionAnswer.textContent = latest.body ?? '';
-  elements.sessionUser.textContent = latest.user?.text ?? '直前の user message はありません。';
+  elements.sessionUser.textContent = latest.user?.text ?? t('noUserMessage');
   renderM5Preview();
 }
 
@@ -892,6 +1285,33 @@ function wireActions() {
     control.addEventListener('change', renderM5Preview);
   });
   $('#refreshButton').addEventListener('click', refresh);
+  elements.languageMode.addEventListener('change', () => {
+    state.language = elements.languageMode.value === 'en' ? 'en' : 'ja';
+    localStorage.setItem('m5pet-language', state.language);
+    applyLanguage();
+    renderCommands();
+  });
+  elements.themeMode.addEventListener('change', () => {
+    state.themeMode = ['system', 'light', 'dark'].includes(elements.themeMode.value) ? elements.themeMode.value : 'system';
+    localStorage.setItem('m5pet-theme', state.themeMode);
+    applyTheme();
+  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (state.themeMode === 'system') {
+      applyTheme();
+    }
+  });
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.hint')) {
+      closeHelpPopovers();
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeHelpPopovers();
+      closeModal(elements.commandModal);
+    }
+  });
   $('#reloadPetPackagesButton').addEventListener('click', () => {
     loadPetPackages().catch(showError);
   });
@@ -943,7 +1363,8 @@ function wireActions() {
 function toggleSection(sectionId, button) {
   const section = $(`#${sectionId}`);
   section.classList.toggle('collapsed');
-  button.textContent = section.classList.contains('collapsed') ? 'View' : 'Hide';
+  button.dataset.i18n = section.classList.contains('collapsed') ? 'view' : 'hide';
+  button.textContent = t(button.dataset.i18n);
 }
 
 function openModal(modal) {
@@ -960,6 +1381,9 @@ function showError(error) {
   elements.sendResult.textContent = `ERROR: ${error.message}`;
 }
 
+applyTheme();
+enhanceHints();
+applyLanguage();
 wireTabs();
 wireSideNav();
 wireForms();

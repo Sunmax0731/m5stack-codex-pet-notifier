@@ -12,7 +12,7 @@
 | Current pet preview | 実装済み | `/pet/current/manifest`、`/pet/current/spritesheet.webp`、Dashboard preview |
 | Pet render / motion separation | 実装済み | `animationFps` と `motionStepMs` を分離 |
 | Collapsible dashboard sections | 実装済み | `section-toggle` による View / Hide |
-| Focus tooltip hints | 実装済み | `data-tooltip` field hints |
+| Click help hints | 実装済み | `?` icon と `data-tooltip` field hints |
 | Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal。環境構築 / デバッグ送信 / 保守のtabとlocalhost限定のallowlist command実行を含む |
 | Background bridge runtime | 実装済み | `npm run bridge:start:bg`、`/debug/runtime`、sidebar runtime status |
 

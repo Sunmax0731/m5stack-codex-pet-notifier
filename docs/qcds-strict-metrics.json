@@ -107,7 +107,7 @@
     "Dashboard の最近の Codex 回答 panel は local session JSONL の最新 assistant 回答を表示し、M5Stackへ送信できる smoke を追加済み。実機目視は手動確認対象。",
     "Pet surface は固定ヘッダーテキストを表示せず、Dashboard の M5Stack 表示プレビューから pet display area と text size を 1..8、render FPS を 4..20、motion step を 120..800ms、screen / pet / text / border RGBA、pet X/Y offset を送る smoke を追加済み。pet animation は M5Canvas Sprite buffer と pet-only redraw path で更新する source gate を追加済み。petScale=8、render FPS / motion step 変更、ちらつきなしの実機目視は手動確認対象。",
     "pet:asset は idle row の非空セルから frame 数を自動検出し、scale 1..8 ごとの Core2 用高解像度 frame を生成する。firmware は scale-specific frame を選択する。GRAY は flash 制約のため base frame fallback とする。",
-    "Dashboard は side menu、Debug統合event tabs、section collapse、tooltip hints、setup command modal、current pet を使う M5Stack 表示プレビュー、ダブルクリック起動batchを追加済み。プレビューは pet 面積、pet X/Y offset、text size slider、render FPS、motion step、RGBA、text border を即時反映する。",
+    "Dashboard は side menu、状態確認のsidebar表示、独立Debug section削除、環境構築コマンドmodal内のdebug送信、section collapse、クリック式help icon、OS追従theme / light / dark、日英label切替、current pet を使う全幅 M5Stack 表示プレビュー、ダブルクリック起動batchを追加済み。プレビューは pet 面積、pet X/Y offset、text size slider、render FPS、motion step、RGBA、text border を即時反映する。",
     "Dashboard GUI、/codex/decision、codex:decision:wait、/codex/choice、/codex/pet、/pet/current/manifest、hatch-pet asset firmware upload を追加済み。実機GUI連携の最終目視は手動確認対象。",
     "A-未満の観点はない。"
   ]

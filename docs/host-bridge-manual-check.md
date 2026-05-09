@@ -99,7 +99,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 期待結果:
 
 - inbound に `device.reply_selected` が出る。
-- Dashboard の Debug section に choiceId / requestEventId / input が出る。
+- Dashboard の `環境構築コマンド` modal にある `Decision 返信` に choiceId / requestEventId / input が出る。
 - pet tap または B 長押し後、inbound に `device.pet_interacted` が出る。
 - 10 秒程度待つと inbound に `device.heartbeat` が出る。
 

@@ -24,7 +24,7 @@
 - Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、`4..20fps` render、`120..800ms` motion step、dynamic display settings の firmware 対応。
 - Core2 scale-specific pet asset frame selection。
 - Core2 Sprite buffer による pet surface redraw と本文 overlay の安定表示。
-- Dashboard side menu、event tabs、M5Stack 表示プレビュー。
+- Dashboard side menu、状態確認sidebar、全幅M5Stack 表示プレビュー、最近の回答 / イベントログの左右ペイン。
 - Runtime gate。
 - Security/privacy checklist。
 - QCDS metrics。

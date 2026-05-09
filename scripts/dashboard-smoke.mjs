@@ -47,17 +47,21 @@ try {
   const index = await getText(`${baseUrl}/`);
   assert.match(index, /M5Stack Codex Pet Console/);
   assert.match(index, /side-nav/);
-  assert.match(index, /デバッグ/);
+  assert.match(index, /data-section="statusSection"/);
+  assert.doesNotMatch(index, /data-section="debugSection"/);
   assert.match(index, /最近の Codex 回答/);
   assert.match(index, /M5Stack 表示プレビュー/);
-  assert.match(index, /render FPS/);
-  assert.match(index, /motion step/);
-  assert.match(index, /screen background/);
-  assert.match(index, /pet background/);
-  assert.match(index, /text background/);
-  assert.match(index, /pet X offset/);
-  assert.match(index, /pet Y offset/);
-  assert.match(index, /text border/);
+  assert.match(index, /<option value="choice">三択<\/option>/);
+  assert.match(index, /languageMode/);
+  assert.match(index, /themeMode/);
+  assert.match(index, /描画FPS/);
+  assert.match(index, /アニメ間隔/);
+  assert.match(index, /画面背景/);
+  assert.match(index, /ペット背景/);
+  assert.match(index, /文字背景/);
+  assert.match(index, /ペットX位置/);
+  assert.match(index, /ペットY位置/);
+  assert.match(index, /文字枠/);
   assert.match(index, /テキスト枠を表示/);
   assert.match(index, /Codex回答のビープ通知/);
   assert.match(index, /previewDevice/);
@@ -101,9 +105,15 @@ try {
   assert.match(app, /previewDevice/);
   assert.match(app, /\/debug\/commands\/run/);
   assert.match(app, /renderRuntimeStatus/);
+  assert.match(app, /applyTheme/);
+  assert.match(app, /applyLanguage/);
+  assert.match(app, /enhanceHints/);
+  assert.match(app, /help-button/);
+  assert.match(app, /run: 'Run'/);
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
+  assert.match(css, /\[data-theme="dark"\]/);
   assert.match(css, /\.m5-screen/);
   assert.match(css, /--screen-bg/);
   assert.match(css, /--pet-x/);
@@ -114,6 +124,8 @@ try {
   assert.match(css, /\.preview-tuning-column/);
   assert.match(css, /\.command-tabs/);
   assert.match(css, /\.color-grid/);
+  assert.match(css, /\.help-button/);
+  assert.doesNotMatch(css, /\.hint::after/);
 
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
@@ -302,11 +314,17 @@ try {
       m5StackPreviewPanel: true,
       m5StackPreviewCurrentPet: true,
       m5StackPreviewDeviceSwitch: true,
-      m5StackPreviewTwoColumnLayout: true,
+      m5StackPreviewFullWidthLayout: true,
       sideNavigation: true,
+      sideNavigationStatusItem: true,
+      sideNavigationNoDebugItem: true,
       sectionCollapseControls: true,
+      clickHelpButtons: true,
+      themeModeSwitch: true,
+      languageModeSwitch: true,
       commandModal: true,
       commandModalTabs: true,
+      debugSendInCommandModal: true,
       commandModalParameterizedRun: true,
       runtimeSidebarStatus: true,
       backgroundBridgeStartCommand: true,
