@@ -9,12 +9,16 @@
 - [x] pet sprite と会話本文の privacy 境界が整理されている。
 - [x] Dashboard GUI と手動確認手順がある。
 - [x] hatch-pet asset 生成手順と ignored local header 方針がある。
+- [x] Codex session 自動送信の opt-in 手順と privacy 境界がある。
+- [x] Codex Hooks 連携の command 例と重複抑止方針がある。
 
 ## Implementation
 
 - [x] Host Bridge model が pairing token を発行できる。
 - [x] LAN Host Bridge が HTTP pairing / polling / replay / device event 受信を提供する。
 - [x] Codex relay が clipboard / stdin / file から `answer.completed` を送信できる。
+- [x] Codex session watcher が local JSONL から最近の user / assistant やり取りを `answer.completed` として送信できる。
+- [x] Codex hook relay が hook command から one-shot session relay を実行できる。
 - [x] Dashboard と CLI が `/codex/choice`、`/codex/pet` を送信できる。
 - [x] clipboard relay が日本語本文を UTF-8 として保持できる。
 - [x] token なし / 誤 token device event を拒否できる。
@@ -31,6 +35,8 @@
 - [x] `npm test` で代表シナリオを検証する。
 - [x] `npm run bridge:smoke` で LAN Host Bridge を検証する。
 - [x] `scripts/codex-relay-smoke.mjs` で Codex relay を検証する。
+- [x] `scripts/codex-session-smoke.mjs` で Codex session auto relay を検証する。
+- [x] hook relay の state file 重複抑止を `scripts/codex-session-smoke.mjs` で検証する。
 - [x] `scripts/dashboard-smoke.mjs` で Dashboard と Choice / Pet endpoint を検証する。
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
@@ -38,6 +44,8 @@
 - [x] Core2 実機 firmware に hatch-pet local asset を含めて upload する。
 - [ ] Core2 実機で日本語 glyph を目視確認した。ユーザー手動。
 - [ ] Core2 実機で Dashboard Choice / hatch-pet animation を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Codex session auto relay を目視確認した。ユーザー手動。
+- [ ] Core2 実機で Codex hook relay を目視確認した。ユーザー手動。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 

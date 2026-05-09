@@ -5,6 +5,8 @@
 - Host Bridge mock。
 - LAN Host Bridge server。
 - Codex relay。
+- Codex session auto relay。
+- Codex hook relay。
 - Host Bridge Dashboard GUI。
 - Clipboard UTF-8 relay。
 - JSON event contract。
@@ -28,6 +30,8 @@
 - Core2 touch / swipe の物理 UX。
 - Core2 日本語 glyph のユーザー目視確認。
 - Dashboard からの Choice / hatch-pet animation 実機目視確認。
+- Codex session auto relay の Core2 実機目視確認。
+- Codex hook relay の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
 - 実 Codex App 内部 API 連携。
 

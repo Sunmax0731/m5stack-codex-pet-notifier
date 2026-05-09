@@ -40,11 +40,14 @@ for (const required of [
   'src/host-adapter/localLanBridge.mjs',
   'src/host-bridge/server.mjs',
   'src/codex-adapter/relay.mjs',
+  'src/codex-adapter/sessionWatcher.mjs',
+  'src/codex-adapter/hookRelay.mjs',
   'src/codex-adapter/eventFactory.mjs',
   'src/device-adapter/deviceProfiles.mjs',
   'src/simulator/mockDevice.mjs',
   'scripts/bridge-smoke.mjs',
   'scripts/codex-relay-smoke.mjs',
+  'scripts/codex-session-smoke.mjs',
   'scripts/dashboard-smoke.mjs',
   'tools/generate-pet-firmware-asset.py',
   'src/host-bridge/dashboard/index.html',
@@ -73,6 +76,15 @@ assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pe
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
 assert(relaySource.includes("Buffer.from(result.stdout.trim(), 'base64').toString('utf8')"), 'clipboard relay must restore UTF-8 from Base64');
+
+const sessionWatcherSource = fs.readFileSync('src/codex-adapter/sessionWatcher.mjs', 'utf8');
+assert(sessionWatcherSource.includes('.codex'), 'session watcher must default to local Codex session logs');
+assert(sessionWatcherSource.includes('publishLatestSession'), 'session watcher must publish the latest Codex exchange');
+assert(sessionWatcherSource.includes('bodyPersistedInEvidence') === false, 'session watcher source must not persist session body evidence directly');
+
+const hookRelaySource = fs.readFileSync('src/codex-adapter/hookRelay.mjs', 'utf8');
+assert(hookRelaySource.includes('runSessionWatcherCli'), 'hook relay must reuse the session watcher path');
+assert(fs.existsSync('docs/codex-hooks.example.json'), 'Codex hooks example must be documented');
 
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');

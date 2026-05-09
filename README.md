@@ -17,6 +17,8 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `src/host-bridge/server.mjs` で LAN Host Bridge を起動し、pairing、token 認証、HTTP polling、device event 受信、sample replay、event log、WebSocket upgrade を提供する。
 - Host Bridge 同梱 Dashboard で環境構築コマンド、状態確認、event log、Answer / Choice / Pet / Notification 送信、ABC 返信確認を GUI から扱う。
 - `src/codex-adapter/relay.mjs` で clipboard / stdin / file から Codex 返答本文を取り込み、PowerShell clipboard は Base64 UTF-8 経由で `answer.completed` として M5Stack へ送る。
+- `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
+- `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換する。
@@ -37,12 +39,18 @@ cmd.exe /d /s /c npm run codex:answer -- --text "Codexの返答本文"
 cmd.exe /d /s /c npm run codex:choice -- --prompt "進めますか?" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
+cmd.exe /d /s /c npm run codex:sessions -- --phase any
+cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
 
 Host Bridge 起動後は `http://127.0.0.1:8080/` で Dashboard を開けます。
+
+`codex:sessions` はローカルの Codex session log を読む opt-in adapter です。`--phase any` は進行中の最新メッセージも送ります。完了応答だけに絞る場合は `--phase final` を指定します。
+
+Codex Hooks が使える環境では `codex:hook` を hook command として登録します。設定例は [codex-hooks.example.json](docs/codex-hooks.example.json) です。
 
 ## Firmware
 

@@ -5,7 +5,7 @@
   "type": "module",
   "description": "M5Stack Codex pet notifier closed alpha prototype",
   "scripts": {
-    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/dashboard-smoke.mjs && node scripts/validate.mjs && node tools/closed-alpha-guard.mjs",
+    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/codex-session-smoke.mjs && node scripts/dashboard-smoke.mjs && node scripts/validate.mjs && node tools/closed-alpha-guard.mjs",
     "validate": "node scripts/validate.mjs",
     "bridge:smoke": "node scripts/bridge-smoke.mjs",
     "dashboard:smoke": "node scripts/dashboard-smoke.mjs",
@@ -16,6 +16,8 @@
     "codex:notification": "node src/codex-adapter/relay.mjs notification",
     "codex:pet": "node src/codex-adapter/relay.mjs pet",
     "codex:watch": "node src/codex-adapter/relay.mjs watch",
+    "codex:sessions": "node src/codex-adapter/sessionWatcher.mjs",
+    "codex:hook": "node src/codex-adapter/hookRelay.mjs",
     "pet:asset": "python tools/generate-pet-firmware-asset.py",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
     "closed-alpha:guard": "node tools/closed-alpha-guard.mjs",

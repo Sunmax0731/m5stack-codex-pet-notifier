@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node D:\\AI\\IoT\\m5stack-codex-pet-notifier\\src\\codex-adapter\\hookRelay.mjs --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001"
+          }
+        ]
+      }
+    ]
+  }
+}

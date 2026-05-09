@@ -101,7 +101,14 @@ cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "C
 cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
+cmd.exe /d /s /c npm run codex:sessions -- --phase any
+cmd.exe /d /s /c npm run codex:sessions -- --once --phase final
+cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
 cmd.exe /d /s /c npm run codex:answer -- --summary "日本語表示" --text "これは日本語の表示確認です。Core2のAnswer画面で文字化けせずに表示されれば合格です。"
 ```
 
 Windows で長い日本語本文を送る場合、`cmd.exe` の code page に左右されない clipboard または UTF-8 file watch を優先します。`codex:clipboard` は PowerShell clipboard を Base64 UTF-8 経由で読み取ります。
+
+Codex の最近 session を自動送信する場合は `codex:sessions` を起動します。既定では `%USERPROFILE%\.codex\sessions` の最新 JSONL を監視し、最新の user / assistant のやり取りを `answer.completed` として送ります。進行中の短い更新も見たい場合は `--phase any`、完了応答だけにしたい場合は `--phase final` を使います。
+
+Codex Hooks が使える環境では `docs/codex-hooks.example.json` の command を hook に登録します。`codex:hook` は hook から呼ばれるたびに最新 session を確認し、すでに送った message は本文を保存しない state file で抑止します。

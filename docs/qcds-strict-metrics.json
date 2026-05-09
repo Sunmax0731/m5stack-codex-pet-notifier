@@ -39,8 +39,9 @@
       "hostAdapter",
       "lanHostBridge",
       "dashboardGui",
-      "codexRelay",
-      "securityPrivacy"
+    "codexRelay",
+    "codexSessionAutoRelay",
+    "securityPrivacy"
     ],
     "passExpected": true
   },
@@ -70,6 +71,9 @@
     "core2HatchPetAssetUpload": true,
     "core2PetAnimationFirmwareUpload": true,
     "clipboardUtf8RelaySmoke": true,
+    "codexSessionSmoke": true,
+    "codexSessionAutoRelay": true,
+    "codexHookRelay": true,
     "core2ClipboardJapaneseVisualConfirmation": true,
     "core2FileWatchAnswerScreenConfirmation": true,
     "representativeSuite": [
@@ -82,6 +86,7 @@
   "notes": [
     "GRAY実機、長時間運用、実Codex App内部API連携は対象外のためS+は付けない。",
     "Core2 file watch はユーザー提供画像で Answer page 1/1、summary、本文、footer 表示を確認済み。",
+    "Codex session auto relay は local session JSONL の最新 user / assistant やり取りを answer.completed として送る smoke を追加済み。実機目視は手動確認対象。",
     "Dashboard GUI、/codex/choice、/codex/pet、hatch-pet asset firmware upload を追加済み。実機GUI連携の最終目視は手動確認対象。",
     "A-未満の観点はない。"
   ]

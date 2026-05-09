@@ -16,7 +16,9 @@
       "pio run -e m5stack-core2",
       "pio run -e m5stack-gray",
       "pio run -e m5stack-core2 -t upload --upload-port COM4",
-      "npm run dashboard:smoke"
+      "npm run dashboard:smoke",
+      "npm run codex:sessions -- --once --phase any",
+      "npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001"
     ]
   },
   "dashboardGui": {
@@ -28,6 +30,8 @@
     "browserSmokeMobile": "dist/dashboard-mobile-smoke.png",
     "choiceEndpoint": "/codex/choice",
     "petEndpoint": "/codex/pet",
+    "codexSessionCommand": "codex:sessions",
+    "codexHookCommand": "codex:hook",
     "abcReplySummaryInEvents": true,
     "evidence": "Dashboard assets, debug snapshot, choice/pet endpoints, and inbound reply details passed dashboard-smoke. Desktop and mobile screenshots were captured with Playwright."
   },
@@ -102,6 +106,28 @@
     "bodyPersistedInEvidence": true,
     "evidence": "User ran the file watch command and provided a Core2 photo showing Answer page 1/1 with the summary, file body text, and A up / B idle / C down footer."
   },
+  "codexSessionRelay": {
+    "command": "cmd.exe /d /s /c npm run codex:sessions -- --once --phase any",
+    "source": "%USERPROFILE%\\.codex\\sessions",
+    "sourceMode": "local-session-jsonl",
+    "optIn": true,
+    "smokePassed": true,
+    "answerCompletedObserved": true,
+    "bodyPersistedInEvidence": false,
+    "core2VisualConfirmationByUser": false,
+    "evidence": "scripts/codex-session-smoke.mjs validates extraction of the latest local Codex session exchange and queues it as answer.completed without persisting the session body in release evidence. Core2 visual confirmation is a manual-test item."
+  },
+  "codexHookRelay": {
+    "command": "cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001",
+    "hookExample": "docs/codex-hooks.example.json",
+    "stateFile": "dist/codex-session-hook-state.json",
+    "stateFileContainsBody": false,
+    "smokePassed": true,
+    "localHookCommandQueued": true,
+    "answerCompletedObserved": true,
+    "core2VisualConfirmationByUser": false,
+    "evidence": "codex:hook reuses the session watcher in one-shot mode and uses a body-free state signature for duplicate suppression. scripts/codex-session-smoke.mjs covers the hook-equivalent state-file path."
+  },
   "japaneseDisplay": {
     "firmwareFont": "fonts::efontJA_12",
     "utf8BoundarySafePaging": true,
@@ -158,6 +184,8 @@
     "device.reply_selected",
     "screen=Answer",
       "answer.completed",
+      "codex session auto relay",
+      "codex hook relay",
       "dashboard:smoke",
       "hatch-pet asset firmware upload"
     ]
@@ -173,9 +201,11 @@
     "Core2 touch and swipe physical interaction not exercised",
     "Dashboard Choice/Pet real-device visual confirmation is prepared but still requires user manual check",
     "hatch-pet asset visual confirmation on Core2 is prepared but still requires user manual check",
+    "Codex session auto relay visual confirmation on Core2 is prepared but still requires user manual check",
+    "Codex hook relay visual confirmation on Core2 is prepared but still requires user manual check",
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
-    "real Codex App internal API is not used; relay uses clipboard/stdin/file input",
+    "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
     "local 8080 bridge is still an admin-owned v0.1.0-alpha.2 process; close it and start v0.1.0-alpha.5 before final manual confirmation"
   ]
 }

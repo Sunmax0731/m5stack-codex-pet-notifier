@@ -7,8 +7,9 @@
 3. M5Stack の Pairing 画面で pairing code を登録する。
 4. Idle 画面で pet、接続状態、未読件数を確認する。
 5. Codex relay で通知や回答を送り、M5Stack 画面で内容を確認する。
-6. Choice 画面では A/B/C に対応する選択肢を押して返信する。
-7. PC の Dashboard で event log と inbound reply を確認する。
+6. `codex:sessions` を起動すると、最近の Codex session の最新やり取りが自動で M5Stack に表示される。
+7. Choice 画面では A/B/C に対応する選択肢を押して返信する。
+8. PC の Dashboard で event log と inbound reply を確認する。
 
 Host Bridge の closed alpha endpoint は LAN 内限定です。公開ネットワークやポート開放した環境では起動しません。
 
@@ -21,6 +22,35 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - `Choice` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound で確認する。
 - `Pet` tab から pet name / state / spriteRef を更新し、M5Stack の avatar 表示を確認する。
 - `debug JSON` で redacted snapshot と導入コマンドを確認する。
+
+## Codex Session Auto Relay
+
+最近の Codex session を自動で M5Stack に送る場合は、Host Bridge 起動後に別 PowerShell で次を実行します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run codex:sessions -- --phase any
+```
+
+最新の完了応答だけに絞る場合:
+
+```powershell
+cmd.exe /d /s /c npm run codex:sessions -- --phase final
+```
+
+1回だけ送る場合:
+
+```powershell
+cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
+```
+
+Codex Hooks から送る場合は、hook の command に次を登録します。
+
+```powershell
+cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
+```
+
+設定例は `docs/codex-hooks.example.json` にあります。
 
 ## Pet Asset
 

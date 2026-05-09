@@ -381,6 +381,8 @@ function buildDebugCommands() {
     petAsset: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\\.codex\\pets\\Mira --output firmware\\include\\pet_asset.local.h',
     core2Upload: 'E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4',
     codexAnswer: 'cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "Core2に表示するCodex返答本文"',
+    codexSessions: 'cmd.exe /d /s /c npm run codex:sessions -- --phase any',
+    codexHook: 'cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001',
     codexChoice: 'cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案',
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'

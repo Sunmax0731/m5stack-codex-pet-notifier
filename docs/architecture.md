@@ -2,7 +2,7 @@
 
 ```mermaid
 flowchart LR
-  Codex["Codex Relay (clipboard/stdin/file)"] --> Bridge["LAN Host Bridge"]
+  Codex["Codex Relay (clipboard/stdin/file/session JSONL)"] --> Bridge["LAN Host Bridge"]
   Dashboard["Dashboard GUI"] --> Bridge
   Bridge --> Protocol["Event Protocol / JSON Schemas"]
   Protocol --> Simulator["Mock M5Stack Simulator"]
@@ -19,6 +19,7 @@ flowchart LR
 | LAN Host Bridge | HTTP API、sample replay、event log、WebSocket upgrade | `src/host-bridge/server.mjs` |
 | Dashboard GUI | 環境構築、状態確認、debug snapshot、event 送信、ABC 返信確認 | `src/host-bridge/dashboard/` |
 | Codex relay | clipboard / stdin / file の返答本文を event 化する | `src/codex-adapter/relay.mjs` |
+| Codex session watcher | local session JSONL の最新 user / assistant やり取りを event 化する | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex adapter model | Codex 側の未確定差分を隔離する mock | `src/host-adapter/mockCodexAdapter.mjs` |
 | Protocol | schema load、型検査、warning | `src/protocol/validator.mjs` |
 | Device adapter | Core2 / GRAY の入力と画面差分 | `src/device-adapter/deviceProfiles.mjs` |
@@ -28,7 +29,7 @@ flowchart LR
 
 ## Data Flow
 
-1. Codex relay または Dashboard GUI が clipboard / stdin / file / form input から event を生成する。
+1. Codex relay または Dashboard GUI が clipboard / stdin / file / local session JSONL / form input から event を生成する。
 2. Host Bridge が device を pairing し token を発行する。
 3. Host -> Device event は schema validation 後に queue され、firmware が polling で取得する。
 4. Device -> Host event は token 検証後に reply / interaction / heartbeat として受理する。

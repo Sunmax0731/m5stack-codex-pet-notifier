@@ -29,8 +29,10 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-12 | `codex:answer` で日本語本文を送る | Core2 の Answer 画面で日本語が文字化けせず表示される | 準備済み。ユーザー目視 |
 | C2-13 | 日本語本文を clipboard に入れ、`codex:clipboard` を実行する | Core2 の Answer 画面で clipboard 日本語本文が文字化けせず表示される | 実施済み。ユーザー目視で文字化けなし |
 | C2-14 | `codex:watch --once` で UTF-8 file 内容を送る | Core2 が `Answer` 画面へ遷移し、summary と file 内容を表示する | 実施済み。ユーザー提供画像で `Answer page 1/1`、summary、file 内容、`A up / B idle / C down` footer を確認 |
-| C2-15 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 header の pet avatar が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
-| C2-16 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
+| C2-15 | `codex:sessions --once --phase any` を実行する | 最近の Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ自動表示される | 準備済み。ユーザー手動 |
+| C2-16 | `codex:hook` を実行する | Codex Hooks から呼ばれる one-shot relay と同じ経路で最新やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
+| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 header の pet avatar が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない | 準備済み。ユーザー手動 |
+| C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -46,6 +48,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-04 | Dashboard の Pet tab から `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションする | ユーザー手動 |
 | GUI-05 | Dashboard の Choice tab から A/B/C を送り、Core2 で A/B/C を押す | inbound に `device.reply_selected`、workflow panel に choiceId / input が出る | ユーザー手動 |
 | GUI-06 | `sample replay` を押す | sample events が outbound に追加され、Core2 が poll する | ユーザー手動 |
+| GUI-07 | Dashboard の command panel で `codexSessions` を確認し、別 PowerShell で実行する | 最新 Codex session が `answer.completed` として outbound に出る | ユーザー手動 |
 
 ## 記録項目
 
@@ -83,6 +86,9 @@ cmd.exe /d /s /c npm run codex:answer -- --summary "Codex返答表示" --text "C
 cmd.exe /d /s /c npm run codex:choice -- --prompt "次の作業を選んでください" --choices yes:進める,no:止める,other:別案
 cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
+cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
+cmd.exe /d /s /c npm run codex:sessions -- --phase final
+cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
 ```
 
 firmware:
@@ -111,6 +117,8 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - Codex relay evidence: `codex:answer` で `answer.completed` を送信し、Core2 の Answer 表示と `/events` outbound を確認済み。ユーザー目視でも意図どおりの表示を確認した。
 - Clipboard Japanese evidence: `codex:clipboard` で日本語本文を送信し、Core2 の Answer 表示が文字化けしていないことをユーザー目視で確認済み。
 - File watch evidence: `codex:watch --file dist\codex-answer.txt --once` で `Codex file watch answer` を送信し、Core2 の `Answer page 1/1` に summary、本文、`A up / B idle / C down` footer が表示されたことをユーザー提供画像で確認済み。
+- Codex session evidence: `codex:sessions` は `%USERPROFILE%\.codex\sessions` の最新 JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として送信する。自動検証は `scripts/codex-session-smoke.mjs` で実施する。
+- Codex hook evidence: `codex:hook` は Codex Hooks の command hook から呼べる one-shot relay で、本文を含まない state file により重複送信を抑止する。
 - Dashboard evidence: `dashboard:smoke`、desktop / mobile browser screenshot、Core2 firmware upload を実施済み。GUI と実機連携の最終目視は `docs/gui-tools-manual-check.md` に従って実施する。
 - Hatch-pet asset evidence: `%USERPROFILE%\.codex\pets\Mira` から `firmware/include/pet_asset.local.h` を生成し、Core2 firmware に組み込む。生成済み header は ignored local file として扱う。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。

@@ -36,6 +36,7 @@ http://127.0.0.1:8080/
 - `M5Stack Codex Pet Console` が表示される。
 - 状態確認に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
+- command panel に `codexSessions` と `codexHook` が表示され、Codex session 自動送信と hook relay の起動コマンドを確認できる。
 - `/health` の `version` が `0.1.0-alpha.5` 以外、または `/debug/snapshot` が 404 の場合は古い Host Bridge が 8080 番に残っているため、その PowerShell を閉じてから再起動する。
 
 ## 2. M5Stack の pairing と状態確認
@@ -71,7 +72,34 @@ Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
 
-## 5. ABC 返信ワークフロー
+## 5. Codex session 自動送信
+
+別 PowerShell で最新 session を1回送信します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run codex:sessions -- --once --phase any
+```
+
+期待結果:
+
+- outbound に `answer.completed` が出る。
+- Core2 が `Answer` 画面へ遷移する。
+- 最近の Codex session の最新 user / assistant やり取りが `User:`、`Codex:` 付きで表示される。
+- session JSONL の実本文は release evidence に保存しない。
+
+Hook 経由相当の one-shot relay を確認する場合:
+
+```powershell
+cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
+```
+
+期待結果:
+
+- 未送信の最新 session がある場合、outbound に `answer.completed` が出る。
+- 直前と同じ message の場合は重複抑止される。
+
+## 6. ABC 返信ワークフロー
 
 Dashboard の `Choice` tab で prompt と A/B/C label を入力し、`Choice を送信` を押します。
 
@@ -82,7 +110,7 @@ Dashboard の `Choice` tab で prompt と A/B/C label を入力し、`Choice を
 - Core2 の A/B/C のいずれかを押すと、Dashboard の inbound に `device.reply_selected` が出る。
 - `ABC 返信ワークフロー` panel に `choiceId`、`requestEventId`、`input` が表示される。
 
-## 6. Sample replay
+## 7. Sample replay
 
 Dashboard の `sample replay` を押します。
 
@@ -91,7 +119,7 @@ Dashboard の `sample replay` を押します。
 - `pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` が outbound に追加される。
 - Core2 が順に event を poll し、最終的に Choice 画面へ遷移する。
 
-## 7. セキュリティ境界確認
+## 8. セキュリティ境界確認
 
 別 PowerShell で誤 token の poll を送ります。
 

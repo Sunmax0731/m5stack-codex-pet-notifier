@@ -27,6 +27,8 @@ try {
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
   assert.match(snapshot.commands.codexChoice, /codex:choice/);
+  assert.match(snapshot.commands.codexSessions, /codex:sessions/);
+  assert.match(snapshot.commands.codexHook, /codex:hook/);
   assert.match(snapshot.commands.petAsset, /pet:asset/);
 
   const pair = await postJson(`${baseUrl}/pair`, { deviceId, pairingCode: productProfile.defaultPairingCode });
@@ -84,6 +86,8 @@ try {
       dashboardIndex: true,
       dashboardAssets: true,
       debugSnapshot: true,
+      codexSessionCommand: true,
+      codexHookCommand: true,
       petAssetCommand: true,
       petEndpoint: true,
       choiceEndpoint: true,
