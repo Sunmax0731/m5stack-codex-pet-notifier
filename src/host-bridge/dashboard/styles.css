@@ -133,6 +133,7 @@ textarea:focus-visible {
   position: sticky;
   top: 0;
   height: 100vh;
+  overflow-y: auto;
   border-right: 1px solid var(--border);
   background: var(--sidebar);
   padding: 20px 14px;
@@ -205,7 +206,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 24px;
+  margin-top: 14px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-soft);
@@ -303,7 +304,6 @@ textarea:focus-visible {
   padding-top: 16px;
 }
 
-.status-panel,
 .preview-panel {
   grid-column: 1 / -1;
 }
@@ -379,6 +379,53 @@ textarea:focus-visible {
   margin-top: 4px;
   font-size: 26px;
   line-height: 1.1;
+}
+
+.sidebar-status-panel {
+  margin-top: 14px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.sidebar-status-panel .panel-header {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sidebar-status-panel .panel-actions {
+  justify-content: space-between;
+}
+
+.sidebar-status-panel .section-toggle {
+  min-width: 54px;
+  min-height: 30px;
+  padding: 5px 8px;
+}
+
+.sidebar-status-panel .metric-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sidebar-status-panel .metric {
+  min-width: 0;
+  padding: 9px;
+}
+
+.sidebar-status-panel .metric strong {
+  font-size: 20px;
+}
+
+.sidebar-status-panel .device-list {
+  display: grid;
+  gap: 6px;
+}
+
+.sidebar-status-panel .device-chip {
+  border-radius: 8px;
+  padding: 7px 8px;
+  line-height: 1.35;
 }
 
 .device-list {

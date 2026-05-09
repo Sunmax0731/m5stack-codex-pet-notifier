@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Host Bridge model | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する contract を検証する | `src/host-adapter/localLanBridge.mjs` |
 | LAN Host Bridge | pairing、token 認証、HTTP polling、device event 受信、sample replay、event log を提供する | `src/host-bridge/server.mjs` |
-| Dashboard GUI | Host Bridge の状態確認、debug snapshot、event 送信、ABC 返信確認、最近の Codex session 回答表示、Core2 / GRAY preview、表示設定、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
+| Dashboard GUI | Host Bridge のsidebar状態確認、debug snapshot、event 送信、ABC 返信確認、最近の Codex session 回答表示、Core2 / GRAY preview、表示設定、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
 | Codex relay | clipboard / stdin / file の Codex 返答を `answer.completed` へ変換して Host Bridge に送る。PowerShell clipboard は Base64 UTF-8 経由で読む | `src/codex-adapter/relay.mjs` |
 | Codex session watcher | `%USERPROFILE%\.codex\sessions` の最新 session JSONL から user / assistant の最新やり取りを抽出し、`answer.completed` として送る | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex hook relay | Codex Hooks の command hook から one-shot で session watcher を実行し、重複送信を state file で抑止する | `src/codex-adapter/hookRelay.mjs` |

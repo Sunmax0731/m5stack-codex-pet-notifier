@@ -54,7 +54,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
-| GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
+| GUI-01 | `npm run bridge:start -- --host=0.0.0.0 --port=8080` 後に `http://127.0.0.1:8080/` を開く | Dashboard が表示され、sidebar 内の状態確認 section に paired / outbound / inbound / security が見える | 自動 screenshot 済み。実機連携はユーザー手動 |
 | GUI-02 | `debug JSON` を開く | `/debug/snapshot` に health、redacted events、debug commands が出る | `dashboard:smoke` 済み |
 | GUI-03 | `環境構築コマンド` modal の `デバッグ送信` tab、または modal 内の直接送信フォームから Answer 本文を送る | outbound に `answer.completed`、Core2 に Answer 画面が出る | ユーザー手動 |
 | GUI-04 | Dashboard の `M5Stack 表示プレビュー` から Pet state `celebrate` を送る | Core2 の pet avatar が state 連動でアニメーションし、Sprite buffer により pet surface 外の文字や footer がちらつかない | ユーザー手動 |
@@ -64,7 +64,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-08 | `最近の Codex 回答` panel の `読込` を押す | local Codex session の最新 assistant 回答と直前 user message が Dashboard に表示される | `dashboard:smoke` 済み。実 session 目視はユーザー手動 |
 | GUI-09 | `最近の Codex 回答` panel の `M5Stackへ送信` を押す | outbound に `answer.completed` が出て、Core2 の Answer 画面へ同じ内容が表示される | `dashboard:smoke` 済み。実機目視はユーザー手動 |
 | GUI-10 | `M5Stack 表示プレビュー` で pet display area、UI text size、body text size を `1..8`、render FPS を `4..20`、motion step を `120..800`、screen / pet / text / border RGBA、pet X/Y offset、beep を変更して `表示設定を送信` を押す | outbound に `display.settings_updated` が出る。payload に `screenBackgroundRgba`、`petBackgroundRgba`、`textColorRgba`、`textBackgroundRgba`、`petOffsetX`、`petOffsetY`、`textBorderEnabled`、`textBorderRgba`、`beepOnAnswer` が入る。古い bridge process では fallback の `pet.updated` でも可 | `dashboard:smoke` 済み。実機目視はユーザー手動 |
-| GUI-11 | side menu で `状態`、`プレビュー`、`最近の回答`、`ログ` へ移動する | `状態` がサイドバーに表示され、各 section へ移動できる。独立した `送信` / `デバッグ` menu はなく、Answer / Decision / Notification は `環境構築コマンド` modal 内にある | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-11 | side menu で `状態`、`プレビュー`、`最近の回答`、`ログ` へ移動する | `状態確認` section が sidebar 内に表示され、各 section へ移動できる。独立した `送信` / `デバッグ` menu はなく、Answer / Decision / Notification は `環境構築コマンド` modal 内にある | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-12 | 各 section の `Hide` / `View` を押す | section body が折りたたみ / 再表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-13 | 主要 input / slider 横の `?` icon をクリックする | 項目の意味を説明する help popover が表示され、外側 click または Esc で閉じる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信`、`保守` のタブ付き command modal が開き、pet asset、Core2 upload、Codex relay、sample replay を任意パラメータで実行できる | `dashboard:smoke` 済み。ユーザー目視 |

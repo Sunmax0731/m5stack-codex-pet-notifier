@@ -171,6 +171,7 @@ const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', '
 assert(dashboardIndexSource.includes('最近の Codex 回答'), 'Dashboard must display the latest Codex answer panel');
 assert(dashboardIndexSource.includes('side-nav'), 'Dashboard must expose side navigation');
 assert(dashboardIndexSource.includes('data-section="statusSection"'), 'Dashboard sidebar must keep the status item visible');
+assert(/<aside class="sidebar">[\s\S]*<section id="statusSection" class="panel status-panel sidebar-status-panel"/.test(dashboardIndexSource), 'Dashboard status section must be rendered inside the sidebar');
 assert(!dashboardIndexSource.includes('data-section="debugSection"'), 'Dashboard sidebar must not expose a separate debug item');
 assert(dashboardIndexSource.includes('M5Stack 表示プレビュー'), 'Dashboard must expose a M5Stack display preview');
 assert(dashboardIndexSource.includes('<option value="choice">三択</option>'), 'Dashboard screen-mode options must default to Japanese labels');
@@ -199,6 +200,7 @@ assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must
 assert(dashboardIndexSource.includes('commandModal'), 'Dashboard setup/debug commands must be shown in a modal');
 assert(dashboardIndexSource.includes('commandTabs'), 'Dashboard command modal must use tabs');
 assert(dashboardIndexSource.includes('runtimeState'), 'Dashboard sidebar must display bridge runtime status');
+assert(fs.readFileSync('src/host-bridge/dashboard/styles.css', 'utf8').includes('.sidebar-status-panel'), 'Dashboard must style the sidebar status section');
 assert(!dashboardIndexSource.includes('data-section="sendSection"'), 'Dashboard must merge the standalone sender section into the command modal');
 assert(dashboardIndexSource.includes('debug-send-block'), 'Dashboard command modal must contain the outbound sender controls');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');

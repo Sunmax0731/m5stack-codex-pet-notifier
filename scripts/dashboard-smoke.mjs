@@ -48,6 +48,7 @@ try {
   assert.match(index, /M5Stack Codex Pet Console/);
   assert.match(index, /side-nav/);
   assert.match(index, /data-section="statusSection"/);
+  assert.match(index, /<aside class="sidebar">[\s\S]*<section id="statusSection" class="panel status-panel sidebar-status-panel"/);
   assert.doesNotMatch(index, /data-section="debugSection"/);
   assert.match(index, /最近の Codex 回答/);
   assert.match(index, /M5Stack 表示プレビュー/);
@@ -113,6 +114,7 @@ try {
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
+  assert.match(css, /\.sidebar-status-panel/);
   assert.match(css, /\[data-theme="dark"\]/);
   assert.match(css, /\.m5-screen/);
   assert.match(css, /--screen-bg/);

@@ -36,10 +36,10 @@ http://127.0.0.1:8080/
 期待結果:
 
 - `M5Stack Codex Pet Console` が表示される。
-- 状態確認に paired、outbound、inbound、security の数値が表示される。
+- sidebar 内の状態確認 section に paired、outbound、inbound、security の数値が表示される。
 - `debug JSON` を開くと `/debug/snapshot` の JSON が表示される。
 - `最近の Codex 回答` panel が表示され、`読込` と `M5Stackへ送信` button がある。
-- side menu があり、状態、プレビュー、最近の回答、ログへ移動できる。`状態` は必ず表示され、独立した `送信` menu と `デバッグ` menu は表示されない。
+- side menu があり、状態、プレビュー、最近の回答、ログへ移動できる。`状態確認` section は sidebar 内に表示され、独立した `送信` menu と `デバッグ` menu は表示されない。
 - Answer / Decision / Notify の送信、sample replay、各種 debug command は `環境構築コマンド` modal に集約されている。
 - `M5Stack 表示プレビュー` に Pet 設定、pet display area、UI text size、body text size、render FPS、motion step が統合されている。
 - `M5Stack 表示プレビュー` があり、現在の hatch-pet キャラで Pet / Answer / Decision / Notify の simulated display を送信前に確認できる。

@@ -23,7 +23,6 @@
           <button class="side-link" type="button" data-section="sessionSection" data-i18n="navSession">最近の回答</button>
           <button class="side-link" type="button" data-section="logSection" data-i18n="navLog">ログ</button>
         </nav>
-        <button id="openCommandsButton" class="sidebar-action" type="button" data-i18n="openCommands">環境構築コマンド</button>
         <div class="side-note runtime-note">
           <span id="runtimeDot" class="status-dot"></span>
           <span>
@@ -31,6 +30,40 @@
             <small id="runtimePid">pid -</small>
           </span>
         </div>
+        <section id="statusSection" class="panel status-panel sidebar-status-panel" aria-labelledby="statusHeading">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Bridge health</p>
+              <h2 id="statusHeading" data-i18n="statusHeading">状態確認</h2>
+            </div>
+            <div class="panel-actions">
+              <span id="lastUpdated" class="muted">未更新</span>
+              <button class="section-toggle secondary" type="button" data-target="statusSection" data-i18n="hide">隠す</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="metric-grid">
+              <div class="metric hint" tabindex="0" data-tooltip="Pairing済みでpoll可能なM5Stackの台数です。">
+                <span class="metric-label" data-i18n="metricPaired">接続</span>
+                <strong id="pairedCount">0</strong>
+              </div>
+              <div class="metric hint" tabindex="0" data-tooltip="CodexまたはGUIからM5Stackへ送ったイベント数です。">
+                <span class="metric-label" data-i18n="metricOutbound">送信</span>
+                <strong id="outboundCount">0</strong>
+              </div>
+              <div class="metric hint" tabindex="0" data-tooltip="M5StackのA/B/C返信、pet touch、heartbeatなどの受信数です。">
+                <span class="metric-label" data-i18n="metricInbound">受信</span>
+                <strong id="inboundCount">0</strong>
+              </div>
+              <div class="metric hint" tabindex="0" data-tooltip="誤pairing codeや誤tokenなど、安全境界で拒否したリクエスト数です。">
+                <span class="metric-label" data-i18n="metricSecurity">拒否</span>
+                <strong id="securityCount">0</strong>
+              </div>
+            </div>
+            <div id="deviceList" class="device-list"></div>
+          </div>
+        </section>
+        <button id="openCommandsButton" class="sidebar-action" type="button" data-i18n="openCommands">環境構築コマンド</button>
       </aside>
 
       <div class="workspace">
@@ -62,40 +95,6 @@
         </header>
 
         <main class="dashboard-grid">
-          <section id="statusSection" class="panel status-panel" aria-labelledby="statusHeading">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Bridge health</p>
-                <h2 id="statusHeading" data-i18n="statusHeading">状態確認</h2>
-              </div>
-              <div class="panel-actions">
-                <span id="lastUpdated" class="muted">未更新</span>
-                <button class="section-toggle secondary" type="button" data-target="statusSection" data-i18n="hide">隠す</button>
-              </div>
-            </div>
-            <div class="panel-body">
-              <div class="metric-grid">
-                <div class="metric hint" tabindex="0" data-tooltip="Pairing済みでpoll可能なM5Stackの台数です。">
-                  <span class="metric-label" data-i18n="metricPaired">接続</span>
-                  <strong id="pairedCount">0</strong>
-                </div>
-                <div class="metric hint" tabindex="0" data-tooltip="CodexまたはGUIからM5Stackへ送ったイベント数です。">
-                  <span class="metric-label" data-i18n="metricOutbound">送信</span>
-                  <strong id="outboundCount">0</strong>
-                </div>
-                <div class="metric hint" tabindex="0" data-tooltip="M5StackのA/B/C返信、pet touch、heartbeatなどの受信数です。">
-                  <span class="metric-label" data-i18n="metricInbound">受信</span>
-                  <strong id="inboundCount">0</strong>
-                </div>
-                <div class="metric hint" tabindex="0" data-tooltip="誤pairing codeや誤tokenなど、安全境界で拒否したリクエスト数です。">
-                  <span class="metric-label" data-i18n="metricSecurity">拒否</span>
-                  <strong id="securityCount">0</strong>
-                </div>
-              </div>
-              <div id="deviceList" class="device-list"></div>
-            </div>
-          </section>
-
           <section id="previewSection" class="panel preview-panel" aria-labelledby="previewHeading">
             <div class="panel-header">
               <div>
