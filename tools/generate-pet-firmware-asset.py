@@ -14,6 +14,7 @@ except ImportError as exc:  # pragma: no cover - environment guidance
 
 
 TRANSPARENT_RGB565 = 0xF81F
+DEFAULT_SCALE_MAX_HEIGHT = 220
 
 
 def rgb565(red: int, green: int, blue: int) -> int:
@@ -32,12 +33,53 @@ def load_pet(pet_dir: Path) -> tuple[dict, Image.Image]:
     return metadata, Image.open(spritesheet_path).convert("RGBA")
 
 
+def c_string(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def union_content_bbox(
+    spritesheet: Image.Image,
+    row: int,
+    frames: int,
+) -> tuple[int, int, int, int]:
+    cell_width = spritesheet.width // 8
+    cell_height = spritesheet.height // 9
+    bounds: tuple[int, int, int, int] | None = None
+    for column in range(frames):
+        cell = spritesheet.crop((
+            column * cell_width,
+            row * cell_height,
+            (column + 1) * cell_width,
+            (row + 1) * cell_height,
+        ))
+        bbox = cell.getbbox()
+        if bbox is None:
+            continue
+        bounds = bbox if bounds is None else (
+            min(bounds[0], bbox[0]),
+            min(bounds[1], bbox[1]),
+            max(bounds[2], bbox[2]),
+            max(bounds[3], bbox[3]),
+        )
+    if bounds is None:
+        return (0, 0, cell_width, cell_height)
+    margin = 2
+    return (
+        max(0, bounds[0] - margin),
+        max(0, bounds[1] - margin),
+        min(cell_width, bounds[2] + margin),
+        min(cell_height, bounds[3] + margin),
+    )
+
+
 def frame_pixels(
     spritesheet: Image.Image,
     row: int,
     column: int,
     frame_width: int,
     frame_height: int,
+    bbox: tuple[int, int, int, int] | None = None,
+    resampling: Image.Resampling = Image.Resampling.NEAREST,
 ) -> list[int]:
     cell_width = spritesheet.width // 8
     cell_height = spritesheet.height // 9
@@ -47,7 +89,9 @@ def frame_pixels(
         (column + 1) * cell_width,
         (row + 1) * cell_height,
     ))
-    resized = cell.resize((frame_width, frame_height), Image.Resampling.NEAREST)
+    if bbox is not None:
+        cell = cell.crop(bbox)
+    resized = cell.resize((frame_width, frame_height), resampling)
     pixels: list[int] = []
     for red, green, blue, alpha in resized.getdata():
         if alpha < 64:
@@ -55,6 +99,24 @@ def frame_pixels(
         else:
             pixels.append(rgb565(red, green, blue))
     return pixels
+
+
+def scale_dimensions(
+    bbox: tuple[int, int, int, int],
+    levels: int,
+    base_height: int,
+    max_height: int,
+    max_width: int,
+) -> list[tuple[int, int]]:
+    source_width = max(1, bbox[2] - bbox[0])
+    source_height = max(1, bbox[3] - bbox[1])
+    aspect = source_width / source_height
+    output: list[tuple[int, int]] = []
+    for level in range(levels):
+        height = base_height + round((max_height - base_height) * level / max(1, levels - 1))
+        width = min(max_width, max(1, round(height * aspect)))
+        output.append((width, height))
+    return output
 
 
 def format_frame(values: list[int]) -> str:
@@ -65,23 +127,51 @@ def format_frame(values: list[int]) -> str:
     return ",\n".join(lines)
 
 
+def format_flat_pixels(values: list[int]) -> str:
+    return format_frame(values)
+
+
 def write_header(args: argparse.Namespace) -> None:
     pet_dir = Path(args.pet_dir).resolve()
     metadata, spritesheet = load_pet(pet_dir)
+    bbox = union_content_bbox(spritesheet, args.row, args.frames)
     frames = [
         frame_pixels(spritesheet, args.row, column, args.width, args.height)
         for column in range(args.frames)
     ]
+    scaled_dimensions = scale_dimensions(
+        bbox,
+        args.scale_levels,
+        args.height,
+        args.scale_max_height,
+        args.scale_max_width,
+    ) if args.scaled else []
+    scaled_offsets: list[list[int]] = []
+    scaled_pixels: list[int] = []
+    if args.scaled:
+        for width, height in scaled_dimensions:
+            level_offsets: list[int] = []
+            for column in range(args.frames):
+                level_offsets.append(len(scaled_pixels))
+                scaled_pixels.extend(frame_pixels(
+                    spritesheet,
+                    args.row,
+                    column,
+                    width,
+                    height,
+                    bbox=bbox,
+                    resampling=Image.Resampling.LANCZOS,
+                ))
+            scaled_offsets.append(level_offsets)
     display_name = metadata.get("displayName", metadata.get("id", pet_dir.name))
     output = Path(args.output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     frame_blocks = ",\n".join("{\n" + format_frame(frame) + "\n  }" for frame in frames)
-    output.write_text(
-        "\n".join([
+    lines = [
             "#pragma once",
             "",
             "// Generated from a local hatch-pet package. Do not commit this file.",
-            f'static constexpr const char* PET_ASSET_NAME = "{display_name}";',
+            f'static constexpr const char* PET_ASSET_NAME = "{c_string(display_name)}";',
             f"static constexpr uint16_t PET_ASSET_TRANSPARENT = 0x{TRANSPARENT_RGB565:04X};",
             f"static constexpr int PET_ASSET_FRAME_WIDTH = {args.width};",
             f"static constexpr int PET_ASSET_FRAME_HEIGHT = {args.height};",
@@ -90,10 +180,35 @@ def write_header(args: argparse.Namespace) -> None:
             "  " + frame_blocks,
             "};",
             "",
-        ]),
+    ]
+    if args.scaled:
+        widths = ", ".join(str(width) for width, _ in scaled_dimensions)
+        heights = ", ".join(str(height) for _, height in scaled_dimensions)
+        offset_rows = ",\n".join(
+            "  {" + ", ".join(str(offset) for offset in offsets) + "}"
+            for offsets in scaled_offsets
+        )
+        lines.extend([
+            "// Scale-specific frames are generated from the source pet cells, not from the low-resolution base frame.",
+            "// Firmware uses these on Core2 to avoid blocky nearest-neighbor enlargement.",
+            "#define PET_ASSET_HAS_SCALE_FRAMES 1",
+            f"static constexpr int PET_ASSET_SCALE_LEVELS = {args.scale_levels};",
+            f"static constexpr uint16_t PET_ASSET_SCALE_WIDTHS[PET_ASSET_SCALE_LEVELS] PROGMEM = {{ {widths} }};",
+            f"static constexpr uint16_t PET_ASSET_SCALE_HEIGHTS[PET_ASSET_SCALE_LEVELS] PROGMEM = {{ {heights} }};",
+            f"static constexpr uint32_t PET_ASSET_SCALE_OFFSETS[PET_ASSET_SCALE_LEVELS][PET_ASSET_FRAME_COUNT] PROGMEM = {{",
+            offset_rows,
+            "};",
+            f"static const uint16_t PET_ASSET_SCALED_PIXELS[{len(scaled_pixels)}] PROGMEM = {{",
+            format_flat_pixels(scaled_pixels),
+            "};",
+            "",
+        ])
+    output.write_text(
+        "\n".join(lines),
         encoding="utf-8",
     )
-    print(f"generated {output} from {pet_dir.name} ({args.frames} frames)")
+    scaled_message = f", {args.scale_levels} scale-specific frame sets" if args.scaled else ""
+    print(f"generated {output} from {pet_dir.name} ({args.frames} frames{scaled_message})")
 
 
 def parse_args() -> argparse.Namespace:
@@ -104,6 +219,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--frames", type=int, default=4)
     parser.add_argument("--width", type=int, default=36)
     parser.add_argument("--height", type=int, default=40)
+    parser.add_argument("--scaled", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--scale-levels", type=int, default=8)
+    parser.add_argument("--scale-max-height", type=int, default=DEFAULT_SCALE_MAX_HEIGHT)
+    parser.add_argument("--scale-max-width", type=int, default=300)
     return parser.parse_args()
 
 

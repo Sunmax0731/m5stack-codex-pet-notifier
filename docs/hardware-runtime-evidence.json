@@ -155,6 +155,11 @@
     "localHeaderIgnoredByGit": true,
     "assetFrames": 4,
     "assetFrameSize": "36x40",
+    "scaleSpecificFrames": true,
+    "scaleSpecificFrameLevels": 8,
+    "scaleSpecificFrameSource": "source hatch-pet cells resampled per display scale",
+    "scaleSpecificCore2Only": true,
+    "grayScaleFrameFallback": "base frame enlargement to stay within flash budget",
     "fallbackAvatarAvailable": true,
     "frameIntervalMs": 320,
     "states": [
@@ -177,7 +182,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded to COM4. The ignored local header includes scale-specific Core2 frames and is not a release asset. Final visual confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",

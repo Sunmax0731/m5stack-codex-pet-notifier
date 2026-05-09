@@ -111,6 +111,8 @@
 - Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に pet 面積と text size の見え方を確認できる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
+- 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。
+- GRAY target は flash 余裕を優先し、同じ header が存在しても scale-specific frame は参照せず base frame 拡大へ fallback する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` を受け付ける。

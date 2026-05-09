@@ -21,6 +21,7 @@
 - Dashboard Display endpoint と pet 表示倍率 / text size controls。
 - Core2 hatch-pet asset animation の firmware 対応と upload。
 - Core2 固定ヘッダーテキスト削除、pet `1..8` 表示面積、dynamic display settings の firmware 対応。
+- Core2 scale-specific pet asset frame selection。
 - Dashboard side menu、event tabs、M5Stack 表示プレビュー。
 - Runtime gate。
 - Security/privacy checklist。

@@ -48,6 +48,7 @@
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 display settings | Dashboard から pet display area と text size を `1..8` で送り、Core2 の固定ヘッダーテキスト削除、pet 最大表示、文字サイズ変化を目視する | `docs/gui-tools-manual-check.md` |
+| Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/8`、`4/8`、`8/8` で低解像度 base frame のブロック拡大にならないことを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 

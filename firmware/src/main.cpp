@@ -124,7 +124,7 @@ void applyBodyFont() {
   applyDisplayFont(bodyTextScale);
 }
 
-int petAssetWidth() {
+int petBaseAssetWidth() {
 #if HAS_LOCAL_PET_ASSET
   return PET_ASSET_FRAME_WIDTH;
 #else
@@ -132,12 +132,46 @@ int petAssetWidth() {
 #endif
 }
 
-int petAssetHeight() {
+int petBaseAssetHeight() {
 #if HAS_LOCAL_PET_ASSET
   return PET_ASSET_FRAME_HEIGHT;
 #else
   return 52;
 #endif
+}
+
+bool hasScaleSpecificPetAsset() {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  return PET_ASSET_HAS_SCALE_FRAMES;
+#else
+  return false;
+#endif
+}
+
+int petScaleLevelIndex() {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  return max(0, min(PET_ASSET_SCALE_LEVELS - 1, petDisplayScale - 1));
+#else
+  return 0;
+#endif
+}
+
+int petAssetWidth() {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  if (hasScaleSpecificPetAsset()) {
+    return pgm_read_word(&PET_ASSET_SCALE_WIDTHS[petScaleLevelIndex()]);
+  }
+#endif
+  return petBaseAssetWidth();
+}
+
+int petAssetHeight() {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  if (hasScaleSpecificPetAsset()) {
+    return pgm_read_word(&PET_ASSET_SCALE_HEIGHTS[petScaleLevelIndex()]);
+  }
+#endif
+  return petBaseAssetHeight();
 }
 
 int petBoxPadding() {
@@ -156,19 +190,23 @@ int petSurfaceHeight() {
 int petPixelScale() {
   const int areaWidth = M5.Display.width();
   const int areaHeight = max(1, petSurfaceHeight() - 8);
-  const int baseWidth = petAssetWidth() + petBoxPadding();
-  const int baseHeight = petAssetHeight() + petBoxPadding();
+  const int baseWidth = petBaseAssetWidth() + petBoxPadding();
+  const int baseHeight = petBaseAssetHeight() + petBoxPadding();
   const int scaleByWidth = max(1, areaWidth / max(1, baseWidth));
   const int scaleByHeight = max(1, areaHeight / max(1, baseHeight));
   return max(1, min(DISPLAY_SCALE_MAX, min(scaleByWidth, scaleByHeight)));
 }
 
+int petAssetRenderScale() {
+  return hasScaleSpecificPetAsset() ? 1 : petPixelScale();
+}
+
 int petBoxWidth() {
-  return (petAssetWidth() + petBoxPadding()) * petPixelScale();
+  return petAssetWidth() + petBoxPadding() * petAssetRenderScale();
 }
 
 int petBoxHeight() {
-  return (petAssetHeight() + petBoxPadding()) * petPixelScale();
+  return petAssetHeight() + petBoxPadding() * petAssetRenderScale();
 }
 
 int headerHeight() {
@@ -371,8 +409,50 @@ uint16_t petAccentColor() {
   return TFT_SKYBLUE;
 }
 
+void drawScaleSpecificLocalPetAsset(int x, int y) {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  const int levelIndex = petScaleLevelIndex();
+  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
+  const int width = pgm_read_word(&PET_ASSET_SCALE_WIDTHS[levelIndex]);
+  const int height = pgm_read_word(&PET_ASSET_SCALE_HEIGHTS[levelIndex]);
+  const uint32_t offset = pgm_read_dword(&PET_ASSET_SCALE_OFFSETS[levelIndex][frameIndex]);
+  for (int row = 0; row < height; ++row) {
+    int runStart = -1;
+    uint16_t runColor = PET_ASSET_TRANSPARENT;
+    for (int col = 0; col < width; ++col) {
+      const uint16_t color = pgm_read_word(&PET_ASSET_SCALED_PIXELS[offset + row * width + col]);
+      if (color == PET_ASSET_TRANSPARENT) {
+        if (runStart >= 0) {
+          M5.Display.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+          runStart = -1;
+        }
+        continue;
+      }
+      if (runStart < 0) {
+        runStart = col;
+        runColor = color;
+      } else if (color != runColor) {
+        M5.Display.drawFastHLine(x + runStart, y + row, col - runStart, runColor);
+        runStart = col;
+        runColor = color;
+      }
+    }
+    if (runStart >= 0) {
+      M5.Display.drawFastHLine(x + runStart, y + row, width - runStart, runColor);
+    }
+  }
+#else
+  (void)x;
+  (void)y;
+#endif
+}
+
 void drawLocalPetAsset(int x, int y, int scale) {
 #if HAS_LOCAL_PET_ASSET
+  if (hasScaleSpecificPetAsset()) {
+    drawScaleSpecificLocalPetAsset(x, y);
+    return;
+  }
   const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
   for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
     for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
@@ -427,7 +507,7 @@ void drawVectorPetAvatar(int x, int y) {
 void drawPetAvatar(int x, int y) {
 #if HAS_LOCAL_PET_ASSET
   const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
-  const int s = petPixelScale();
+  const int s = petAssetRenderScale();
   const int inset = (petBoxPadding() / 2) * s;
   M5.Display.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
   M5.Display.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);

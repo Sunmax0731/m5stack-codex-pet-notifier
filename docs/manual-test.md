@@ -36,6 +36,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
 | C2-20 | Dashboard の `Display` tab で pet display area を `8/8`、UI text size と body text size を任意に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8` の設定に応じて変わる | 準備済み。ユーザー手動 |
 | C2-21 | Dashboard の `M5Stack 表示プレビュー` で Pet / Answer / Choice / Notify を切り替え、Display slider を `1..8` で変更する | 送信前の simulated display が pet 面積、body text、footer text size を即時反映する | `dashboard:smoke` 済み。ユーザー目視 |
+| C2-22 | `pet:asset` 生成後の firmware で Display slider を `1/8`、`4/8`、`8/8` に変えて pet を見る | Core2 の pet は scale ごとの高解像度 frame に切り替わり、低解像度 base frame をブロック状に拡大した見た目にならない | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 
@@ -128,6 +129,6 @@ E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2 -t up
 - Codex session evidence: `codex:sessions` は `%USERPROFILE%\.codex\sessions` の最新 JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として送信する。自動検証は `scripts/codex-session-smoke.mjs` で実施する。
 - Codex hook evidence: `codex:hook` は Codex Hooks の command hook から呼べる one-shot relay で、本文を含まない state file により重複送信を抑止する。
 - Dashboard evidence: `dashboard:smoke`、desktop / mobile browser screenshot、Core2 firmware upload を実施済み。GUI と実機連携の最終目視は `docs/gui-tools-manual-check.md` に従って実施する。
-- Hatch-pet asset evidence: `%USERPROFILE%\.codex\pets\Mira` から `firmware/include/pet_asset.local.h` を生成し、Core2 firmware に組み込む。生成済み header は ignored local file として扱う。
+- Hatch-pet asset evidence: `%USERPROFILE%\.codex\pets\Mira` から scale-specific frame 付きの `firmware/include/pet_asset.local.h` を生成し、Core2 firmware に組み込む。生成済み header は ignored local file として扱う。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。
 - 注意: `D:\AI\secure\ssid.txt` の SSID は 5GHz 側だったため、M5Stack から見える 2.4GHz 側 SSID を local config に設定した。

@@ -75,6 +75,7 @@ Dashboard の `Pet` tab で state を `celebrate` または `reacting` にして
 - Core2 の pet surface の背景色または表示状態が変わる。
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。
+- Display 設定を `1/8`、`4/8`、`8/8` に変えたとき、Core2 は scale ごとの高解像度 frame を選び、同じ低解像度 frame をブロック状に拡大した見た目にならない。
 
 ## 4.1 Display 設定とプレビュー
 
@@ -91,6 +92,7 @@ Dashboard の `Display` tab を開き、次を送信します。
 - 古い Host Bridge process が残っている場合は fallback として `pet.updated` が出る。この場合も Core2 の display 設定が変われば合格とする。
 - Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示しない。
 - `petScale=8` では pet が画面全体に近い最大面積で表示される。
+- Core2 では `petScale` に対応する scale-specific frame が描画され、低解像度 base frame の単純拡大より輪郭と模様が読みやすい。
 - `UI text size` を変更すると footer の文字サイズが変わる。
 - `body text size` を変更すると Answer / Notification の本文サイズが変わり、1ページに入る文字量が変わる。
 - Dashboard の M5Stack 表示プレビューも slider 変更を即時反映する。

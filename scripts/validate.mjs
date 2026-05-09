@@ -73,11 +73,17 @@ assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fi
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
 assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
+assert(firmwareSource.includes('drawScaleSpecificLocalPetAsset'), 'firmware must draw scale-specific local hatch-pet assets');
+assert(firmwareSource.includes('PET_ASSET_SCALED_PIXELS'), 'firmware must select high-resolution scale-specific pet frames when available');
 assert(firmwareSource.includes('pet_asset.local.h'), 'firmware must support an ignored local hatch-pet asset header');
 assert(firmwareSource.includes('HAS_LOCAL_PET_ASSET'), 'firmware must gate local hatch-pet assets behind a compile-time flag');
 
 const gitignoreSource = fs.readFileSync('.gitignore', 'utf8');
 assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pet asset header must be ignored');
+
+const petAssetGeneratorSource = fs.readFileSync('tools/generate-pet-firmware-asset.py', 'utf8');
+assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset generator must emit scale-specific frames');
+assert(petAssetGeneratorSource.includes('Image.Resampling.LANCZOS'), 'pet asset generator must resample scale-specific frames from source cells');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');

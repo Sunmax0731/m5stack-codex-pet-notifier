@@ -65,5 +65,7 @@
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。
 - [x] `firmware/include/pet_asset.local.h` を release asset へ含めない。
+- [x] pet asset generator が scale `1..8` ごとの Core2 用高解像度 frame を生成できる。
+- [x] firmware が scale-specific frame を Core2 で選択し、GRAY では flash 制約のため base frame fallback を使える。
 - [x] local Wi-Fi config を含む firmware binary は release asset にしない。
 - [x] GitHub prerelease 作成後に `docs/release-evidence.json` を実 URL で更新する。

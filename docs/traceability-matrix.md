@@ -15,7 +15,7 @@
 | pet 更新表示 | `pet.updated` schema、`MockM5StackDevice.receive()` | `happy-path.validEvents=5` |
 | pet animation | `firmware/src/main.cpp` の `drawPetAvatar`、`PET_ANIMATION_INTERVAL_MS` | `scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
 | pet 表示倍率と text size | `display.settings_updated`、`/codex/display`、Dashboard Display tab、M5Stack 表示プレビュー、`firmware/src/main.cpp` の `petDisplayScale` | `scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、`docs/gui-tools-manual-check.md` |
-| hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate | `scripts/validate.mjs`、Core2 firmware build / upload |
+| hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |
 | 通知表示 | `notification.created` schema | `happy-path.finalScreen=Choice` までの遷移 |
 | 長文回答スクロール | `src/protocol/scrollModel.mjs` | `mixed-batch.scrollPages=2` |
 | 3択返信 | `prompt.choice_requested`、`device.reply_selected` | `happy-path.replyCount=1` |

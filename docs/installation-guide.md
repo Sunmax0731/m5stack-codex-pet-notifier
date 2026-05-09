@@ -35,7 +35,7 @@ cmd.exe /d /s /c npm run demo
 
 closed alpha では動作 firmware を同梱します。Core2 target は `COM4` へ upload し、2.4GHz Wi-Fi、Host Bridge pairing、Codex relay answer 表示を確認対象にします。
 
-Codex Pets の素材を表示する場合は、build / upload の前に hatch-pet package から local asset header を生成します。`firmware/include/pet_asset.local.h` は `.gitignore` 対象で、個人 pet sprite を release asset に含めません。
+Codex Pets の素材を表示する場合は、build / upload の前に hatch-pet package から local asset header を生成します。`firmware/include/pet_asset.local.h` は `.gitignore` 対象で、個人 pet sprite を release asset に含めません。既定では Core2 向けに scale `1..8` ごとの高解像度 frame も生成します。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier

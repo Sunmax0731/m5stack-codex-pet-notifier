@@ -69,7 +69,7 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
-- pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。
+- pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。
 - pet display area は Dashboard の `Display` tab から `1..8` を切り替えられる。`8/8` は pet を画面全体に近い最大面積で表示する。
