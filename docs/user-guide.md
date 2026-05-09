@@ -20,13 +20,14 @@ Host Bridge 起動後に `http://127.0.0.1:8080/` を開きます。
 - 状態確認で paired device、outbound、inbound、security rejection を見る。
 - `Answer` tab から Codex の返答本文を M5Stack へ送る。
 - `Decision` tab から A/B/C の確認依頼を送り、M5Stack で押された返信を inbound と Debug section で確認する。
-- `M5Stack 表示プレビュー` で現在の hatch-pet キャラ、pet name / state / spriteRef、Pet / Answer / Decision / Notify の見え方を送信前に確認する。
+- `M5Stack 表示プレビュー` で現在の hatch-pet キャラ、pet name / state / spriteRef、Pet / Answer / Decision / Notify の見え方を送信前に確認する。画面プレビューと設定フォームは2カラムで並ぶため、スクロール量を抑えて調整できます。
 - `M5Stack 表示プレビュー` から pet display area、UI text size、body text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信し、M5Stack 上の pet 表示面積、文字サイズ、描画更新上限、キャラ frame 切替頻度を調整する。
 - `M5Stack 表示プレビュー` の `device` で Core2 / GRAY を切り替え、同じ 320x240 画面で入力前提と footer label の違いを確認する。
 - `M5Stack 表示プレビュー` の `local hatch-pet asset` または `asset path override` で `%USERPROFILE%\.codex\pets` 配下の任意 package を preview する。
 - pet background、text color、text background の color / alpha を調整し、`表示設定を送信` で M5Stack へ反映する。`Codex回答のビープ通知` を有効にすると次回 `answer.completed` 到着時に短い beep が鳴る。
 - 主要項目に focus して tooltip hint を確認し、各 section の `Hide` / `View` で必要な領域だけ表示する。
-- sidebar の `環境構築コマンド` から bridge 起動、pet asset 生成、Core2 upload、Codex relay の command modal を確認する。
+- sidebar の `環境構築コマンド` からタブ付き command modal を開き、bridge background 起動、pet asset 生成、Core2 upload、Codex relay、display settings、sample replay を任意パラメータで実行する。コマンド実行APIは localhost からの allowlist 実行だけを許可します。
+- sidebar の runtime status で Bridge の起動状態、foreground / background、pid、uptime を確認する。
 - `最近の Codex 回答` panel で local Codex session の最新 assistant 回答を確認し、`M5Stackへ送信` で直前 user message と合わせて Answer 画面へ送る。
 - `debug JSON` で redacted snapshot と導入コマンドを確認する。
 
@@ -74,7 +75,7 @@ Dashboard preview だけを切り替える場合は、Host Bridge 起動後に `
 ## Core2
 
 - pet 領域を tap すると pet interaction が送られる。
-- pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。
+- pet surface は hatch-pet asset が生成済みならその素材を表示し、未生成なら fallback avatar を表示する。Core2 では display area `1..8` ごとの高解像度 frame を選び、拡大時のブロック感を抑える。local hatch-pet asset の透明ピクセルは固定アクセント背景ではなく、pet background RGBA の合成色を見せます。
 - pet surface は state に応じて背景色または表示状態が変わり、frame / bounce animation を行う。fallback avatar では blink / tail も表示する。
 - pet surface は `M5Canvas` Sprite buffer へ off-screen 描画してから転送するため、animation tick 中に画面全体の黒塗りや Answer / Choice の本文、footer text の明滅を抑える。
 - M5Stack の固定ヘッダー文言（`Codex Pet`、`state`、`LAN`、`U:0` など）は表示されない。

@@ -178,11 +178,32 @@ textarea:focus-visible {
   font-size: 12px;
 }
 
+.runtime-note strong,
+.runtime-note small {
+  display: block;
+}
+
+.runtime-note strong {
+  color: var(--text);
+}
+
+.runtime-note small {
+  color: var(--muted);
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   background: var(--green);
+}
+
+.status-dot.warn {
+  background: var(--amber);
+}
+
+.status-dot.danger {
+  background: var(--danger);
 }
 
 .workspace {
@@ -491,15 +512,15 @@ input[type="range"] {
 
 .m5-preview-layout {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
+  grid-template-columns: minmax(360px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 12px;
   align-items: start;
 }
 
 .preview-stage {
   display: grid;
-  grid-template-columns: minmax(340px, max-content) minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 10px;
   align-items: start;
 }
 
@@ -509,7 +530,7 @@ input[type="range"] {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #d9dee8;
-  padding: 18px;
+  padding: 10px;
 }
 
 .m5-screen {
@@ -648,6 +669,27 @@ input[type="range"] {
   gap: 8px;
 }
 
+.preview-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.preview-controls > .field,
+.preview-controls > .choice-grid,
+.preview-controls > .display-controls,
+.preview-controls > .color-grid,
+.preview-controls > .panel-actions {
+  grid-column: 1 / -1;
+}
+
+.display-controls {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.preview-readout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .pet-current,
 .readout-row {
   border: 1px solid var(--border);
@@ -666,6 +708,7 @@ input[type="range"] {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  min-height: 42px;
 }
 
 .readout-row span {
@@ -757,6 +800,68 @@ input[type="range"] {
   color: #d7e7ff;
 }
 
+.command-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.command-tab {
+  min-height: 34px;
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.command-tab.active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.command-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.command-card h3 {
+  color: var(--text);
+}
+
+.command-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.command-param-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.command-param-grid .field:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.command-output {
+  min-height: 120px;
+  max-height: 220px;
+  overflow: auto;
+  margin: 12px 0 0;
+  border: 1px solid #243248;
+  border-radius: 8px;
+  background: #0f1724;
+  color: #e9f0fb;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -800,6 +905,7 @@ input[type="range"] {
 }
 
 @media (max-width: 1180px) {
+  .m5-preview-layout,
   .preview-stage {
     grid-template-columns: 1fr;
   }
@@ -843,10 +949,13 @@ input[type="range"] {
   .log-columns,
   .debug-grid,
   .command-list,
+  .command-param-grid,
   .choice-grid,
   .choice-grid.two,
   .color-grid,
-  .preview-readout {
+  .preview-readout,
+  .preview-controls,
+  .display-controls {
     grid-template-columns: 1fr;
   }
 

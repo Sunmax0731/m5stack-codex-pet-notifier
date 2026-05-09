@@ -51,6 +51,7 @@ for (const required of [
   'scripts/codex-session-smoke.mjs',
   'scripts/dashboard-smoke.mjs',
   'tools/upload-firmware.ps1',
+  'tools/start-bridge-background.mjs',
   'tools/generate-pet-firmware-asset.py',
   'src/host-bridge/dashboard/index.html',
   'src/host-bridge/dashboard/app.js',
@@ -89,6 +90,8 @@ assert(firmwareSource.includes('DISPLAY_SCALE_MAX = 8'), 'firmware must support 
 assert(!firmwareSource.includes('String("state: ")'), 'firmware must not draw fixed state header text');
 assert(firmwareSource.includes('display.settings_updated'), 'firmware must accept dynamic display settings from the Host Bridge');
 assert(firmwareSource.includes('applyDisplaySettings(event["display"])'), 'firmware must accept display settings on direct and fallback events');
+assert(firmwareSource.includes('parseRgbaString'), 'firmware must accept string RGBA settings as well as object RGBA settings');
+assert(!firmwareSource.includes('target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor())'), 'local hatch-pet transparent pixels must reveal the configured pet background instead of a fixed accent card');
 assert(firmwareSource.includes('drawLocalPetAsset(int x, int y, int scale)'), 'firmware must scale local hatch-pet assets');
 assert(firmwareSource.includes('drawScaleSpecificLocalPetAsset'), 'firmware must draw scale-specific local hatch-pet assets');
 assert(firmwareSource.includes('PET_ASSET_SCALED_PIXELS'), 'firmware must select high-resolution scale-specific pet frames when available');
@@ -108,6 +111,11 @@ assert(uploadFirmwareSource.includes('Get-CimInstance Win32_SerialPort'), 'firmw
 assert(uploadFirmwareSource.includes('VID_10C4'), 'firmware upload helper must prefer CP210x USB serial devices');
 assert(uploadFirmwareSource.includes("PNPDeviceID -match '^USB\\\\'"), 'firmware upload helper must not fall back to non-USB serial ports');
 assert(uploadFirmwareSource.includes('run -d $firmwareRoot'), 'firmware upload helper must run PlatformIO from the repo root with -d firmware');
+
+const backgroundBridgeSource = fs.readFileSync('tools/start-bridge-background.mjs', 'utf8');
+assert(backgroundBridgeSource.includes('windowsHide: true'), 'background bridge launcher must hide the spawned server window on Windows');
+assert(backgroundBridgeSource.includes('detached: true'), 'background bridge launcher must detach the server process');
+assert(backgroundBridgeSource.includes('M5STACK_BRIDGE_BACKGROUND'), 'background bridge launcher must mark the child process as background mode');
 
 const relaySource = fs.readFileSync('src/codex-adapter/relay.mjs', 'utf8');
 assert(relaySource.includes('ToBase64String'), 'clipboard relay must avoid direct non-UTF8 PowerShell stdout text');
@@ -135,6 +143,9 @@ assert(bridgeSource.includes("url.pathname === '/codex/session/publish'"), 'Host
 assert(bridgeSource.includes("url.pathname === '/pet/packages'"), 'Host Bridge must expose local pet package metadata for dashboard preview');
 assert(bridgeSource.includes('/pet/current/manifest'), 'Host Bridge must expose the current local pet manifest for dashboard preview');
 assert(bridgeSource.includes('/debug/snapshot'), 'Host Bridge must expose a sanitized debug snapshot for the GUI');
+assert(bridgeSource.includes("url.pathname === '/debug/runtime'"), 'Host Bridge must expose runtime status for the GUI sidebar');
+assert(bridgeSource.includes("url.pathname === '/debug/commands/run'"), 'Host Bridge must expose allowlisted command execution for the GUI');
+assert(bridgeSource.includes('local-command-execution-only'), 'Host Bridge command execution must be restricted to local requests');
 assert(bridgeSource.includes('firmware:upload:core2'), 'Host Bridge debug commands must expose auto-detected Core2 upload');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
@@ -155,6 +166,8 @@ assert(dashboardIndexSource.includes('max="8"'), 'Dashboard display controls mus
 assert(dashboardIndexSource.includes('data-tooltip'), 'Dashboard controls must provide focusable tooltip hints');
 assert(dashboardIndexSource.includes('section-toggle'), 'Dashboard sections must support View/Hide collapse controls');
 assert(dashboardIndexSource.includes('commandModal'), 'Dashboard setup/debug commands must be shown in a modal');
+assert(dashboardIndexSource.includes('commandTabs'), 'Dashboard command modal must use tabs');
+assert(dashboardIndexSource.includes('runtimeState'), 'Dashboard sidebar must display bridge runtime status');
 assert(dashboardAppSource.includes('/codex/session/latest'), 'Dashboard must load the latest Codex session answer');
 assert(dashboardAppSource.includes('/codex/session/publish'), 'Dashboard must publish the latest Codex session answer to M5Stack');
 assert(dashboardAppSource.includes('/codex/display'), 'Dashboard must publish dynamic display settings to M5Stack');
@@ -169,6 +182,8 @@ assert(dashboardAppSource.includes('textBackgroundRgba'), 'Dashboard must publis
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');
 assert(dashboardAppSource.includes('createDisplayFallbackPetEvent'), 'Dashboard must support display settings fallback for an old bridge process');
 assert(dashboardAppSource.includes('renderM5Preview'), 'Dashboard must render the M5Stack simulated preview');
+assert(dashboardAppSource.includes('/debug/commands/run'), 'Dashboard must run allowlisted setup/debug commands from the modal');
+assert(dashboardAppSource.includes('renderRuntimeStatus'), 'Dashboard must render server runtime status in the sidebar');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];
 for (const filePath of listTextFiles(process.cwd())) {

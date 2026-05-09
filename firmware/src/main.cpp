@@ -200,7 +200,101 @@ uint8_t readColorChannel(JsonVariant source, const char* key, uint8_t fallback) 
   return static_cast<uint8_t>(constrain(source[key].as<int>(), 0, 255));
 }
 
+int hexNibble(char value) {
+  if (value >= '0' && value <= '9') {
+    return value - '0';
+  }
+  if (value >= 'a' && value <= 'f') {
+    return value - 'a' + 10;
+  }
+  if (value >= 'A' && value <= 'F') {
+    return value - 'A' + 10;
+  }
+  return -1;
+}
+
+bool readHexByte(const String& value, int offset, uint8_t& out) {
+  if (offset + 1 >= value.length()) {
+    return false;
+  }
+  const int hi = hexNibble(value[offset]);
+  const int lo = hexNibble(value[offset + 1]);
+  if (hi < 0 || lo < 0) {
+    return false;
+  }
+  out = static_cast<uint8_t>((hi << 4) | lo);
+  return true;
+}
+
+bool parseRgbaString(const String& value, RgbaColor& target) {
+  String text = value;
+  text.trim();
+  if (text.startsWith("#")) {
+    text.remove(0, 1);
+  }
+  if (text.length() == 6 || text.length() == 8) {
+    uint8_t r = target.r;
+    uint8_t g = target.g;
+    uint8_t b = target.b;
+    uint8_t a = target.a;
+    if (!readHexByte(text, 0, r) || !readHexByte(text, 2, g) || !readHexByte(text, 4, b)) {
+      return false;
+    }
+    if (text.length() == 8 && !readHexByte(text, 6, a)) {
+      return false;
+    }
+    target = RgbaColor{r, g, b, a};
+    return true;
+  }
+
+  int channels[4] = {target.r, target.g, target.b, target.a};
+  int channelIndex = 0;
+  int start = 0;
+  while (channelIndex < 4 && start <= text.length()) {
+    int comma = text.indexOf(',', start);
+    if (comma < 0) {
+      comma = text.length();
+    }
+    String part = text.substring(start, comma);
+    part.trim();
+    if (!part.length()) {
+      return false;
+    }
+    channels[channelIndex] = constrain(part.toInt(), 0, 255);
+    channelIndex += 1;
+    start = comma + 1;
+    if (comma == text.length()) {
+      break;
+    }
+  }
+  if (channelIndex < 3) {
+    return false;
+  }
+  target = RgbaColor{
+    static_cast<uint8_t>(channels[0]),
+    static_cast<uint8_t>(channels[1]),
+    static_cast<uint8_t>(channels[2]),
+    static_cast<uint8_t>(channels[3])
+  };
+  return true;
+}
+
 void applyRgbaSetting(JsonVariant source, RgbaColor& target) {
+  if (source.isNull()) {
+    return;
+  }
+  if (source.is<const char*>()) {
+    parseRgbaString(String(source.as<const char*>()), target);
+    return;
+  }
+  if (source.is<JsonArray>()) {
+    JsonArray channels = source.as<JsonArray>();
+    target.r = static_cast<uint8_t>(constrain(channels[0] | target.r, 0, 255));
+    target.g = static_cast<uint8_t>(constrain(channels[1] | target.g, 0, 255));
+    target.b = static_cast<uint8_t>(constrain(channels[2] | target.b, 0, 255));
+    target.a = static_cast<uint8_t>(constrain(channels[3] | target.a, 0, 255));
+    return;
+  }
   if (!source.is<JsonObject>()) {
     return;
   }
@@ -640,8 +734,6 @@ void drawPetAvatarTo(Target& target, int x, int y) {
   const int bounce = (petFrame % 4 == 1) ? -1 : ((petFrame % 4 == 3) ? 1 : 0);
   const int s = petAssetRenderScale();
   const int inset = (petBoxPadding() / 2) * s;
-  target.fillRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, petAccentColor());
-  target.drawRoundRect(x, y, petBoxWidth(), petBoxHeight(), 10 * s, TFT_WHITE);
   drawLocalPetAssetTo(target, x + inset, y + inset + bounce * s, s);
 #else
   drawVectorPetAvatarTo(target, x, y);

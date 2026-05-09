@@ -5,6 +5,9 @@ const state = {
   latestSession: null,
   petManifest: null,
   petPackages: [],
+  runtime: null,
+  commandDefinitions: null,
+  activeCommandTab: 'setup',
   previewPetFrame: 0,
   previewAnimationInterval: null,
   previewAnimationDelay: null
@@ -20,6 +23,9 @@ const elements = {
   outboundCount: $('#outboundCount'),
   inboundCount: $('#inboundCount'),
   securityCount: $('#securityCount'),
+  runtimeDot: $('#runtimeDot'),
+  runtimeState: $('#runtimeState'),
+  runtimePid: $('#runtimePid'),
   deviceList: $('#deviceList'),
   deviceId: $('#deviceId'),
   sendResult: $('#sendResult'),
@@ -70,7 +76,9 @@ const elements = {
   previewMotionReadout: $('#previewMotionReadout'),
   petAssetName: $('#petAssetName'),
   petAssetDescription: $('#petAssetDescription'),
+  commandTabs: $('#commandTabs'),
   commandList: $('#commandList'),
+  commandOutput: $('#commandOutput'),
   commandModal: $('#commandModal')
 };
 
@@ -96,14 +104,17 @@ function nowLabel() {
 
 async function refresh() {
   try {
-    const [health, events, snapshot] = await Promise.all([
+    const [health, events, snapshot, runtime] = await Promise.all([
       api('/health'),
       api('/events'),
-      api('/debug/snapshot')
+      api('/debug/snapshot'),
+      api('/debug/runtime')
     ]);
     state.health = health;
     state.events = events;
     state.commands = snapshot.commands;
+    state.commandDefinitions = snapshot.commandDefinitions;
+    state.runtime = runtime;
     render();
   } catch (error) {
     elements.bridgeLine.textContent = `Host Bridge error: ${error.message}`;
@@ -193,6 +204,7 @@ function render() {
     ? `<strong>choiceId: ${escapeHtml(latestReply.details.choiceId)}</strong><br>request: ${escapeHtml(latestReply.details.requestEventId)}<br>input: ${escapeHtml(latestReply.details.input ?? '')}`
     : 'まだ返信はありません。';
   renderLatestSession();
+  renderRuntimeStatus();
   renderCommands();
   renderM5Preview();
 }
@@ -203,13 +215,114 @@ function renderLog(target, entries, template) {
     : '<li class="muted">event なし</li>';
 }
 
-function renderCommands() {
-  if (!state.commands) {
+function renderRuntimeStatus() {
+  const current = state.runtime?.currentProcess;
+  if (!current) {
+    elements.runtimeState.textContent = 'Bridge未確認';
+    elements.runtimePid.textContent = 'pid -';
+    elements.runtimeDot.className = 'status-dot warn';
     return;
   }
-  elements.commandList.innerHTML = Object.entries(state.commands).map(([name, command]) => (
-    `<div class="command"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(command)}</code></div>`
+  const mode = current.background ? 'background' : 'foreground';
+  elements.runtimeState.textContent = `Bridge running / ${mode}`;
+  elements.runtimePid.textContent = `pid ${current.pid} / uptime ${current.uptimeSec}s`;
+  elements.runtimeDot.className = current.background ? 'status-dot' : 'status-dot warn';
+}
+
+function renderCommands() {
+  const definitions = state.commandDefinitions;
+  if (!definitions?.commands?.length) {
+    if (!state.commands) {
+      return;
+    }
+    elements.commandTabs.innerHTML = '';
+    elements.commandList.innerHTML = Object.entries(state.commands).map(([name, command]) => (
+      `<div class="command"><strong>${escapeHtml(name)}</strong><code>${escapeHtml(command)}</code></div>`
+    )).join('');
+    return;
+  }
+
+  elements.commandTabs.innerHTML = definitions.tabs.map((tab) => (
+    `<button class="command-tab ${tab.id === state.activeCommandTab ? 'active' : ''}" type="button" data-command-tab="${escapeHtml(tab.id)}">${escapeHtml(tab.label)}</button>`
   )).join('');
+
+  const activeCommands = definitions.commands.filter((command) => command.tab === state.activeCommandTab);
+  elements.commandList.innerHTML = activeCommands.map((command) => (
+    `<article class="command-card" data-command-id="${escapeHtml(command.id)}">
+      <div>
+        <h3>${escapeHtml(command.label)}</h3>
+        <p>${escapeHtml(command.description ?? '')}</p>
+      </div>
+      <div class="command-param-grid">
+        ${(command.params ?? []).map((param) => renderCommandParam(command.id, param)).join('')}
+      </div>
+      <button class="run-command" type="button" data-command-id="${escapeHtml(command.id)}">実行</button>
+    </article>`
+  )).join('');
+}
+
+function renderCommandParam(commandId, param) {
+  const fieldId = `cmd-${commandId}-${param.name}`;
+  const value = readCommandParamValue(commandId, param) ?? param.defaultValue ?? '';
+  if (param.type === 'textarea') {
+    return `<label class="field">
+      <span>${escapeHtml(param.label)}</span>
+      <textarea id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" rows="3">${escapeHtml(value)}</textarea>
+    </label>`;
+  }
+  if (param.type === 'select') {
+    return `<label class="field">
+      <span>${escapeHtml(param.label)}</span>
+      <select id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}">
+        ${(param.options ?? []).map((option) => `<option value="${escapeHtml(option)}" ${String(value) === option ? 'selected' : ''}>${escapeHtml(option)}</option>`).join('')}
+      </select>
+    </label>`;
+  }
+  if (param.type === 'checkbox') {
+    return `<label class="check-field">
+      <input id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" type="checkbox" ${value === true || value === 'true' ? 'checked' : ''}>
+      <span>${escapeHtml(param.label)}</span>
+    </label>`;
+  }
+  return `<label class="field">
+    <span>${escapeHtml(param.label)}</span>
+    <input id="${escapeHtml(fieldId)}" data-param="${escapeHtml(param.name)}" type="${escapeHtml(param.type ?? 'text')}" value="${escapeHtml(value)}" placeholder="${escapeHtml(param.placeholder ?? '')}">
+  </label>`;
+}
+
+function readCommandParamValue(commandId, param) {
+  const existing = $(`[data-command-id="${CSS.escape(commandId)}"] [data-param="${CSS.escape(param.name)}"]`);
+  if (!existing) {
+    return undefined;
+  }
+  if (existing.type === 'checkbox') {
+    return existing.checked;
+  }
+  return existing.value;
+}
+
+function collectCommandParams(commandId) {
+  const card = $(`[data-command-id="${CSS.escape(commandId)}"]`);
+  const params = {};
+  card?.querySelectorAll('[data-param]').forEach((field) => {
+    params[field.dataset.param] = field.type === 'checkbox' ? field.checked : field.value;
+  });
+  return params;
+}
+
+async function runDashboardCommand(commandId) {
+  elements.commandOutput.textContent = `running ${commandId}...`;
+  const response = await fetch('/debug/commands/run', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      commandId,
+      params: collectCommandParams(commandId)
+    })
+  });
+  const result = await response.json();
+  elements.commandOutput.textContent = JSON.stringify(result, null, 2);
+  await refresh();
 }
 
 function renderLatestSession() {
@@ -627,6 +740,23 @@ function wireActions() {
   $('#loadCommandsButton').addEventListener('click', refresh);
   $('#openCommandsButton').addEventListener('click', () => openModal(elements.commandModal));
   $$('[data-close-modal]').forEach((item) => item.addEventListener('click', () => closeModal(elements.commandModal)));
+  elements.commandTabs.addEventListener('click', (event) => {
+    const tab = event.target.closest('[data-command-tab]');
+    if (!tab) {
+      return;
+    }
+    state.activeCommandTab = tab.dataset.commandTab;
+    renderCommands();
+  });
+  elements.commandList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-command-id].run-command');
+    if (!button) {
+      return;
+    }
+    runDashboardCommand(button.dataset.commandId).catch((error) => {
+      elements.commandOutput.textContent = `ERROR: ${error.message}`;
+    });
+  });
   $('#loadSessionButton').addEventListener('click', loadLatestSession);
   $('#publishSessionButton').addEventListener('click', () => {
     publishLatestSession().catch(showError);

@@ -17,6 +17,7 @@
 | Dashboard が秘密情報を永続化しない | Pass | `/debug/snapshot` と `/events` は token、SSID、host IP、回答本文を release evidence として保存しない |
 | Display 設定に個人情報を含めない | Pass | `display.settings_updated` は petScale、uiTextScale、bodyTextScale、animationFps、motionStepMs、RGBA、beepOnAnswer の設定値だけを扱う |
 | local pet package path を LAN 外へ公開しない | Pass | `/pet/packages` と `/pet/current/manifest` は local dashboard 用。preview 用の package 名と説明だけを返し、release evidence には個人 sprite や絶対pathを保存しない |
+| GUI command 実行をLAN外へ開放しない | Pass | `/debug/commands/run` は localhost からの allowlist command だけを実行し、任意 shell 文字列を受け付けない |
 | relay 入力を release asset に含めない | Pass | `codex-relay-manual-check.md` は手順のみ。実会話本文は保存しない |
 | 実機 Wi-Fi の安全設定確認 | Partial pass | SSID / password は ignored local header のみ。公開証跡は redacted |
 

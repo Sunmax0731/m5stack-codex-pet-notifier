@@ -15,7 +15,7 @@
 | Codex session smoke | local session JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として queue / poll できることを検証する | `scripts/codex-session-smoke.mjs`、`dist/codex-session-smoke-result.json` |
 | Codex hook relay smoke | hook process 相当の one-shot relay が state file で重複を抑止することを検証する | `scripts/codex-session-smoke.mjs` |
 | clipboard UTF-8 relay smoke | 日本語 clipboard 本文を `answer.completed` として壊さず送れることを検証する | `scripts/codex-relay-smoke.mjs` |
-| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/codex/decision`、`/codex/pet`、`/codex/display`、`/pet/current/manifest`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary、collapse、command modal を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
+| dashboard smoke | Dashboard asset、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、`/codex/decision`、`/codex/pet`、`/codex/display`、`/pet/current/manifest`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary、collapse、command modal tabs を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet surface redraw path を含むことを検証する | `scripts/validate.mjs` |

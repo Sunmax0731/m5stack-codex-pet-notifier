@@ -2,7 +2,7 @@
 
 ## MVP Baseline
 
-`v0.1.0-alpha.8` 時点の MVP は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
+`v0.1.0-alpha.9` 時点の MVP は、PC の Host Bridge、M5Stack firmware、Dashboard、Codex relay、Codex session watcher、Codex hook relay、hatch-pet asset 連携で構成します。M5Stack は Codex App の内部 API に依存せず、LAN 内の JSON event contract だけを扱います。
 
 ## 追加済み Platform Capability
 
@@ -13,7 +13,8 @@
 | Pet render / motion separation | 実装済み | `animationFps` と `motionStepMs` を分離 |
 | Collapsible dashboard sections | 実装済み | `section-toggle` による View / Hide |
 | Focus tooltip hints | 実装済み | `data-tooltip` field hints |
-| Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal |
+| Setup command modal | 実装済み | sidebar の `環境構築コマンド` modal。環境構築 / デバッグ送信 / 保守のtabとlocalhost限定のallowlist command実行を含む |
+| Background bridge runtime | 実装済み | `npm run bridge:start:bg`、`/debug/runtime`、sidebar runtime status |
 
 ## Release Candidate Workstreams
 

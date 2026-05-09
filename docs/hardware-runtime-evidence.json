@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
   "status": "partial-pass",
   "device": {
@@ -267,6 +267,7 @@
     "GRAY target not uploaded to physical hardware",
     "GRAY IMU tap fallback not exercised",
     "real Codex App internal API is not used; relay uses clipboard/stdin/file/local-session-jsonl input",
-    "local 8080 bridge should be kept on the current v0.1.0-alpha.8 process before final manual confirmation"
+    "local 8080 bridge should be kept on the current v0.1.0-alpha.9 process before final manual confirmation",
+    "latest Core2 upload retry on 2026-05-09 detected no M5Stack USB serial port; reconnect the device and rerun npm run firmware:upload:core2 before physical visual confirmation"
   ]
 }

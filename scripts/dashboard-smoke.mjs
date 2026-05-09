@@ -60,6 +60,9 @@ try {
   assert.match(index, /data-tooltip/);
   assert.match(index, /section-toggle/);
   assert.match(index, /commandModal/);
+  assert.match(index, /commandTabs/);
+  assert.match(index, /commandOutput/);
+  assert.match(index, /runtimeState/);
   assert.match(index, /環境構築コマンド/);
   assert.match(index, /max="8"/);
 
@@ -76,15 +79,23 @@ try {
   assert.match(app, /textBackgroundRgba/);
   assert.match(app, /beepOnAnswer/);
   assert.match(app, /previewDevice/);
+  assert.match(app, /\/debug\/commands\/run/);
+  assert.match(app, /renderRuntimeStatus/);
 
   const css = await getText(`${baseUrl}/dashboard/styles.css`);
   assert.match(css, /\.dashboard-grid/);
   assert.match(css, /\.m5-screen/);
   assert.match(css, /\.preview-stage/);
+  assert.match(css, /\.command-tabs/);
   assert.match(css, /\.color-grid/);
 
   const snapshot = await getJson(`${baseUrl}/debug/snapshot`);
   assert.equal(snapshot.ok, true);
+  assert.equal(snapshot.runtime.ok, true);
+  assert.equal(snapshot.runtime.currentProcess.pid, process.pid);
+  assert.equal(snapshot.commandDefinitions.ok, true);
+  assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'bridgeStartBackground'));
+  assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'codexDisplay'));
   assert.match(snapshot.commands.codexChoice, /codex:choice/);
   assert.match(snapshot.commands.codexDecision, /codex:decision/);
   assert.match(snapshot.commands.codexDecisionWait, /codex:decision:wait/);
@@ -206,6 +217,22 @@ try {
   assert.equal(latestReply.details.choiceId, 'yes');
   assert.equal(latestReply.details.input, 'button-a');
 
+  const runtime = await getJson(`${baseUrl}/debug/runtime`);
+  assert.equal(runtime.ok, true);
+  assert.equal(runtime.commandExecution.localOnly, true);
+
+  const commandDefinitions = await getJson(`${baseUrl}/debug/commands`);
+  assert.equal(commandDefinitions.ok, true);
+  assert(commandDefinitions.tabs.some((tab) => tab.id === 'setup'));
+  assert(commandDefinitions.tabs.some((tab) => tab.id === 'debug'));
+
+  const replayRun = await postJson(`${baseUrl}/debug/commands/run`, {
+    commandId: 'sampleReplay',
+    params: { deviceId }
+  });
+  assert.equal(replayRun.ok, true);
+  assert.equal(replayRun.result.ok, true);
+
   fs.mkdirSync('dist', { recursive: true });
   fs.writeFileSync('dist/dashboard-smoke-result.json', `${JSON.stringify({
     product: productProfile.repo,
@@ -236,6 +263,10 @@ try {
       sideNavigation: true,
       sectionCollapseControls: true,
       commandModal: true,
+      commandModalTabs: true,
+      commandModalParameterizedRun: true,
+      runtimeSidebarStatus: true,
+      backgroundBridgeStartCommand: true,
       petEndpoint: true,
       choiceEndpoint: true,
       decisionEndpoint: true,

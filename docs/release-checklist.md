@@ -26,6 +26,8 @@
 - [x] Dashboard が `/codex/session/latest` と `/codex/session/publish` で最新 Codex 回答を表示/送信できる。
 - [x] Dashboard が `/pet/current/manifest` と `/pet/current/spritesheet.webp` で現在の pet を preview できる。
 - [x] Dashboard が `/codex/display` で pet display area と text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms` で送信できる。
+- [x] Dashboard の command modal が tab とパラメータフォームを持ち、localhost allowlist command だけを実行できる。
+- [x] Host Bridge を hidden background process として起動する `bridge:start:bg` がある。
 - [x] clipboard relay が日本語本文を UTF-8 として保持できる。
 - [x] token なし / 誤 token device event を拒否できる。
 - [x] simulator が実機なしで代表フローを再生できる。
@@ -47,7 +49,7 @@
 - [x] `scripts/codex-relay-smoke.mjs` で Codex relay を検証する。
 - [x] `scripts/codex-session-smoke.mjs` で Codex session auto relay を検証する。
 - [x] hook relay の state file 重複抑止を `scripts/codex-session-smoke.mjs` で検証する。
-- [x] `scripts/dashboard-smoke.mjs` で Dashboard、Decision / Pet / Display endpoint、current pet preview、section collapse、tooltip、command modal、最新 Codex 回答表示/送信 endpoint を検証する。
+- [x] `scripts/dashboard-smoke.mjs` で Dashboard、Decision / Pet / Display endpoint、current pet preview、section collapse、tooltip、command modal tabs、runtime status、allowlist command execution、最新 Codex 回答表示/送信 endpoint を検証する。
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
 - [x] Core2 実機で build / upload / Wi-Fi / pairing / Codex relay answer を確認する。

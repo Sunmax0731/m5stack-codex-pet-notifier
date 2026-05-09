@@ -1,6 +1,6 @@
 {
   "product": "m5stack-codex-pet-notifier",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.9",
   "definition": {
     "Quality": "実装、代表シナリオ、runtime gate、security/privacy、traceability の品質。",
     "Cost": "追加環境、依存、運用負荷、保守容易性。",

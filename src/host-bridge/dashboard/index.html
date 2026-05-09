@@ -25,9 +25,12 @@
           <button class="side-link" type="button" data-section="debugSection">デバッグ</button>
         </nav>
         <button id="openCommandsButton" class="sidebar-action" type="button">環境構築コマンド</button>
-        <div class="side-note">
-          <span class="status-dot"></span>
-          <span>LAN内 closed alpha bridge</span>
+        <div class="side-note runtime-note">
+          <span id="runtimeDot" class="status-dot"></span>
+          <span>
+            <strong id="runtimeState">Bridge確認中</strong>
+            <small id="runtimePid">pid -</small>
+          </span>
         </div>
       </aside>
 
@@ -395,7 +398,9 @@
             <button type="button" data-close-modal>閉じる</button>
           </div>
         </div>
+        <div id="commandTabs" class="command-tabs" role="tablist" aria-label="command categories"></div>
         <div id="commandList" class="command-list"></div>
+        <pre id="commandOutput" class="command-output" aria-live="polite">コマンド未実行</pre>
       </div>
     </div>
 

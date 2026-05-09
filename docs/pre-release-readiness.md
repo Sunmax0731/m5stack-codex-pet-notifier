@@ -48,4 +48,4 @@
 
 ## Decision
 
-`v0.1.0-alpha.8` は closed alpha prerelease として公開し、stable release にはしません。
+`v0.1.0-alpha.9` は closed alpha prerelease として公開し、stable release にはしません。

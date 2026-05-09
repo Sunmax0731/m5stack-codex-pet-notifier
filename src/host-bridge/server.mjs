@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -16,6 +17,7 @@ import { loadSchemas, validateEvent } from '../protocol/validator.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const dashboardRoot = path.join(repoRoot, 'src', 'host-bridge', 'dashboard');
+const runtimeStatusPath = path.join(repoRoot, 'tmp', 'bridge-runtime.json');
 const hostToDeviceTypes = new Set([
   'pet.updated',
   'notification.created',
@@ -245,8 +247,24 @@ export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {
           ok: true,
           health: bridge.summary(),
           events: bridge.safeEvents(),
-          commands: buildDebugCommands()
+          runtime: buildRuntimeStatus(),
+          commands: buildDebugCommands(),
+          commandDefinitions: buildDashboardCommandDefinitions(request)
         });
+      }
+      if (request.method === 'GET' && url.pathname === '/debug/runtime') {
+        return sendJson(response, 200, buildRuntimeStatus());
+      }
+      if (request.method === 'GET' && url.pathname === '/debug/commands') {
+        return sendJson(response, 200, buildDashboardCommandDefinitions(request));
+      }
+      if (request.method === 'POST' && url.pathname === '/debug/commands/run') {
+        if (!isLocalRequest(request)) {
+          return sendJson(response, 403, { ok: false, reason: 'local-command-execution-only' });
+        }
+        const body = await readJsonBody(request);
+        const result = await runDashboardCommand(body.commandId ?? body.id, body.params ?? {}, request, bridge);
+        return sendJson(response, result.ok ? 200 : 500, result);
       }
       if (request.method === 'POST' && url.pathname === '/pair') {
         const body = await readJsonBody(request);
@@ -641,6 +659,7 @@ function redactSessionLatest(latest, options = {}) {
 
 function buildDebugCommands() {
   return {
+    bridgeStartBackground: 'cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080',
     bridgeStart: 'cmd.exe /d /s /c npm run bridge:start -- --host=0.0.0.0 --port=8080',
     petAsset: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\\.codex\\pets\\Mira --output firmware\\include\\pet_asset.local.h',
     petAssetAny: 'cmd.exe /d /s /c npm run pet:asset -- --pet-dir "<local-hatch-pet-package-dir>" --output firmware\\include\\pet_asset.local.h',
@@ -656,6 +675,349 @@ function buildDebugCommands() {
     codexClipboard: 'cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"',
     codexWatch: 'cmd.exe /d /s /c npm run codex:watch -- --file dist\\codex-answer.txt --once'
   };
+}
+
+function buildRuntimeStatus() {
+  const recorded = readRuntimeStatusFile();
+  return {
+    ok: true,
+    product: productProfile.repo,
+    version: productProfile.version,
+    currentProcess: {
+      pid: process.pid,
+      ppid: process.ppid,
+      uptimeSec: Math.round(process.uptime()),
+      background: process.env.M5STACK_BRIDGE_BACKGROUND === '1'
+    },
+    recordedProcess: recorded
+      ? {
+          ...recorded,
+          alive: isPidAlive(recorded.pid)
+        }
+      : null,
+    commandExecution: {
+      enabled: true,
+      localOnly: true
+    }
+  };
+}
+
+function writeRuntimeStatusFile(status) {
+  fs.mkdirSync(path.dirname(runtimeStatusPath), { recursive: true });
+  fs.writeFileSync(runtimeStatusPath, `${JSON.stringify({
+    product: productProfile.repo,
+    version: productProfile.version,
+    ...status
+  }, null, 2)}\n`, 'utf8');
+}
+
+function readRuntimeStatusFile() {
+  if (!fs.existsSync(runtimeStatusPath)) {
+    return null;
+  }
+  try {
+    return JSON.parse(fs.readFileSync(runtimeStatusPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function isPidAlive(pid) {
+  const numericPid = Number(pid);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) {
+    return false;
+  }
+  try {
+    process.kill(numericPid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isLocalRequest(request) {
+  const remote = request.socket.remoteAddress ?? '';
+  return remote === '127.0.0.1' || remote === '::1' || remote === '::ffff:127.0.0.1';
+}
+
+function bridgeUrlFromRequest(request) {
+  const host = request.headers.host ?? '127.0.0.1:8080';
+  return `http://${host.replace(/^0\.0\.0\.0:/, '127.0.0.1:')}`;
+}
+
+function buildDashboardCommandDefinitions(request) {
+  const bridgeUrl = bridgeUrlFromRequest(request);
+  return {
+    ok: true,
+    localExecutionOnly: true,
+    tabs: [
+      { id: 'setup', label: '環境構築' },
+      { id: 'debug', label: 'デバッグ送信' },
+      { id: 'maintenance', label: '保守' }
+    ],
+    commands: [
+      {
+        id: 'bridgeStartBackground',
+        tab: 'setup',
+        label: 'Bridge をバックグラウンド起動',
+        description: 'PowerShell画面を残さずHost Bridgeを起動します。既に同portで動いている場合は状態確認だけ返します。',
+        params: [
+          { name: 'host', label: 'host', type: 'text', defaultValue: '0.0.0.0' },
+          { name: 'port', label: 'port', type: 'number', defaultValue: '8080' }
+        ]
+      },
+      {
+        id: 'petAsset',
+        tab: 'setup',
+        label: 'pet asset 生成',
+        description: 'local hatch-pet packageからfirmware/include/pet_asset.local.hを生成します。',
+        params: [
+          { name: 'petDir', label: 'petDir', type: 'text', defaultValue: '%USERPROFILE%\\.codex\\pets\\Mira' },
+          { name: 'output', label: 'output', type: 'text', defaultValue: 'firmware\\include\\pet_asset.local.h' }
+        ]
+      },
+      {
+        id: 'core2Upload',
+        tab: 'setup',
+        label: 'Core2 firmware upload',
+        description: 'USB serialを自動検出してCore2へfirmwareを書き込みます。必要な場合だけCOMを明示します。',
+        params: [
+          { name: 'uploadPort', label: 'uploadPort', type: 'text', defaultValue: '', placeholder: 'COM3' }
+        ]
+      },
+      {
+        id: 'codexAnswer',
+        tab: 'debug',
+        label: 'Answer を送信',
+        description: '任意のCodex回答本文をM5Stackへ送ります。',
+        params: [
+          { name: 'bridge', label: 'bridge', type: 'text', defaultValue: bridgeUrl },
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId },
+          { name: 'summary', label: 'summary', type: 'text', defaultValue: 'GUI command answer' },
+          { name: 'text', label: 'text', type: 'textarea', defaultValue: 'GUIから送信したCodex回答です。' }
+        ]
+      },
+      {
+        id: 'codexDecision',
+        tab: 'debug',
+        label: 'ABC Decision を送信',
+        description: 'M5StackのA/B/CでCodex側の作業判断を返す三択を送ります。',
+        params: [
+          { name: 'bridge', label: 'bridge', type: 'text', defaultValue: bridgeUrl },
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId },
+          { name: 'question', label: 'question', type: 'textarea', defaultValue: '次の作業を選んでください。' },
+          { name: 'a', label: 'A', type: 'text', defaultValue: '進める' },
+          { name: 'b', label: 'B', type: 'text', defaultValue: '修正する' },
+          { name: 'c', label: 'C', type: 'text', defaultValue: '保留する' }
+        ]
+      },
+      {
+        id: 'codexDisplay',
+        tab: 'debug',
+        label: '表示設定を送信',
+        description: 'pet表示面積、文字サイズ、FPS、RGBA、beep設定をM5Stackへ送ります。',
+        params: [
+          { name: 'bridge', label: 'bridge', type: 'text', defaultValue: bridgeUrl },
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId },
+          { name: 'petScale', label: 'petScale', type: 'number', defaultValue: '8' },
+          { name: 'uiTextScale', label: 'uiTextScale', type: 'number', defaultValue: '2' },
+          { name: 'bodyTextScale', label: 'bodyTextScale', type: 'number', defaultValue: '2' },
+          { name: 'animationFps', label: 'animationFps', type: 'number', defaultValue: '12' },
+          { name: 'motionStepMs', label: 'motionStepMs', type: 'number', defaultValue: '280' },
+          { name: 'petBg', label: 'petBg', type: 'text', defaultValue: '#050b14ff' },
+          { name: 'textColor', label: 'textColor', type: 'text', defaultValue: '#ffffffff' },
+          { name: 'textBg', label: 'textBg', type: 'text', defaultValue: '#000000b2' },
+          { name: 'beepOnAnswer', label: 'beepOnAnswer', type: 'checkbox', defaultValue: true }
+        ]
+      },
+      {
+        id: 'codexSessions',
+        tab: 'debug',
+        label: '最近のCodex sessionを送信',
+        description: '最近のCodex sessionの最新やり取りをone-shotでM5Stackへ送ります。',
+        params: [
+          { name: 'bridge', label: 'bridge', type: 'text', defaultValue: bridgeUrl },
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId },
+          { name: 'phase', label: 'phase', type: 'select', defaultValue: 'any', options: ['any', 'final'] }
+        ]
+      },
+      {
+        id: 'sampleReplay',
+        tab: 'maintenance',
+        label: 'sample replay',
+        description: '代表sample eventをHost Bridge queueへ投入します。',
+        params: [
+          { name: 'deviceId', label: 'deviceId', type: 'text', defaultValue: productProfile.sampleDeviceId }
+        ]
+      }
+    ]
+  };
+}
+
+async function runDashboardCommand(commandId, params, request, bridge) {
+  const id = String(commandId ?? '');
+  const values = normalizeCommandParams(params);
+  const bridgeUrl = values.bridge || bridgeUrlFromRequest(request);
+  switch (id) {
+    case 'bridgeStartBackground':
+      return runNodeTool('tools/start-bridge-background.mjs', [
+        '--host', values.host || '0.0.0.0',
+        '--port', values.port || '8080'
+      ], { timeoutMs: 10000 });
+    case 'petAsset':
+      return runNpmScript('pet:asset', [
+        '--pet-dir', expandUserPath(values.petDir || '%USERPROFILE%\\.codex\\pets\\Mira'),
+        '--output', values.output || 'firmware\\include\\pet_asset.local.h'
+      ], { timeoutMs: 120000 });
+    case 'core2Upload': {
+      const args = values.uploadPort ? ['-UploadPort', values.uploadPort] : [];
+      return runNpmScript('firmware:upload:core2', args, { timeoutMs: 180000 });
+    }
+    case 'codexAnswer':
+      return runNpmScript('codex:answer', [
+        '--bridge', bridgeUrl,
+        '--device-id', values.deviceId || productProfile.sampleDeviceId,
+        '--summary', values.summary || 'GUI command answer',
+        '--text', values.text || 'GUIから送信したCodex回答です。'
+      ], { timeoutMs: 60000 });
+    case 'codexDecision':
+      return runNpmScript('codex:decision', [
+        '--bridge', bridgeUrl,
+        '--device-id', values.deviceId || productProfile.sampleDeviceId,
+        '--question', values.question || '次の作業を選んでください。',
+        '--a', values.a || '進める',
+        '--b', values.b || '修正する',
+        '--c', values.c || '保留する'
+      ], { timeoutMs: 60000 });
+    case 'codexDisplay':
+      return runNpmScript('codex:display', [
+        '--bridge', bridgeUrl,
+        '--device-id', values.deviceId || productProfile.sampleDeviceId,
+        '--pet-scale', values.petScale || '8',
+        '--ui-text-scale', values.uiTextScale || '2',
+        '--body-text-scale', values.bodyTextScale || '2',
+        '--animation-fps', values.animationFps || '12',
+        '--motion-step-ms', values.motionStepMs || '280',
+        '--pet-bg', values.petBg || '#050b14ff',
+        '--text-color', values.textColor || '#ffffffff',
+        '--text-bg', values.textBg || '#000000b2',
+        '--beep-on-answer', String(values.beepOnAnswer ?? true)
+      ], { timeoutMs: 60000 });
+    case 'codexSessions':
+      return runNpmScript('codex:sessions', [
+        '--once',
+        '--bridge', bridgeUrl,
+        '--device-id', values.deviceId || productProfile.sampleDeviceId,
+        '--phase', values.phase || 'any'
+      ], { timeoutMs: 60000 });
+    case 'sampleReplay':
+      return {
+        ok: true,
+        command: 'bridge.replaySamples',
+        result: bridge.replaySamples({ deviceId: values.deviceId || productProfile.sampleDeviceId })
+      };
+    default:
+      return { ok: false, reason: 'unknown-command', commandId: id };
+  }
+}
+
+function normalizeCommandParams(params) {
+  const out = {};
+  if (!params || typeof params !== 'object') {
+    return out;
+  }
+  for (const [key, value] of Object.entries(params)) {
+    if (typeof value === 'string') {
+      out[key] = value.trim();
+    } else {
+      out[key] = value;
+    }
+  }
+  return out;
+}
+
+function expandUserPath(value) {
+  const home = process.env.USERPROFILE ?? process.env.HOME ?? '';
+  return String(value)
+    .replace(/^~/, home)
+    .replace(/%USERPROFILE%/gi, process.env.USERPROFILE ?? home)
+    .replace(/%HOME%/gi, process.env.HOME ?? home);
+}
+
+function runNpmScript(script, args = [], options = {}) {
+  return runProcess(npmCommand(), ['run', script, '--', ...args], options);
+}
+
+function runNodeTool(toolPath, args = [], options = {}) {
+  return runProcess(process.execPath, [toolPath, ...args], options);
+}
+
+function npmCommand() {
+  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
+}
+
+function runProcess(command, args = [], options = {}) {
+  const startedAt = Date.now();
+  const timeoutMs = options.timeoutMs ?? 60000;
+  return new Promise((resolve) => {
+    const child = spawn(command, args, {
+      cwd: repoRoot,
+      env: process.env,
+      windowsHide: true
+    });
+    let stdout = '';
+    let stderr = '';
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill();
+    }, timeoutMs);
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString('utf8');
+      stdout = limitOutput(stdout);
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString('utf8');
+      stderr = limitOutput(stderr);
+    });
+    child.on('error', (error) => {
+      clearTimeout(timer);
+      resolve({
+        ok: false,
+        command: renderCommand(command, args),
+        message: error.message,
+        stdout,
+        stderr,
+        durationMs: Date.now() - startedAt
+      });
+    });
+    child.on('close', (code, signal) => {
+      clearTimeout(timer);
+      resolve({
+        ok: code === 0 && !timedOut,
+        command: renderCommand(command, args),
+        code,
+        signal,
+        timedOut,
+        stdout,
+        stderr,
+        durationMs: Date.now() - startedAt
+      });
+    });
+  });
+}
+
+function limitOutput(value, maxLength = 12000) {
+  if (value.length <= maxLength) {
+    return value;
+  }
+  return `${value.slice(0, Math.floor(maxLength / 2))}\n... output truncated ...\n${value.slice(-Math.floor(maxLength / 2))}`;
+}
+
+function renderCommand(command, args) {
+  return [command, ...args].map((part) => (
+    /\s|"/.test(String(part)) ? `"${String(part).replace(/"/g, '\\"')}"` : String(part)
+  )).join(' ');
 }
 
 function readJsonBody(request) {
@@ -726,6 +1088,15 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const host = hostArg?.split('=')[1] ?? process.env.HOST ?? '0.0.0.0';
   const server = createBridgeHttpServer();
   server.listen(port, host, () => {
+    writeRuntimeStatusFile({
+      pid: process.pid,
+      ppid: process.ppid,
+      host,
+      port,
+      url: `http://${host}:${port}`,
+      background: process.env.M5STACK_BRIDGE_BACKGROUND === '1',
+      startedAt: new Date().toISOString()
+    });
     console.log(`m5stack-codex-pet-notifier bridge listening on http://${host}:${port}`);
   });
 }

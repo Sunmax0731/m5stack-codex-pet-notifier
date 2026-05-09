@@ -39,6 +39,9 @@
 | `GET` | `/events` | outbound / inbound / security log を redaction 前提で確認する |
 | `GET` | `/health` | version、paired device、event count を確認する |
 | `GET` | `/debug/snapshot` | Dashboard と手動確認用に health、redacted events、debug command を返す |
+| `GET` | `/debug/runtime` | Dashboard sidebar 用に Bridge の pid、uptime、foreground / background 状態を返す |
+| `GET` | `/debug/commands` | Dashboard command modal 用に allowlist 済み command 定義、tab、parameter schema を返す |
+| `POST` | `/debug/commands/run` | localhost からの allowlist command 実行だけを受け付け、stdout / stderr / result を返す |
 | `GET` | `/`、`/dashboard/*` | Host Bridge Dashboard を返す |
 
 ## Event Schema
@@ -103,7 +106,7 @@
 - Pet と Display は `M5Stack 表示プレビュー` へ統合し、`/codex/pet` と `/codex/display` から pet 表示倍率、UI text size、body text size、pet render FPS、motion step、RGBA、answer beep を M5Stack へ送る。
 - 古い Host Bridge process が残って `/codex/display` が 404 になる場合、Dashboard は `/codex/event` 経由の `pet.updated` fallback に display 設定を同梱して送る。
 - `最近の Codex 回答` panel は `/codex/session/latest` で最新 assistant 回答を表示し、`/codex/session/publish` で M5Stack へ送信する。
-- 環境構築と debug command は side menu の button から modal で表示する。
+- 環境構築と debug command は side menu の button から modal で表示し、`環境構築`、`デバッグ送信`、`保守` の tab から allowlist 済み command を任意パラメータで実行できる。command 実行は localhost からの `/debug/commands/run` に限定する。
 - Decision 返信ワークフローと送信結果は Debug section に統合し、Decision 送信後に M5Stack 側の A/B/C 操作で `device.reply_selected` が inbound に入ることを Dashboard 上で確認する。
 - 各 section は View / Hide で折りたたみできる。主要 field は focus / hover で tooltip hint を表示する。
 - `/events` は reply の `choiceId`、`requestEventId`、input、heartbeat summary などの運用確認に必要な最小情報だけを返し、回答本文を永続 evidence に残さない。
@@ -118,8 +121,9 @@
 - `display.settings_updated.display.motionStepMs` は `120..800` を受け付け、既定 `280ms` でキャラの pose / frame 切替間隔を決める。
 - `display.settings_updated.display.*Rgba` は `r/g/b/a=0..255` を受け付け、pet 背景、本文文字、本文背景に反映する。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
-- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step、RGBA、Core2 / GRAY 表示を確認できる。
+- Dashboard は side menu、event tabs、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、text size、render FPS、motion step、RGBA、Core2 / GRAY 表示を確認できる。プレビューは画面と設定を2カラムにして縦方向の占有を抑える。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
+- firmware は `display.*Rgba` を object、hex string、channel array として受け取り、local hatch-pet asset の透明ピクセル部分には固定アクセント色ではなく pet background の合成色を表示する。
 - firmware は pet surface を `M5Canvas` の off-screen Sprite に描画し、`pushSprite()` で一括転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。

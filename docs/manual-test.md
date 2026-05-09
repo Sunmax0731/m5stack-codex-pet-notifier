@@ -34,7 +34,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない。pet animation は Sprite buffer で更新され、pet surface 外の本文や footer が毎フレームちらつかない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-20 | Dashboard の `M5Stack 表示プレビュー` で pet display area を `8/8`、UI text size と body text size を任意、render FPS を `12fps`、motion step を `280ms`、pet background / text color / text background を任意の RGBA に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。UI / body text size は `1..8`、render FPS は `4..20`、motion step は `120..800ms` の設定に応じて変わり、背景色と文字色も変わる | 準備済み。ユーザー手動 |
+| C2-20 | Dashboard の `M5Stack 表示プレビュー` で pet display area を `8/8`、UI text size と body text size を任意、render FPS を `12fps`、motion step を `280ms`、pet background / text color / text background を任意の RGBA に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体に近い最大面積で表示される。local hatch-pet asset の透明ピクセルは設定した pet background を見せ、文字背景と文字色もRGBA合成後の色に変わる | 準備済み。ユーザー手動 |
 | C2-21 | Dashboard の `M5Stack 表示プレビュー` で Core2 / GRAY、Pet / Answer / Decision / Notify を切り替え、pet / display slider、RGBA、local hatch-pet asset を変更する | 送信前の simulated display が現在の hatch-pet キャラ、pet 面積、body text、footer text size、render FPS、motion step、色設定を即時反映する。GRAY 切替では button 前提のreadoutになる | `dashboard:smoke` 済み。ユーザー目視 |
 | C2-22 | `pet:asset` 生成後の firmware で Display slider を `1/8`、`4/8`、`8/8` に変えて pet を見る | Core2 の pet は scale ごとの高解像度 frame に切り替わり、低解像度 base frame をブロック状に拡大した見た目にならない | 準備済み。ユーザー手動 |
 | C2-23 | Dashboard または `codex:display` で render FPS を `4`、`12`、`20`、motion step を `120`、`280`、`600` の順に送る | render FPS は更新上限、motion step はキャラ frame / bounce の切替頻度として効く。`20fps / 280ms` では小刻みに震えず、Answer / Decision / footer text のちらつきが増えない | 準備済み。ユーザー手動 |
@@ -64,9 +64,10 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-11 | side menu で `状態`、`送信`、`プレビュー`、`Codex回答`、`ログ`、`デバッグ` へ移動する | 各 section に移動でき、現在選択した menu が強調表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-12 | 各 section の `Hide` / `View` を押す | section body が折りたたみ / 再表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-13 | 主要 input / slider に focus する | 項目の意味を説明する tooltip hint が表示される | `dashboard:smoke` 済み。ユーザー目視 |
-| GUI-14 | sidebar の `環境構築コマンド` を押す | bridge start、pet asset、Core2 upload、Codex relay などの command modal が開く | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信`、`保守` のタブ付き command modal が開き、pet asset、Core2 upload、Codex relay、sample replay を任意パラメータで実行できる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-15 | `local hatch-pet asset` を別packageへ切り替える、または `asset path override` に `%USERPROFILE%\.codex\pets\Mira` を入れる | preview の `current pet` と simulated display が選択した package の spritesheet に切り替わる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-16 | `M5Stack 表示プレビュー` の `device` を Core2 / GRAY で切り替える | preview readout が `Core2 / 320x240 / touch` と `GRAY / 320x240 / buttons` で切り替わり、画面プレビュー、状態確認、イベントログ、デバッグが全幅表示にならない | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-17 | `cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080` で起動し、Dashboard sidebar を見る | PowerShell 画面を残さずHost Bridgeが動き、sidebarに `Bridge running / background`、pid、uptimeが表示される | `dashboard:smoke` 済み。ユーザー目視 |
 
 ## 記録項目
 
