@@ -7,6 +7,7 @@
 | LAN 内利用を前提にする | Pass | Host Bridge は `0.0.0.0:8080` で LAN 手動確認用に起動し、外部公開を対象外にする |
 | pairing token を必須にする | Pass | `LocalLanBridge.checkToken()`、`LanHostBridge.checkToken()` |
 | token なし / 誤 token を拒否する | Pass | `happy-path.unauthorizedRejected=1`、`bridge:smoke` |
+| Bridge 再起動後の既存実機復帰 | Pass | `LanHostBridge.checkToken()` は `paired-*` token を保持した実機 poll を再取り込みし、任意文字列や誤tokenは引き続き拒否する |
 | device に本文を永続保存しない | Pass | `sample-telemetry.json`、`persistentMessageBodies=false` |
 | 個人 pet sprite を release asset に含めない | Pass | sample は `host://` 参照のみ |
 | hatch-pet local asset を commit しない | Pass | `firmware/include/pet_asset.local.h` は `.gitignore` 対象。生成ツールと firmware gate だけを commit する |

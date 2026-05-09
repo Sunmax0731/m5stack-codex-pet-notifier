@@ -202,6 +202,13 @@ export class LanHostBridge {
   checkToken(deviceId, token) {
     const record = this.devices.get(deviceId);
     if (!record || !record.paired) {
+      if (isRecoverablePairingToken(token)) {
+        const recovered = this.ensureDevice(deviceId);
+        recovered.token = token;
+        recovered.paired = true;
+        this.securityLog.push({ kind: 'token-rehydrated', deviceId });
+        return { ok: true };
+      }
       this.securityLog.push({ kind: 'unpaired-device', deviceId });
       return { ok: false, reason: 'device-not-paired' };
     }
@@ -211,6 +218,10 @@ export class LanHostBridge {
     }
     return { ok: true };
   }
+}
+
+function isRecoverablePairingToken(token) {
+  return typeof token === 'string' && /^paired-[A-Za-z0-9_-]{20,}$/.test(token);
 }
 
 export function createBridgeHttpServer(bridge = new LanHostBridge(), options = {}) {

@@ -20,6 +20,34 @@ try {
   assert.equal(unauthorizedPoll.ok, false);
   assert.equal(unauthorizedPoll.reason, 'invalid-token');
 
+  const restartedBridge = new LanHostBridge();
+  restartedBridge.publish({
+    type: 'display.settings_updated',
+    eventId: 'evt-restarted-display',
+    createdAt: '2026-05-09T00:00:10+09:00',
+    display: {
+      petScale: 4,
+      uiTextScale: 1,
+      bodyTextScale: 1,
+      animationFps: 12,
+      motionStepMs: 280,
+      screenBackgroundRgba: { r: 34, g: 68, b: 102, a: 255 },
+      petBackgroundRgba: { r: 102, g: 51, b: 0, a: 204 },
+      textColorRgba: { r: 255, g: 255, b: 255, a: 255 },
+      textBackgroundRgba: { r: 17, g: 17, b: 17, a: 128 },
+      petOffsetX: 88,
+      petOffsetY: -44,
+      textBorderEnabled: false,
+      textBorderRgba: { r: 255, g: 255, b: 255, a: 255 },
+      beepOnAnswer: true
+    }
+  }, { deviceId });
+  const recoveredPoll = restartedBridge.poll(deviceId, pair.token);
+  assert.equal(recoveredPoll.ok, true);
+  assert.equal(recoveredPoll.event.type, 'display.settings_updated');
+  assert.equal(restartedBridge.summary().pairedDevices.length, 1);
+  assert.equal(restartedBridge.safeEvents().security[0].kind, 'token-rehydrated');
+
   const replay = await postJson(`${baseUrl}/codex/replay-samples`, { deviceId });
   assert.equal(replay.ok, true);
 
