@@ -149,6 +149,9 @@ assert(bridgeSource.includes('local-command-execution-only'), 'Host Bridge comma
 assert(bridgeSource.includes('access-control-allow-origin'), 'Host Bridge must allow the dashboard to use a latest Bridge API on another local port');
 assert(bridgeSource.includes("request.method === 'OPTIONS'"), 'Host Bridge must answer CORS preflight requests for cross-port dashboard commands');
 assert(bridgeSource.includes('firmware:upload:core2'), 'Host Bridge debug commands must expose auto-detected Core2 upload');
+assert(bridgeSource.includes("runProcess('cmd.exe', ['/d', '/s', '/c', 'npm'"), 'Host Bridge must run npm GUI commands through cmd.exe on Windows to avoid npm.cmd spawn EINVAL');
+assert(bridgeSource.includes('try {') && bridgeSource.includes('message: error.message'), 'Host Bridge command execution must return spawn errors as JSON instead of crashing the route');
+assert(bridgeSource.includes('cmd-wrapper-v1'), 'Host Bridge runtime must expose the Windows-safe GUI command runner version');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
@@ -191,6 +194,7 @@ assert(dashboardAppSource.includes('/debug/commands/run'), 'Dashboard must run a
 assert(dashboardAppSource.includes('renderRuntimeStatus'), 'Dashboard must render server runtime status in the sidebar');
 assert(dashboardAppSource.includes('ensureApiBase'), 'Dashboard must discover the latest Bridge API when an old process owns the current port');
 assert(dashboardAppSource.includes('bridgeCandidates'), 'Dashboard must try known local Bridge ports for pet asset preview');
+assert(dashboardAppSource.includes('compatibleCommandRunners'), 'Dashboard must avoid GUI command execution on old Bridge processes with unsafe npm spawning');
 assert(dashboardAppSource.includes('assetUrl'), 'Dashboard must resolve pet spritesheet URLs against the discovered Bridge API origin');
 
 const mojibakeCodePoints = [0x7e67, 0x90e2, 0x9aeb, 0xfffd];

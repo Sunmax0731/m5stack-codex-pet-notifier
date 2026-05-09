@@ -720,7 +720,8 @@ function buildRuntimeStatus() {
       : null,
     commandExecution: {
       enabled: true,
-      localOnly: true
+      localOnly: true,
+      runner: process.platform === 'win32' ? 'cmd-wrapper-v1' : 'direct-npm-v1'
     }
   };
 }
@@ -968,26 +969,38 @@ function expandUserPath(value) {
 }
 
 function runNpmScript(script, args = [], options = {}) {
-  return runProcess(npmCommand(), ['run', script, '--', ...args], options);
+  if (process.platform === 'win32') {
+    return runProcess('cmd.exe', ['/d', '/s', '/c', 'npm', 'run', script, '--', ...args], options);
+  }
+  return runProcess('npm', ['run', script, '--', ...args], options);
 }
 
 function runNodeTool(toolPath, args = [], options = {}) {
   return runProcess(process.execPath, [toolPath, ...args], options);
 }
 
-function npmCommand() {
-  return process.platform === 'win32' ? 'npm.cmd' : 'npm';
-}
-
 function runProcess(command, args = [], options = {}) {
   const startedAt = Date.now();
   const timeoutMs = options.timeoutMs ?? 60000;
   return new Promise((resolve) => {
-    const child = spawn(command, args, {
-      cwd: repoRoot,
-      env: process.env,
-      windowsHide: true
-    });
+    let child;
+    try {
+      child = spawn(command, args, {
+        cwd: repoRoot,
+        env: process.env,
+        windowsHide: true
+      });
+    } catch (error) {
+      resolve({
+        ok: false,
+        command: renderCommand(command, args),
+        message: error.message,
+        stdout: '',
+        stderr: '',
+        durationMs: Date.now() - startedAt
+      });
+      return;
+    }
     let stdout = '';
     let stderr = '';
     let timedOut = false;

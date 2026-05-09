@@ -78,6 +78,7 @@ try {
   assert.match(app, /\/pet\/packages/);
   assert.match(app, /ensureApiBase/);
   assert.match(app, /bridgeCandidates/);
+  assert.match(app, /compatibleCommandRunners/);
   assert.match(app, /apiUrl/);
   assert.match(app, /assetUrl/);
   assert.match(app, /motionStepMs/);
@@ -103,6 +104,7 @@ try {
   assert.equal(snapshot.ok, true);
   assert.equal(snapshot.runtime.ok, true);
   assert.equal(snapshot.runtime.currentProcess.pid, process.pid);
+  assert.equal(typeof snapshot.runtime.commandExecution.runner, 'string');
   assert.equal(snapshot.commandDefinitions.ok, true);
   assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'bridgeStartBackground'));
   assert(snapshot.commandDefinitions.commands.some((command) => command.id === 'codexDisplay'));

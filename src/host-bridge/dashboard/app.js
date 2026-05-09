@@ -18,6 +18,7 @@ const state = {
 };
 
 const expectedVersion = document.documentElement.dataset.version || '0.1.0-alpha.10';
+const compatibleCommandRunners = new Set(['cmd-wrapper-v1', 'direct-npm-v1']);
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -166,6 +167,10 @@ async function discoverApiBase() {
       const runtime = await fetchJson(base, '/debug/runtime');
       if (runtime.version !== expectedVersion) {
         state.apiBaseWarning = `${base} は ${runtime.version} のため最新Bridgeではありません`;
+        continue;
+      }
+      if (!compatibleCommandRunners.has(runtime.commandExecution?.runner)) {
+        state.apiBaseWarning = `${base} はGUI command runner更新前のBridgeです`;
         continue;
       }
       state.apiBase = base === sameOriginBase() ? '' : base;

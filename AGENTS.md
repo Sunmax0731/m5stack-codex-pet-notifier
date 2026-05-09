@@ -15,6 +15,7 @@
 - 実機がない場合でも、simulator、mock device、sample telemetry、device / host adapter、security/privacy 境界を `npm test` で確認する。
 - PlatformIO を repo root から実行する場合は `pio.exe run -d firmware ...` を使う。`pio.exe -d firmware run ...` はこの環境では失敗する。
 - hatch-pet 由来の pet sprite は `tools/generate-pet-firmware-asset.py` で `firmware/include/pet_asset.local.h` に変換する。この local header は `.gitignore` 対象で、個人 pet sprite を commit しない。
+- Dashboard の `/debug/commands/run` から npm script を起動する場合、Windows では `npm.cmd` を直接 `spawn()` せず、`cmd.exe /d /s /c npm ...` 経由にする。この Node/Windows 環境では `spawn('npm.cmd', ...)` が `spawn EINVAL` になる。
 - 同じ `firmware/.pio` を使うため、Core2 / GRAY の PlatformIO build は並列実行せず順番に実行する。
 - `dist/validation-result.json` と `docs/platform-runtime-gate.json` には実行時刻、絶対パス、ZIP byte size などの不安定値を入れない。
 - token、host IP、個人 pet sprite、会話本文を release asset へ含めない。

@@ -24,6 +24,7 @@ cmd.exe /d /s /c npm test
 - 日本語表示を変更した場合は Core2 / GRAY 両方の firmware build と `scripts/validate.mjs` の日本語フォント / UTF-8 境界 gate を通す。
 - Codex session 自動送信を変更した場合は `node scripts/codex-session-smoke.mjs` と `cmd.exe /d /s /c npm test` を通し、session 本文を release evidence に保存しない。
 - hatch-pet の素材を firmware に反映する場合は、先に `cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h` を実行する。生成される `pet_asset.local.h` は ignored local file であり commit しない。
+- Dashboard の command modal 経由で npm script を実行する実装を変更した場合は、Windows の `spawn('npm.cmd', ...)` を避け、`cmd.exe /d /s /c npm ...` 経由にする。GUIで `spawn EINVAL` が出た場合はこの経路を最初に確認する。
 - PlatformIO build は `.pio` の cleanup が競合しないように Core2、GRAY の順に個別実行する。
 
 ## Release
