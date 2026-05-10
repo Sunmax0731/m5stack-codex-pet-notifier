@@ -5,8 +5,11 @@ import { productProfile } from '../src/core/product-profile.mjs';
 
 const repoRoot = process.cwd();
 const args = new Set(process.argv.slice(2));
+const rawArgs = process.argv.slice(2);
 const strict = args.has('--strict');
 const includeTurn = args.has('--include-turn');
+const includeLongRun = args.has('--include-long-run');
+const skipWifiInterruption = args.has('--skip-wifi-interruption');
 const skipNpmTest = args.has('--skip-npm-test');
 const resultPath = path.join(repoRoot, 'dist', 'formal-release-automation-result.json');
 const docsResultPath = path.join(repoRoot, 'docs', 'formal-release-automation-result.json');
@@ -25,17 +28,19 @@ const result = {
   steps: [],
   gates: {
     baselineAutomation: 'pending',
-    longRun: 'external-device-required',
+    longRun: 'pending',
     signedInstaller: 'pending',
     codexAppServer: 'pending'
   },
   evidence: {
+    longRun: null,
     signedInstaller: null,
     codexAppServer: null
   },
   manualToAutomationPolicy: [
     'Codex側で実行可能な検証は npm script と JSON evidence に寄せる。',
-    'Core2 実機、Wi-Fi AP停止、署名証明書、Codex account/model access は外部前提として残し、実行結果だけを自動収集する。',
+    'Core2 実機、署名証明書、Codex account/model access は外部前提として残し、実行結果だけを自動収集する。',
+    'Wi-Fi AP停止 / 復帰は実施指示がある場合だけ LR-02 として扱い、今回の Core2 soak gate には含めない。',
     '回答本文、token、PFX password、SSID、host IP は evidence に保存しない。'
   ],
   nextActions: []
@@ -51,6 +56,21 @@ try {
     result.steps.push({ name: 'npm test', status: 'skipped' });
     result.gates.baselineAutomation = 'skipped';
   }
+
+  if (includeLongRun) {
+    const longRunMinutes = Number(argValue('--long-run-min', '480'));
+    const soakArgs = ['run', 'core2:soak', '--', `--duration-min=${longRunMinutes}`];
+    if (skipWifiInterruption) {
+      soakArgs.push('--skip-wifi-interruption');
+    }
+    const longRun = runNpm(soakArgs, { timeout: (longRunMinutes * 60_000) + 120_000 });
+    result.steps.push(step('core2:soak', longRun));
+    result.evidence.longRun = readJson(path.join(repoRoot, 'dist', 'core2-soak-result.json'));
+  } else {
+    result.steps.push({ name: 'core2:soak', status: 'evidence-read' });
+    result.evidence.longRun = readJson(path.join(repoRoot, 'docs', 'core2-soak-result.json'));
+  }
+  result.gates.longRun = longRunGate(result.evidence.longRun);
 
   const installer = runNpm(['run', 'installer:signed:pipeline'], { timeout: 240000 });
   result.steps.push(step('installer:signed:pipeline', installer));
@@ -94,6 +114,25 @@ function signedInstallerGate(evidence) {
   return 'passed';
 }
 
+function longRunGate(evidence) {
+  if (!evidence) {
+    return 'external-device-required';
+  }
+  if (evidence.status !== 'passed') {
+    return evidence.status === 'running' ? 'running' : 'external-device-required';
+  }
+  if (evidence.scope?.releaseTarget !== 'Core2') {
+    return 'failed';
+  }
+  if (evidence.checks?.heartbeatObserved !== true || evidence.checks?.latestHeartbeatFresh !== true) {
+    return 'failed';
+  }
+  if (evidence.checks?.noStaleDeviceAtEnd !== true || evidence.checks?.droppedEventsWithinLimit !== true) {
+    return 'failed';
+  }
+  return 'passed';
+}
+
 function codexAppServerGate(evidence, turnRequired) {
   if (!evidence) {
     return 'failed';
@@ -107,7 +146,7 @@ function codexAppServerGate(evidence, turnRequired) {
 function buildNextActions() {
   const actions = [];
   if (result.gates.longRun !== 'passed') {
-    actions.push('Core2 を接続した 8時間 soak は外部環境込みで自動ハーネス化し、heartbeat / droppedEvents / stale を JSON evidence に保存する。');
+    actions.push('Core2 を接続した soak を `npm run core2:soak -- --duration-min=480 --skip-wifi-interruption` で実行し、heartbeat / droppedEvents / stale を JSON evidence に保存する。');
   }
   if (result.gates.signedInstaller !== 'passed') {
     actions.push('WiX / Windows SDK / 署名証明書を用意し、`npm run installer:signed:pipeline -- --sign` を実行する。');
@@ -116,6 +155,18 @@ function buildNextActions() {
     actions.push('正式 API-01 では `npm run codex:app-server:probe -- --include-turn` を実行し、turn/start 成功を証跡化する。');
   }
   return actions;
+}
+
+function argValue(name, fallback) {
+  const inline = rawArgs.find((arg) => arg.startsWith(`${name}=`));
+  if (inline) {
+    return inline.slice(name.length + 1);
+  }
+  const index = rawArgs.indexOf(name);
+  if (index >= 0 && rawArgs[index + 1] && !rawArgs[index + 1].startsWith('--')) {
+    return rawArgs[index + 1];
+  }
+  return fallback;
 }
 
 function runNpm(npmArgs, options = {}) {

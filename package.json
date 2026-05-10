@@ -12,6 +12,8 @@
     "bridge:start": "node src/host-bridge/server.mjs",
     "bridge:start:bg": "node tools/start-bridge-background.mjs",
     "bridge:restart:bg": "node tools/restart-bridge-background.mjs",
+    "core2:soak": "node tools/core2-soak-runner.mjs",
+    "core2:soak:bg": "node tools/start-core2-soak-background.mjs",
     "codex:answer": "node src/codex-adapter/relay.mjs answer",
     "codex:clipboard": "node src/codex-adapter/relay.mjs clipboard",
     "codex:choice": "node src/codex-adapter/relay.mjs choice",

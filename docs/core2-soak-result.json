@@ -1,0 +1,392 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.2.0-beta.1",
+  "generatedAt": "2026-05-10T17:22:24.390Z",
+  "status": "passed",
+  "scope": {
+    "releaseTarget": "Core2",
+    "grayHardware": "out-of-scope",
+    "grayImu": "out-of-scope",
+    "multipleM5Stack": "future-update",
+    "wifiInterruption": "excluded-by-request"
+  },
+  "config": {
+    "bridge": "loopback",
+    "durationMs": 90000,
+    "intervalMs": 15000,
+    "replayIntervalMs": 60000,
+    "pairingTimeoutMs": 60000,
+    "maxHeartbeatAgeSec": 45,
+    "maxDroppedEvents": 0,
+    "requireDevice": true
+  },
+  "startedAt": "2026-05-10T17:22:24.391Z",
+  "endedAt": "2026-05-10T17:23:54.437Z",
+  "checks": {
+    "bridgeReachable": true,
+    "pairedDeviceObserved": true,
+    "heartbeatObserved": true,
+    "latestHeartbeatFresh": true,
+    "noStaleDeviceAtEnd": true,
+    "droppedEventsWithinLimit": true,
+    "wifiInterruptionSkipped": true
+  },
+  "counters": {
+    "snapshots": 7,
+    "replayAttempts": 2,
+    "replayFailures": 0,
+    "bridgeFailures": 0,
+    "observedDeviceCount": 1,
+    "observedHeartbeatCount": 7,
+    "maxHeartbeatAgeSec": 7,
+    "maxDroppedEvents": 0,
+    "staleSampleCount": 0
+  },
+  "devices": [
+    {
+      "deviceId": "m5stack-sample-001",
+      "pending": 0,
+      "websocket": false,
+      "stale": false,
+      "lastSeenSec": 0,
+      "lastPollSec": 0,
+      "lastHeartbeatSec": 2,
+      "droppedEvents": 0,
+      "lastHeartbeat": {
+        "battery": 100,
+        "wifiRssi": -43,
+        "screen": "Choice",
+        "lastError": null,
+        "errorRecoverable": null,
+        "display": {
+          "petScale": 2,
+          "uiTextScale": 1,
+          "bodyTextScale": 1,
+          "animationFps": 12,
+          "motionStepMs": 280,
+          "applyCount": 2,
+          "lastEventId": "evt-display-001",
+          "visualProbe": false,
+          "beepOnAnswer": true
+        },
+        "pet": {
+          "mood": "confused",
+          "lastInteraction": "none",
+          "interactionCount": 0
+        }
+      }
+    }
+  ],
+  "samples": [
+    {
+      "elapsedMs": 43,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 0,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 1,
+          "lastPollSec": 1,
+          "lastHeartbeatSec": 7,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -42,
+            "screen": "Idle",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 0,
+              "lastEventId": null,
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "idle",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 0,
+      "inboundEvents": 13,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 53,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 5,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 1,
+          "lastPollSec": 1,
+          "lastHeartbeatSec": 7,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -42,
+            "screen": "Idle",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 0,
+              "lastEventId": null,
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "idle",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 5,
+      "inboundEvents": 13,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 15059,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 0,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 0,
+          "lastPollSec": 0,
+          "lastHeartbeatSec": 2,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -43,
+            "screen": "Choice",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 1,
+              "lastEventId": "evt-display-001",
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "confused",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 5,
+      "inboundEvents": 15,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 30063,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 0,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 1,
+          "lastPollSec": 1,
+          "lastHeartbeatSec": 7,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -45,
+            "screen": "Choice",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 1,
+              "lastEventId": "evt-display-001",
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "confused",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 5,
+      "inboundEvents": 16,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 45067,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 0,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 0,
+          "lastPollSec": 0,
+          "lastHeartbeatSec": 2,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -43,
+            "screen": "Choice",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 1,
+              "lastEventId": "evt-display-001",
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "confused",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 5,
+      "inboundEvents": 18,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 60076,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 5,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 1,
+          "lastPollSec": 1,
+          "lastHeartbeatSec": 7,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -43,
+            "screen": "Choice",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 1,
+              "lastEventId": "evt-display-001",
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "confused",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 10,
+      "inboundEvents": 19,
+      "securityRejections": 1
+    },
+    {
+      "elapsedMs": 75079,
+      "ok": true,
+      "pairedDevices": [
+        {
+          "deviceId": "m5stack-sample-001",
+          "pending": 0,
+          "websocket": false,
+          "stale": false,
+          "lastSeenSec": 0,
+          "lastPollSec": 0,
+          "lastHeartbeatSec": 2,
+          "droppedEvents": 0,
+          "lastHeartbeat": {
+            "battery": 100,
+            "wifiRssi": -43,
+            "screen": "Choice",
+            "lastError": null,
+            "errorRecoverable": null,
+            "display": {
+              "petScale": 2,
+              "uiTextScale": 1,
+              "bodyTextScale": 1,
+              "animationFps": 12,
+              "motionStepMs": 280,
+              "applyCount": 2,
+              "lastEventId": "evt-display-001",
+              "visualProbe": false,
+              "beepOnAnswer": true
+            },
+            "pet": {
+              "mood": "confused",
+              "lastInteraction": "none",
+              "interactionCount": 0
+            }
+          }
+        }
+      ],
+      "outboundEvents": 10,
+      "inboundEvents": 21,
+      "securityRejections": 1
+    }
+  ],
+  "replayResults": [
+    {
+      "elapsedMs": 50,
+      "ok": true,
+      "resultCount": 5,
+      "failures": []
+    },
+    {
+      "elapsedMs": 60073,
+      "ok": true,
+      "resultCount": 5,
+      "failures": []
+    }
+  ],
+  "errors": [],
+  "nextActions": []
+}

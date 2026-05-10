@@ -24,5 +24,18 @@
 
 - `cmd.exe /d /s /c npm test` で queue cap、runtime gate、adapter review を通す。
 - 30 分以上の Core2 常時接続で `lastHeartbeatSec` が増え続けず、`stale=false` に戻ることを確認する。
+- 正式リリース候補では 8 時間以上の Core2 soak を実行し、`dist/core2-soak-result.json` と `docs/core2-soak-result.json` に evidence を保存する。
 - Host Bridge 再起動後に token rehydrate または再 pairing が発生し、display settings が再送できることを確認する。
 - `dist/adapter-review-result.json` と `docs/adapter-review-result.json` に adapter 状態を残す。
+
+## Core2 soak runner
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run core2:soak -- --duration-min=30 --skip-wifi-interruption
+cmd.exe /d /s /c npm run core2:soak:bg -- --duration-min=480 --skip-wifi-interruption
+```
+
+`core2:soak` は Host Bridge が起動していなければ `bridge:start:bg` で起動し、`/debug/snapshot` から paired device、heartbeat age、stale、droppedEvents、inbound / outbound count だけを収集します。回答本文、token、SSID、host IP は evidence に保存しません。
+
+今回の正式化作業では Wi-Fi AP停止 / 復帰を soak に含めません。AP停止 / 復帰は `--skip-wifi-interruption` を外すだけでは自動実行されないため、別途ユーザーが実施タイミングを指定した回だけ LR-02 として扱います。

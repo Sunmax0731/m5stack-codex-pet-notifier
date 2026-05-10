@@ -21,13 +21,14 @@
 | Codex App Server runtime probe | 実装済み | `src/codex-adapter/appServerAdapter.mjs`、`scripts/codex-app-server-adapter-smoke.mjs`、`tools/codex-app-server-runtime-probe.mjs`、`docs/codex-app-server-runtime-probe-result.json` |
 | Adapter review | 実装済み | `tools/adapter-review.mjs`、private API scraping 禁止 |
 | Signed MSI / MSIX pipeline | 準備済み | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs`、`docs/signed-installer-pipeline-result.json` |
-| Manual gate automation | 準備済み | `tools/formal-release-automation.mjs`、`docs/manual-test-automation.md`、`docs/formal-release-automation-result.json` |
+| Manual gate automation | 準備済み | `tools/formal-release-automation.mjs`、`tools/core2-soak-runner.mjs`、`docs/manual-test-automation.md`、`docs/formal-release-automation-result.json` |
 
 ## Release Candidate Workstreams
 
 1. Device reliability
-   - Wi-Fi 再接続、Host Bridge 再起動、token 失効時の再pairingを 8 時間以上の運用で確認する。
+   - Core2 常時接続、Host Bridge 再起動、token 失効時の再pairingを 8 時間以上の運用で確認する。
    - heartbeat age、stale flag、dropped event count、poll backoff、Wi-Fi reconnect backoff を証跡化する。
+   - Wi-Fi AP停止 / 復帰は今回の soak から外し、実施タイミングを指定した別 gate として扱う。
 
 2. Codex workflow
    - `codex:decision:wait` を Codex Hooks または session workflow から呼べる運用例として固定する。
@@ -57,4 +58,4 @@
 
 ## Manual Gate
 
-正式リリース候補へ進める前に、`docs/manual-test.md` の Core2 項目、長時間運用、Dashboard current pet preview、Codex decision request、署名付き MSI / MSIX、実 Codex App Server 接続を確認します。GRAY 実機と GRAY IMU は対象外です。未実施項目がある場合は stable release ではなく prerelease とします。
+正式リリース候補へ進める前に、`docs/manual-test.md` の Core2 項目、長時間運用、Dashboard current pet preview、Codex decision request、署名付き MSI / MSIX、実 Codex App Server 接続を確認します。今回の長時間運用では Wi-Fi AP停止 / 復帰を含めません。GRAY 実機と GRAY IMU は対象外です。未実施項目がある場合は stable release ではなく prerelease とします。

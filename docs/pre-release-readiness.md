@@ -32,6 +32,7 @@
 - Dashboard side menu、状態確認sidebar、全幅M5Stack 表示プレビュー、最近の回答 / イベントログの左右ペイン。
 - Core2 / Dashboard の機能ブラッシュアップ手動確認。日本語表示、Display 設定、pet 位置 / scale / RGBA、hatch-pet row illustration、gesture、Decision、最新 Codex 回答送信、installer shortcut、background launcher はユーザー確認済み。
 - Host Bridge long-run diagnostics と firmware Wi-Fi / poll backoff。
+- Core2 soak runner。
 - 署名付き MSI / MSIX template、signing readiness check、signed installer pipeline。
 - 実 Codex App Server runtime probe。`initialize`、`thread/start`、`turn/start` は public interface で確認済み。
 - 手動 gate 自動化 runner。

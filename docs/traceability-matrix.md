@@ -30,7 +30,7 @@
 | pet interaction / gesture | `device.pet_interacted`、Core2 touch gesture、long press side effect | `happy-path.interactionCount=2`、`warning.interactionCount=1`、`npm run bridge:smoke` |
 | Windows installer / background launcher | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` | `npm run installer:package`、`scripts/validate.mjs`、`docs/manual-test.md` |
 | 署名付き MSI / MSIX 準備 | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs` | `npm run installer:signing:check`、`npm run installer:signed:pipeline` |
-| 長時間運用 diagnostics | `src/host-bridge/server.mjs`、`firmware/src/main.cpp` | `scripts/validate.mjs`、`docs/long-run-operations.md` |
+| 長時間運用 diagnostics | `src/host-bridge/server.mjs`、`firmware/src/main.cpp`、`tools/core2-soak-runner.mjs` | `scripts/validate.mjs`、`docs/long-run-operations.md`、`docs/core2-soak-result.json` |
 | Core2 / button reference profile | `src/device-adapter/deviceProfiles.mjs` | `profileCovered=true` |
 | sample telemetry | `samples/sample-telemetry.json` | `docs/platform-runtime-gate.json` |
 | security/privacy boundary | checklist、bridge token check | runtime gate `securityPrivacy=true` |

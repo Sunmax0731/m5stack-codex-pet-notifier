@@ -26,7 +26,8 @@
 | hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、標準 9 行 atlas、row-aware frame selection を検証する | `scripts/validate.mjs` |
 | signing readiness | Windows SDK / WiX / 署名用 env の準備状況を JSON へ出す | `npm run installer:signing:check`、`dist/windows-signing-readiness.json` |
 | signed installer pipeline | installer ZIP payload から WiX source / MSIX payload を生成し、release 環境では署名と verify まで行う | `npm run installer:signed:pipeline`、`docs/signed-installer-pipeline-result.json` |
-| formal gate automation | `npm test`、署名 pipeline、Codex App Server probe をまとめて実行する | `npm run formal:automation -- --include-turn`、`docs/formal-release-automation-result.json` |
+| Core2 soak runner | 実機常時接続の heartbeat age、stale、droppedEvents を収集する。今回の実行では Wi-Fi AP停止 / 復帰を含めない | `npm run core2:soak -- --duration-min=480 --skip-wifi-interruption`、`docs/core2-soak-result.json` |
+| formal gate automation | `npm test`、Core2 soak evidence、署名 pipeline、Codex App Server probe をまとめて確認する | `npm run formal:automation -- --include-turn`、`docs/formal-release-automation-result.json` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
 ## Representative Suite
@@ -62,4 +63,4 @@
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 
-GRAY 実機と GRAY IMU は release target 外です。長時間 soak は Core2 実機環境が必要です。実 Codex App Server 接続は `codex:app-server:probe -- --include-turn` で確認済みです。署名付き MSI / MSIX は pipeline 化済みですが、現環境では WiX / Windows SDK / 署名証明書が未導入のため release 環境で再実行します。複数 M5Stack 同時接続は今回対象外で、今後のアップデート対象です。
+GRAY 実機と GRAY IMU は release target 外です。長時間 soak は Core2 実機環境が必要です。今回の soak では Wi-Fi AP停止 / 復帰を含めません。実 Codex App Server 接続は `codex:app-server:probe -- --include-turn` で確認済みです。署名付き MSI / MSIX は pipeline 化済みですが、現環境では WiX / Windows SDK / 署名証明書が未導入のため release 環境で再実行します。複数 M5Stack 同時接続は今回対象外で、今後のアップデート対象です。

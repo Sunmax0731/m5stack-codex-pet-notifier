@@ -1,7 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
   "version": "0.2.0-beta.1",
-  "generatedAt": "2026-05-10T16:53:55.939Z",
+  "generatedAt": "2026-05-10T17:24:41.127Z",
   "status": "passed",
   "officialDocs": "https://developers.openai.com/codex/app-server",
   "publicInterfaceOnly": true,
@@ -98,11 +98,11 @@
     "malformedLineCount": 0,
     "stderrLineCount": 9,
     "stderrSample": [
-      "{\"timestamp\":\"2026-05-10T16:53:57.084439Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to warm featured plugin ids cache\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/featured failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2rem;height:100%;justify-con",
-      "{\"timestamp\":\"2026-05-10T16:53:57.090077Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"startup remote plugin sync failed; will retry on next app-server start\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/list failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2r",
-      "{\"timestamp\":\"2026-05-10T16:53:57.483888Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to load plugin: missing or invalid plugin.json\",\"plugin\":\"chrome@openai-bundled\",\"path\":\"%USERPROFILE%\\\\.codex\\\\plugins\\\\cache\\\\openai-bundled\\\\chrome\\\\0.1.7\"},\"target\":\"codex_core_plugins::loader\"}",
-      "{\"timestamp\":\"2026-05-10T16:53:57.578457Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: prompt must be at most 128 characters\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\build-ios-apps\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}",
-      "{\"timestamp\":\"2026-05-10T16:53:57.580077Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: maximum of 3 prompts is supported\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\plugin-eval\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}"
+      "{\"timestamp\":\"2026-05-10T17:24:42.199404Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to warm featured plugin ids cache\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/featured failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2rem;height:100%;justify-con",
+      "{\"timestamp\":\"2026-05-10T17:24:42.199436Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"startup remote plugin sync failed; will retry on next app-server start\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/list failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2r",
+      "{\"timestamp\":\"2026-05-10T17:24:42.579789Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to load plugin: missing or invalid plugin.json\",\"plugin\":\"chrome@openai-bundled\",\"path\":\"%USERPROFILE%\\\\.codex\\\\plugins\\\\cache\\\\openai-bundled\\\\chrome\\\\0.1.7\"},\"target\":\"codex_core_plugins::loader\"}",
+      "{\"timestamp\":\"2026-05-10T17:24:42.693625Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: prompt must be at most 128 characters\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\build-ios-apps\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}",
+      "{\"timestamp\":\"2026-05-10T17:24:42.695644Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: maximum of 3 prompts is supported\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\plugin-eval\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}"
     ],
     "threadIdReceived": true,
     "turnIdReceived": true

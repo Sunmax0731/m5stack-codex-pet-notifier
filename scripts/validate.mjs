@@ -65,6 +65,8 @@ for (const required of [
   'tools/signed-installer-pipeline.mjs',
   'tools/codex-app-server-runtime-probe.mjs',
   'tools/formal-release-automation.mjs',
+  'tools/core2-soak-runner.mjs',
+  'tools/start-core2-soak-background.mjs',
   'tools/upload-firmware.ps1',
   'tools/start-bridge-background.mjs',
   'tools/generate-pet-firmware-asset.py',
@@ -191,6 +193,13 @@ const backgroundBridgeSource = fs.readFileSync('tools/start-bridge-background.mj
 assert(backgroundBridgeSource.includes('windowsHide: true'), 'background bridge launcher must hide the spawned server window on Windows');
 assert(backgroundBridgeSource.includes('detached: true'), 'background bridge launcher must detach the server process');
 assert(backgroundBridgeSource.includes('M5STACK_BRIDGE_BACKGROUND'), 'background bridge launcher must mark the child process as background mode');
+const core2SoakSource = fs.readFileSync('tools/core2-soak-runner.mjs', 'utf8');
+assert(core2SoakSource.includes('/debug/snapshot'), 'Core2 soak runner must collect sanitized bridge snapshots');
+assert(core2SoakSource.includes('skipWifiInterruption'), 'Core2 soak runner must support excluding Wi-Fi interruption from this run');
+assert(core2SoakSource.includes('docsResultPath') && core2SoakSource.includes('core2-soak-result.json'), 'Core2 soak runner must persist docs evidence');
+const core2SoakBackgroundSource = fs.readFileSync('tools/start-core2-soak-background.mjs', 'utf8');
+assert(core2SoakBackgroundSource.includes('windowsHide: true'), 'Core2 soak background launcher must hide the spawned runner window on Windows');
+assert(core2SoakBackgroundSource.includes('detached: true'), 'Core2 soak background launcher must detach the soak process');
 const dashboardBatchSource = fs.readFileSync('start-dashboard.bat', 'utf8');
 assert(dashboardBatchSource.includes('start-dashboard-hidden.ps1'), 'dashboard batch file must hand off to the hidden dashboard launcher');
 const hiddenDashboardSource = fs.readFileSync('tools/start-dashboard-hidden.ps1', 'utf8');
