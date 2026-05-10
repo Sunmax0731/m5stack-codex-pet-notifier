@@ -1,0 +1,22 @@
+{
+  "kind": "m5stack.choice.request",
+  "version": 1,
+  "bridge": "http://127.0.0.1:8080",
+  "deviceId": "m5stack-sample-001",
+  "question": "この方針で進めますか?",
+  "choices": [
+    {
+      "id": "yes",
+      "label": "Yes"
+    },
+    {
+      "id": "no",
+      "label": "No"
+    },
+    {
+      "id": "other",
+      "label": "Other"
+    }
+  ],
+  "waitMs": 300000
+}

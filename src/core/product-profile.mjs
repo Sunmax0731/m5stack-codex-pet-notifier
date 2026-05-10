@@ -49,6 +49,7 @@ export const productProfile = {
     'docs/hardware-runtime-evidence.json',
     'docs/host-bridge-manual-check.md',
     'docs/codex-relay-manual-check.md',
+    'docs/m5stack-choice-workflow.md',
     'docs/releases/v0.2.0-beta.1.md'
   ]
 };

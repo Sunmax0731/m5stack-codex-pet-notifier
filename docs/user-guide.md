@@ -63,6 +63,23 @@ cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-i
 
 設定例は `docs/codex-hooks.example.json` にあります。
 
+## M5Stack Choice Gate の配布
+
+他のリポジトリや他ユーザーにも M5Stack 3択判断 workflow を使わせたい場合は、`distribution/m5stack-choice-workflow/` を配布します。
+
+- `AGENTS.md`: 対象 repo に置く運用ルールです。既存 `AGENTS.md` がある場合は M5Stack Choice Gate section だけを追記します。
+- `SKILL.md`: Codex skill として使う実行手順です。複数 repo で使う場合は `%USERPROFILE%\.codex\skills\m5stack-choice\SKILL.md` に配置します。
+- `examples/m5stack-choice-request.json`: shell 実行できない環境で使う portable block の例です。
+
+配布 ZIP は次のコマンドで生成します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run choice:package
+```
+
+生成先は `dist/m5stack-choice-workflow-kit.zip` です。配布先では `M5STACK_PET_REPO`、`M5STACK_BRIDGE_URL`、`M5STACK_DEVICE_ID`、`M5STACK_DECISION_WAIT_MS` を必要に応じて設定します。
+
 ## Pet Asset
 
 `%USERPROFILE%\.codex\pets` の hatch-pet package を使う場合は、firmware build / upload 前に local asset header を生成します。標準 9 行 atlas の表情 / 姿勢 row を取り込むため、`sakenomeuniere` のような package では idle、running、waiting、waving、jumping、failed、review のイラスト差分を M5Stack 上で使えます。

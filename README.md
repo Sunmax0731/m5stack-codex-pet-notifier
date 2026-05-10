@@ -20,6 +20,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `src/codex-adapter/sessionWatcher.mjs` で `%USERPROFILE%\.codex\sessions` の最新 Codex session JSONL を opt-in 監視し、最新の user / assistant のやり取りを M5Stack へ自動送信する。
 - `src/codex-adapter/hookRelay.mjs` で Codex Hooks から呼べる one-shot relay を提供し、hook 発火時に最新 session を M5Stack へ送る。
 - `codex:decision`、`codex:decision:wait`、Dashboard の Decision tab で、Codex 側から M5Stack へ A/B/C の三択判断を求め、必要に応じて M5Stack の返信を待って Codex 側コマンド結果へ戻す正式リリース向け workflow を提供する。
+- `distribution/m5stack-choice-workflow/` に、他リポジトリや他ユーザーへ配布できる M5Stack Choice Gate 用 `AGENTS.md` / `SKILL.md` / portable JSON block 例を同梱する。`npm run choice:package` で配布 ZIP を生成できる。
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換し、標準 9 行 atlas の表情 / 姿勢 row と Core2 向け scale `1..8` の高解像度 frame set を生成する。
@@ -58,6 +59,7 @@ cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
 cmd.exe /d /s /c npm run firmware:upload:core2
+cmd.exe /d /s /c npm run choice:package
 ```
 
 `npm test` は `docs/platform-runtime-gate.json`、`dist/validation-result.json`、`docs/qcds-regression-baseline.json`、`dist/m5stack-codex-pet-notifier-docs.zip` を生成または更新します。
@@ -112,6 +114,7 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 - [gui-tools-manual-check.md](docs/gui-tools-manual-check.md)
 - [host-bridge-manual-check.md](docs/host-bridge-manual-check.md)
 - [codex-relay-manual-check.md](docs/codex-relay-manual-check.md)
+- [m5stack-choice-workflow.md](docs/m5stack-choice-workflow.md)
 - [installation-guide.md](docs/installation-guide.md)
 - [user-guide.md](docs/user-guide.md)
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)

@@ -13,11 +13,12 @@
     "result": "404 Not Found",
     "interpretation": "No stable latest release exists; the beta prerelease is not returned as latest."
   },
-  "assetCount": 10,
+  "assetCount": 11,
   "assets": {
     "required": [
       "dist/m5stack-codex-pet-notifier-docs.zip",
       "dist/m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip",
+      "dist/m5stack-choice-workflow-kit.zip",
       "dist/validation-result.json",
       "dist/dashboard-smoke-result.json",
       "docs/manual-test.md",
@@ -32,6 +33,7 @@
       "dashboard-smoke-result.json",
       "display-sync-evidence.json",
       "hardware-runtime-evidence.json",
+      "m5stack-choice-workflow-kit.zip",
       "m5stack-codex-pet-notifier-docs.zip",
       "m5stack-codex-pet-notifier-v0.2.0-beta.1-windows-installer.zip",
       "manual-test.md",
@@ -71,6 +73,10 @@
     },
     {
       "command": "cmd.exe /d /s /c npm run installer:package",
+      "result": "passed"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run choice:package",
       "result": "passed"
     },
     {

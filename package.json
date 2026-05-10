@@ -26,6 +26,7 @@
     "pet:asset": "python tools/generate-pet-firmware-asset.py",
     "firmware:upload:core2": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/upload-firmware.ps1 -Environment m5stack-core2",
     "installer:package": "node tools/package-beta.mjs",
+    "choice:package": "node tools/package-choice-workflow.mjs",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
     "release:guard": "node tools/release-guard.mjs",
     "demo": "node src/cli/index.mjs demo"

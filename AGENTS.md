@@ -21,6 +21,7 @@
 - `dist/validation-result.json` と `docs/platform-runtime-gate.json` には実行時刻、絶対パス、ZIP byte size などの不安定値を入れない。
 - token、host IP、個人 pet sprite、会話本文を release asset へ含めない。
 - Core2 / GRAY 実機未確認のまま公開する場合は prerelease にし、未確認範囲を release notes と `docs/manual-test.md` に明記する。
+- 他リポジトリや他ユーザーへ M5Stack 3択 workflow を配布する場合は、`distribution/m5stack-choice-workflow/AGENTS.md` と `distribution/m5stack-choice-workflow/SKILL.md` を更新し、`npm run choice:package` で `dist/m5stack-choice-workflow-kit.zip` を生成する。
 
 ## Release Boundary
 

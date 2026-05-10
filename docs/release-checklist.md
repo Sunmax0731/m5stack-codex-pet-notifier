@@ -8,6 +8,7 @@
 - [x] Codex App 内部 API へ未確認依存していない。
 - [x] pet sprite と会話本文の privacy 境界が整理されている。
 - [x] Dashboard GUI と手動確認手順がある。
+- [x] M5Stack Choice Gate の配布用 `AGENTS.md` / `SKILL.md` / portable JSON block の手順がある。
 - [x] hatch-pet asset 生成手順と ignored local header 方針がある。
 - [x] Codex session 自動送信の opt-in 手順と privacy 境界がある。
 - [x] Codex Hooks 連携の command 例と重複抑止方針がある。
@@ -49,6 +50,7 @@
 - [x] Host Bridge が long press / button long press から `prompt.choice_requested` を同一 device に queue できる。
 - [x] `start-dashboard.bat` が hidden PowerShell launcher 経由で background Bridge と browser open を実行できる。
 - [x] Windows user-local installer が Desktop / Start Menu shortcut と install manifest を作成できる。
+- [x] M5Stack Choice Gate 配布 ZIP 生成 script がある。
 
 ## Verification
 
@@ -78,6 +80,7 @@
 
 - [x] docs ZIP を生成する。
 - [x] beta installer ZIP を生成する。
+- [x] M5Stack Choice Gate 配布 ZIP を生成する。
 - [x] firmware build / upload 証跡を redacted JSON と manual docs に残す。
 - [x] prerelease 本文に実機未実施範囲を書く。
 - [x] token、host IP、個人 pet sprite を release asset へ含めない。

@@ -19,6 +19,7 @@ const includeEntries = [
   'schemas',
   'samples',
   'firmware',
+  'distribution',
   'docs/installation-guide.md',
   'docs/user-guide.md',
   'docs/manual-test.md',

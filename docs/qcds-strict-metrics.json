@@ -116,7 +116,7 @@
     "Pet surface は固定ヘッダーテキストを表示せず、Dashboard の M5Stack 表示プレビューから pet display area 1..32、text size 1..8、render FPS 4..20、motion step 120..800ms、screen / pet / text / border RGBA、pet X/Y offset を送る smoke を追加済み。pet animation は M5Canvas Sprite buffer と pet-only redraw path で更新する source gate を追加済み。Core2 実機 heartbeat で petScale=32、petOffsetX=-640、petOffsetY=360、textBackgroundRgba.a=0 の同期を確認済み。ちらつき抑制と実機表示はユーザー確認済み。",
     "pet:asset は hatch-pet 標準 9 行 atlas を row metadata 付きで取り込み、base frame は各 row の全 frame、scale 1..8 ごとの Core2 用高解像度 frame は idle 全 frame と各 row の代表 pose を生成する。firmware は mood / state / gesture に応じて row-aware scale-specific frame を選択する。GRAY は flash 制約のため fallback とする。",
     "Dashboard は side menu、状態確認のsidebar常時表示、状態navigation button削除、独立Debug section削除、環境構築コマンドmodal内のdebug送信、保守tabの重複削除、section collapse、クリック式help icon、OS追従theme / light / dark、日英label切替、current pet を使う全幅 M5Stack 表示プレビュー、ダブルクリック起動batchを追加済み。プレビューは pet 面積、pet X/Y offset、text size slider、render FPS、motion step、項目ごとの統合RGBA picker、text border を即時反映し、変更を自動送信できる。Pet更新経路でも display 設定を同梱する smoke と device.heartbeat display 診断を追加済み。",
-    "Dashboard GUI、/codex/decision、codex:decision:wait、/codex/choice、/codex/pet、/pet/current/manifest、hatch-pet asset firmware upload を追加済み。Core2 実機GUI連携はユーザー確認済み。",
+    "Dashboard GUI、/codex/decision、codex:decision:wait、/codex/choice、/codex/pet、/pet/current/manifest、hatch-pet asset firmware upload、M5Stack Choice Gate 配布用 AGENTS.md / SKILL.md / portable JSON block を追加済み。Core2 実機GUI連携はユーザー確認済み。",
     "A-未満の観点はない。"
   ]
 }

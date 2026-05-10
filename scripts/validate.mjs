@@ -42,6 +42,7 @@ for (const required of [
   'installer/install-windows.ps1',
   'tools/package-beta.mjs',
   'tools/release-guard.mjs',
+  'tools/package-choice-workflow.mjs',
   'schemas/events/pet.updated.json',
   'schemas/events/display.settings_updated.json',
   'src/host-adapter/localLanBridge.mjs',
@@ -66,10 +67,25 @@ for (const required of [
   'firmware/src/main.cpp',
   'firmware/platformio.ini',
   'samples/representative-suite.json',
-  'samples/sample-telemetry.json'
+  'samples/sample-telemetry.json',
+  'distribution/m5stack-choice-workflow/README.md',
+  'distribution/m5stack-choice-workflow/AGENTS.md',
+  'distribution/m5stack-choice-workflow/SKILL.md',
+  'distribution/m5stack-choice-workflow/examples/m5stack-choice-request.json'
 ]) {
   assert(fs.existsSync(required), `implementation file missing: ${required}`);
 }
+
+const choiceWorkflowDoc = fs.readFileSync('docs/m5stack-choice-workflow.md', 'utf8');
+const distributedAgents = fs.readFileSync('distribution/m5stack-choice-workflow/AGENTS.md', 'utf8');
+const distributedSkill = fs.readFileSync('distribution/m5stack-choice-workflow/SKILL.md', 'utf8');
+const distributedChoiceExample = readJson('distribution/m5stack-choice-workflow/examples/m5stack-choice-request.json');
+assert(choiceWorkflowDoc.includes('m5stack-choice') && choiceWorkflowDoc.includes('codex:decision:wait'), 'choice workflow docs must define portable and direct modes');
+assert(distributedAgents.includes('M5Stack Choice Gate') && distributedAgents.includes('Yes / No / Other'), 'distributed AGENTS must define the M5Stack choice gate');
+assert(distributedSkill.includes('codex:decision:wait') && distributedSkill.includes('Portable Block Mode'), 'distributed SKILL must define direct and portable choice modes');
+assert(distributedSkill.startsWith('---\nname: m5stack-choice-gate') && distributedSkill.includes('description:'), 'distributed SKILL must include Codex skill frontmatter');
+assert(distributedChoiceExample.kind === 'm5stack.choice.request', 'distributed choice example must use the m5stack choice request kind');
+assert(Array.isArray(distributedChoiceExample.choices) && distributedChoiceExample.choices.length === 3, 'distributed choice example must define three choices');
 
 const firmwareSource = fs.readFileSync('firmware/src/main.cpp', 'utf8');
 assert(firmwareSource.includes('fonts::efontJA_12'), 'firmware must set a Japanese-capable M5GFX font');
@@ -385,7 +401,7 @@ if (fs.existsSync(zipPath)) {
 }
 const archiveCommand = [
   "Compress-Archive -Path",
-  "'README.md','AGENTS.md','SKILL.md','docs','samples','schemas'",
+  "'README.md','AGENTS.md','SKILL.md','docs','samples','schemas','distribution'",
   `-DestinationPath '${zipPath.replaceAll('/', '\\')}' -Force`
 ].join(' ');
 const zip = cp.spawnSync('powershell', ['-NoProfile', '-Command', archiveCommand], { encoding: 'utf8' });

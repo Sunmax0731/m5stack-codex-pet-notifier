@@ -9,6 +9,7 @@
 | Codex 最近 session 自動送信 | `src/codex-adapter/sessionWatcher.mjs`、`npm run codex:sessions`、`answer.completed` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | Dashboard 最新 Codex 回答表示 | `/codex/session/latest`、`/codex/session/publish`、`src/host-bridge/dashboard/` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
 | Codex decision request | `npm run codex:decision`、`/codex/decision`、Dashboard Decision tab | `scripts/codex-relay-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`docs/formal-release-platform.md` |
+| M5Stack Choice Gate 配布 | `distribution/m5stack-choice-workflow/AGENTS.md`、`distribution/m5stack-choice-workflow/SKILL.md`、`docs/m5stack-choice-workflow.md`、`npm run choice:package` | `scripts/validate.mjs`、`dist/m5stack-choice-workflow-kit.zip` |
 | Codex Hooks 連携 | `src/codex-adapter/hookRelay.mjs`、`docs/codex-hooks.example.json` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | 日本語返答表示 | `firmware/src/main.cpp` の `fonts::efontJA_12`、UTF-8 code point paging | `scripts/validate.mjs`、`docs/codex-relay-manual-check.md` |
 | clipboard 日本語返答表示 | `readClipboard()` の Base64 UTF-8 復元 | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
