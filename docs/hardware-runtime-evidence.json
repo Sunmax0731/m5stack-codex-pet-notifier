@@ -169,15 +169,26 @@
   "petAnimation": {
     "firmwareAvatar": "drawPetAvatar",
     "assetMode": "hatch-pet-local-header",
-    "assetSourcePackage": "Mira",
+    "assetSourcePackage": "sakenomeuniere",
     "localHeader": "firmware/include/pet_asset.local.h",
     "localHeaderIgnoredByGit": true,
-    "assetFrames": 6,
-    "assetFrameDetection": "idle row non-empty cells",
-    "assetFrameSize": "36x40",
+    "assetFrames": 57,
+    "assetFrameDetection": "standard 9-row hatch-pet atlas",
+    "assetRows": [
+      "idle",
+      "running-right",
+      "running-left",
+      "waving",
+      "jumping",
+      "failed",
+      "waiting",
+      "running",
+      "review"
+    ],
+    "assetFrameSize": "192x208 source cells, trimmed per frame",
     "scaleSpecificFrames": true,
     "scaleSpecificFrameLevels": 8,
-    "scaleSpecificFrameSource": "source hatch-pet cells resampled per display scale",
+    "scaleSpecificFrameSource": "idle full animation plus representative high-resolution key poses for non-idle rows",
     "scaleSpecificCore2Only": true,
     "grayScaleFrameFallback": "vector fallback with huge_app partition to stay within flash budget",
     "fallbackAvatarAvailable": true,
@@ -189,14 +200,28 @@
     "poseSwitchSeparatedFromRenderFps": true,
     "states": [
       "idle",
+      "running",
+      "waiting",
       "review",
       "reacting",
-      "celebrate"
+      "celebrate",
+      "failed"
     ],
+    "moodRowMapping": {
+      "thinking": "running",
+      "listening": "waiting",
+      "surprised": "waving",
+      "happy": "jumping",
+      "proud": "jumping",
+      "confused": "review",
+      "alert": "failed",
+      "worried": "failed",
+      "sleepy": "failed"
+    },
     "defaultPetScale": 2,
     "defaultDisplayAreaMultiplier": 4,
     "displayScaleRange": "1..32",
-    "maxPetScale": 8,
+    "maxPetScale": 32,
     "fixedHeaderTextRemoved": true,
     "spriteBufferedRendering": true,
     "spriteBuffer": "M5Canvas petSprite",
@@ -214,7 +239,7 @@
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
     "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from Mira was built and uploaded through the USB serial auto-detection helper. On the latest check the helper selected COM4 (Silicon Labs CP210x USB to UART Bridge) and PlatformIO upload succeeded. The ignored local header includes auto-detected idle frames, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, and display setting controls. Final visual no-flicker confirmation is listed in docs/gui-tools-manual-check.md."
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from sakenomeuniere was built and uploaded to COM4 (Silicon Labs CP210x USB to UART Bridge). PlatformIO upload succeeded after generating a 9-row / 57-frame local header. A pet.updated event with name=酒飲ムニエル, state=celebrate, mood=happy was queued and later device heartbeat returned the same pet name/state/mood. The ignored local header includes row metadata, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, row-aware local asset drawing, and display setting controls. Final visual row-by-row confirmation is listed in docs/gui-tools-manual-check.md."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",

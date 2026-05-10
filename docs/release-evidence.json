@@ -47,7 +47,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-display-sync; beta long-run, GRAY hardware, and signed installer checks prepared but not executed by Codex",
+  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-display-sync-hatch-pet-row-sync; beta long-run, GRAY hardware, and signed installer checks prepared but not executed by Codex",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
@@ -56,6 +56,10 @@
     {
       "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2",
       "result": "passed"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run pet:asset -- --pet-dir C:\\Users\\gkkjh\\.codex\\pets\\sakenomeuniere --output firmware\\include\\pet_asset.local.h",
+      "result": "passed-9-rows-57-frames"
     },
     {
       "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4",
@@ -72,6 +76,14 @@
     {
       "command": "Browser plugin reload of http://127.0.0.1:8080/",
       "result": "passed-no-console-errors-display-sync-applied"
+    },
+    {
+      "command": "Chrome CDP Dashboard preview with package=sakenomeuniere and mood=happy",
+      "result": "passed-row-jumping-sprite-pet-no-mood-marker-no-console-errors"
+    },
+    {
+      "command": "Host Bridge /codex/pet followed by device heartbeat",
+      "result": "passed-heartbeat-returned-name-state-mood-for-酒飲ムニエル-celebrate-happy"
     },
     {
       "command": "browser-device-sync-evidence.json",

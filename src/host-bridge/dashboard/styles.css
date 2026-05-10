@@ -811,6 +811,10 @@ input[type="range"] {
   image-rendering: auto;
 }
 
+.preview-pet.sprite-pet .pet-mood-mark {
+  display: none;
+}
+
 .preview-pet.sprite-fallback {
   border: max(2px, calc(var(--pet-width, 84px) / 34)) solid #ffffff;
   border-radius: 32% 32% 42% 42%;

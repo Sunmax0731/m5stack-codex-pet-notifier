@@ -126,21 +126,21 @@
 - `display.settings_updated.display.petOffsetX` と `petOffsetY` はそれぞれ `-1280..1280`、`-960..960` を受け付け、pet を画面外にはみ出す位置まで動かせる。
 - `display.settings_updated.display.textBorderEnabled` は boolean を受け付け、文字パネルと footer の枠線を切り替える。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
-- `pet.updated.pet.mood` は `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` を受け付け、`state` と独立して pet の表情または marker に反映する。未指定時は `state` から安全な fallback mood を導出する。
+- `pet.updated.pet.mood` は `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` を受け付け、`state` と独立して pet の表情または姿勢に反映する。local hatch-pet asset がある場合は標準 atlas row を選択し、図形 marker は重ねない。未指定時は `state` から安全な fallback mood を導出する。
 - `device.pet_interacted.interaction` は `tap / double-tap / long-press / button-long-press / imu-tap / swipe-up / swipe-down / swipe-left / swipe-right` を扱う。`gesture`、`target`、`screen`、`page`、`mood` は Dashboard 診断と Codex workflow の context として保持する。
 - Host Bridge は `long-press` または `button-long-press` を受け取った場合、同じ device に `prompt.choice_requested` を queue し、M5Stack から Codex 側の次アクションを A/B/C で返せるようにする。
 - Dashboard は side menu、環境構築コマンド modal、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / GRAY 表示を確認できる。表示パラメータは `変更を自動送信` がonならデバウンス付きで実機へ送信し、offなら `表示設定を送信` button で手動送信する。プレビューは1ペインで全幅表示し、最近の Codex 回答とイベントログは左右ペインで維持する。各項目の説明は `?` icon click で開く help popover とし、theme は既定で OS に追従しつつ light / dark を手動選択できる。label は既定日本語で、English へ切り替えできる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。text background は screen background に暗黙同期せず、alpha `0` ではパネル塗りを行わず文字だけを描画する。pet fullscreen layout の Answer / Decision / Notification でも本文パネルを描画して、text panel の塗りを screen background へfallbackしない。
 - firmware は pet avatar を `M5Canvas` の off-screen Sprite に描画し、pet box だけを `pushSprite()` で転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
-- `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。
-- 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。
+- `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。header は `PET_ASSET_HAS_ANIMATION_ROWS`、row frame count、row offset を持ち、`idle`、`running-right`、`running-left`、`waving`、`jumping`、`failed`、`waiting`、`running`、`review` を行別に参照できる。
+- 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` と現在の row に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。flash 制約のため高解像度 set は idle の全 frame と各 row の代表 pose を保持する。
 - GRAY target は flash 余裕を優先し、同じ header が存在しても scale-specific frame は参照せず base frame 拡大へ fallback する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` と mood 互換値を受け付ける。
 - avatar は `max(animationFps 由来 interval, motionStepMs)` ごとに frame / bounce を更新する。fallback avatar では blink / tail も更新する。
-- `review`、`reacting`、`celebrate` は mood fallback を通じて色または表情を変え、pet interaction 時は短時間 `surprised`、`happy`、`thinking`、`confused` などの mood として表示する。
+- `review`、`reacting`、`celebrate` は mood fallback を通じて row を変え、pet interaction 時は短時間 `waving`、`jumping`、`review`、左右 running などの row として表示する。local asset がない場合は従来の fallback avatar 表情で近似する。
 
 ## 保存方針
 

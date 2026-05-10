@@ -117,6 +117,8 @@ try {
   assert.match(app, /petMood/);
   assert.match(app, /latestPetInteraction/);
   assert.match(app, /moodFromState/);
+  assert.match(app, /petAnimationRows/);
+  assert.match(app, /previewPetRow/);
   assert.match(app, /textBorderEnabled/);
   assert.match(app, /textBorderRgba/);
   assert.match(app, /scheduleAutoDisplaySync/);

@@ -136,7 +136,7 @@ cmd.exe /d /s /c npm run codex:pet -- --name "Codex Pet" --state celebrate
 
 期待結果:
 
-- Core2 の pet surface が state に応じて色または表情を変える。
+- Core2 の local hatch-pet asset は state / mood に応じてキャラクターイラストの表情 / 姿勢 row を変える。local asset がない場合だけ fallback avatar の色または簡易表情で近似する。
 - pet avatar が blink / bounce / tail animation を継続する。
 - animation tick 中に画面全体、Answer / Choice の本文、footer が明滅せず、pet surface だけが更新される。
 

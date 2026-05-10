@@ -19,12 +19,12 @@
 | ダブルクリック起動 | `start-dashboard.bat`、`npm run bridge:start:bg`、`tools/start-bridge-background.mjs` | `scripts/validate.mjs`、`docs/manual-test.md` |
 | background bridge 起動 | `tools/start-bridge-background.mjs`、`npm run bridge:start:bg`、`/debug/runtime` | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
 | current pet preview | `/pet/current/manifest`、`/pet/current/spritesheet.webp`、Dashboard preview sprite renderer | `scripts/dashboard-smoke.mjs`、browser screenshot |
-| hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |
+| hatch-pet asset 表示 | `tools/generate-pet-firmware-asset.py`、`firmware/src/main.cpp` の `pet_asset.local.h` gate、標準 9 行 atlas、row-aware scale-specific frame selection | `scripts/validate.mjs`、Core2 firmware build / upload |
 | 通知表示 | `notification.created` schema | `happy-path.finalScreen=Choice` までの遷移 |
 | 長文回答スクロール | `src/protocol/scrollModel.mjs` | `mixed-batch.scrollPages=2` |
 | 3択返信 | `prompt.choice_requested`、`device.reply_selected` | `happy-path.replyCount=1` |
 | Dashboard ABC workflow | `/codex/choice`、Dashboard inbound summary | `scripts/dashboard-smoke.mjs`、`docs/gui-tools-manual-check.md` |
-| pet mood / expression | `src/core/pet-mood.mjs`、`pet.updated.pet.mood`、`firmware/src/main.cpp` | `scripts/bridge-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`scripts/validate.mjs` |
+| pet mood / expression | `src/core/pet-mood.mjs`、`pet.updated.pet.mood`、`firmware/src/main.cpp` の hatch-pet row mapping、Dashboard preview row mapping | `scripts/bridge-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、browser smoke |
 | pet interaction / gesture | `device.pet_interacted`、Core2 touch gesture、long press side effect | `happy-path.interactionCount=2`、`warning.interactionCount=1`、`npm run bridge:smoke` |
 | Windows installer / background launcher | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` | `npm run installer:package`、`scripts/validate.mjs`、`docs/manual-test.md` |
 | Core2 / GRAY profile | `src/device-adapter/deviceProfiles.mjs` | `profileCovered=true` |

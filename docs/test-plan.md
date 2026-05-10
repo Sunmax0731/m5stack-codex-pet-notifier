@@ -19,7 +19,7 @@
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet box redraw path を含むことを検証する | `scripts/validate.mjs` |
-| hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、非空 frame 自動検出を検証する | `scripts/validate.mjs` |
+| hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、標準 9 行 atlas、row-aware frame selection を検証する | `scripts/validate.mjs` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
 ## Representative Suite
@@ -48,7 +48,7 @@
 | Dashboard latest Codex answer | Dashboard の `最近の Codex 回答` panel で最新 assistant 回答を表示し、`M5Stackへ送信` で Core2 Answer 画面を確認する | `docs/gui-tools-manual-check.md` |
 | Dashboard current pet preview | Dashboard preview が `/pet/current/manifest` の現在の hatch-pet spritesheet を表示し、`/pet/packages` と path override で任意の local hatch-pet package を切り替えられる | `docs/gui-tools-manual-check.md` |
 | Codex decision request | `codex:decision` または Dashboard Decision tab から三択を送り、Core2 A/B/C 返信を確認する | `docs/gui-tools-manual-check.md` |
-| Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state 連動で animation することを目視する | `docs/gui-tools-manual-check.md` |
+| Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state / mood / gesture 連動でキャラクターイラストの表情 / 姿勢 row が切り替わることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 display settings | Dashboard から pet display area を `1..32`、text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms`、RGBA、beep を送り、Core2 の固定ヘッダーテキスト削除、pet 超拡大、文字サイズ変化、pose 切替頻度変化、色変更、answer beep を目視する | `docs/gui-tools-manual-check.md` |
 | Dashboard Core2 / GRAY preview | Dashboard の device preview を Core2 / GRAY で切り替え、320x240 layout、text overlay、2カラム配置を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/32`、`8/32`、`16/32`、`32/32` で低解像度 base frame のブロック拡大にならないことと超拡大構図を目視する | `docs/gui-tools-manual-check.md` |

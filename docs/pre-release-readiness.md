@@ -43,7 +43,7 @@
 - Codex hook relay の Core2 実機目視確認。
 - Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
 - Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更の Core2 実機目視確認。
-- Pet mood marker、tap / double tap / long press / swipe の Core2 実機 UX。
+- hatch-pet row illustration 切替、tap / double tap / long press / swipe の Core2 実機 UX。
 - Long press からの Codex decision request queue の実機目視確認。
 - Current pet preview と実機 layout の一致、文字 overlay、tooltip、section collapse、command modal のユーザー目視確認。
 - Sprite buffer による pet animation ちらつき抑制の Core2 実機目視確認。

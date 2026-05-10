@@ -119,7 +119,9 @@ assert(firmwareSource.includes('triggerDisplayProbe'), 'firmware must show a vis
 assert(firmwareSource.includes('screenState == SCREEN_ERROR'), 'firmware display settings events must recover from transient error screen state');
 assert(firmwareSource.includes('petMood'), 'firmware must track pet mood separately from pet state');
 assert(firmwareSource.includes('renderedPetMood'), 'firmware must render mood-specific pet expressions');
-assert(firmwareSource.includes('drawMoodOverlayTo'), 'firmware must draw mood overlays for local hatch-pet assets');
+assert(firmwareSource.includes('petAssetRowIndex'), 'firmware must map pet mood/state to hatch-pet animation rows');
+assert(firmwareSource.includes('PET_ASSET_HAS_ANIMATION_ROWS'), 'firmware must support multi-row hatch-pet illustration variants');
+assert(firmwareSource.includes('PET_ROW_REVIEW'), 'firmware must expose a review/focused illustration row');
 assert(firmwareSource.includes('sendPetInteraction("double-tap"'), 'firmware must publish double-tap pet interactions');
 assert(firmwareSource.includes('sendPetInteraction("long-press"'), 'firmware must publish long-press pet interactions');
 assert(firmwareSource.includes('wasFlicked'), 'firmware must publish swipe interactions from touch flicks');
@@ -137,6 +139,9 @@ assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pe
 
 const petAssetGeneratorSource = fs.readFileSync('tools/generate-pet-firmware-asset.py', 'utf8');
 assert(petAssetGeneratorSource.includes('PET_ASSET_SCALED_PIXELS'), 'pet asset generator must emit scale-specific frames');
+assert(petAssetGeneratorSource.includes('ANIMATION_ROWS'), 'pet asset generator must understand the standard 9-row hatch-pet atlas');
+assert(petAssetGeneratorSource.includes('PET_ASSET_ROW_FRAME_COUNTS'), 'pet asset generator must emit row-specific frame counts');
+assert(petAssetGeneratorSource.includes('SCALE_KEY_COLUMNS'), 'pet asset generator must preserve flash by using high-resolution key poses for non-idle rows');
 
 const eventFactorySource = fs.readFileSync('src/codex-adapter/eventFactory.mjs', 'utf8');
 assert(eventFactorySource.includes('normalizeDisplaySettings(options.display)'), 'pet.updated events must preserve optional display settings for device updates');
@@ -280,6 +285,8 @@ assert(dashboardAppSource.includes('petOffsetY'), 'Dashboard must publish vertic
 assert(dashboardAppSource.includes('petMood'), 'Dashboard must publish pet mood in pet update events');
 assert(dashboardAppSource.includes('latestPetInteraction'), 'Dashboard must surface the latest pet interaction in the preview');
 assert(dashboardAppSource.includes('moodFromState'), 'Dashboard must derive a safe fallback mood from pet state');
+assert(dashboardAppSource.includes('petAnimationRows'), 'Dashboard preview must understand hatch-pet animation rows');
+assert(dashboardAppSource.includes('previewPetRow'), 'Dashboard preview must map mood/state to illustrated pet rows');
 assert(dashboardAppSource.includes('textBorderEnabled'), 'Dashboard must publish text border visibility in display settings');
 assert(dashboardAppSource.includes('textBorderRgba'), 'Dashboard must publish text border RGBA in display settings');
 assert(dashboardAppSource.includes('beepOnAnswer'), 'Dashboard must publish answer beep setting in display settings');

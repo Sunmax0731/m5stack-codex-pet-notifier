@@ -81,13 +81,13 @@ Dashboard の `Answer` tab で summary と body を入力し、`Answer を送信
 
 ## 4. Pet 更新と hatch-pet アニメーション
 
-Dashboard の `M5Stack 表示プレビュー` で state を `celebrate` または `reacting` にして `Pet 更新を送信` を押します。
+Dashboard の `M5Stack 表示プレビュー` で state を `celebrate` または `reacting` にして `Pet 更新を送信` を押します。続けて mood を `happy`、`confused`、`alert`、`sleepy` に切り替えます。
 
 期待結果:
 
 - outbound に `pet.updated` が出る。
 - Core2 の pet surface が `Mira` などの hatch-pet asset として表示される。
-- Core2 の pet surface の背景色または表示状態が変わる。
+- Core2 の local hatch-pet asset では図形 marker が重ならず、`celebrate` / `happy` は jumping row、`reacting` / `surprised` は waving row、`confused` は review row、`alert` / `sleepy` は failed row のキャラクターイラストに切り替わる。
 - avatar が静止画ではなく、frame / bounce の周期変化を続ける。
 - pet avatar box は `M5Canvas` Sprite buffer 経由で更新され、pet に重なった本文、Decision label、footer は animation tick ごとにちらつかない。
 - `firmware/include/pet_asset.local.h` を削除して build した fallback vector だけの見た目ではない。

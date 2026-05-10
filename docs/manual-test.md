@@ -31,7 +31,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-14 | `codex:watch --once` で UTF-8 file 内容を送る | Core2 が `Answer` 画面へ遷移し、summary と file 内容を表示する | 実施済み。ユーザー提供画像で `Answer page 1/1`、summary、file 内容、`A up / B idle / C down` footer を確認 |
 | C2-15 | `codex:sessions --once --phase any` を実行する | 最近の Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ自動表示される | 準備済み。ユーザー手動 |
 | C2-16 | `codex:hook` を実行する | Codex Hooks から呼ばれる one-shot relay と同じ経路で最新やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
-| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、色または背景、frame / bounce animation が継続する。vector fallback だけの表示にならない。pet animation は Sprite buffer で更新され、pet surface 外の本文や footer が毎フレームちらつかない | 準備済み。ユーザー手動 |
+| C2-17 | Dashboard から `Pet` state を `celebrate` または `reacting` にして送る | Core2 の pet surface が hatch-pet asset として表示され、`celebrate` は jumping row、`reacting` は waving row などのキャラクターイラスト差分に切り替わる。vector fallback だけの表示にならない。pet animation は Sprite buffer で更新され、pet surface 外の本文や footer が毎フレームちらつかない | 準備済み。ユーザー手動 |
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 準備済み。ユーザー手動 |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 準備済み。ユーザー手動 |
 | C2-20 | Dashboard の `M5Stack 表示プレビュー` で pet display area を `8/32`、`16/32`、`32/32`、UI text size と body text size を任意、render FPS を `12fps`、motion step を `280ms`、pet background / text color / text background を任意の RGBA に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体付近から超拡大まで変化する。local hatch-pet asset の透明ピクセルは設定した pet background を見せ、文字背景と文字色もRGBA合成後の色に変わる | 準備済み。ユーザー手動 |
@@ -45,9 +45,10 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-28 | Dashboard または `codex:display` で `screen background`、`pet background`、`text background` をそれぞれ異なる色にして送る。pet display area は `6/32` 以上、`text background alpha` は `0`、`128`、`255` の順にして Answer または Choice 画面で確認する | LCD 全体の背景、pet 透明ピクセル背面、本文パネル / footer 背景がそれぞれ別設定として見える。alpha `0` では本文パネル / footer の塗りが消え、文字だけが表示される。alpha `128` / `255` では text background が画面背景に同期せず別色で表示される | 準備済み。ユーザー手動 |
 | C2-29 | Dashboard または `codex:display` で `pet X/Y offset` を `-80`、`80`、大きな負値 / 正値に変えて送る | pet が上下左右へ移動し、値によって画面外にはみ出して頭や一部だけが見える | 準備済み。ユーザー手動 |
 | C2-30 | Dashboard または `codex:display` で `text border` を有効化し、色 / alpha を変える | Answer / Decision / Notification の本文パネルと footer に枠線が出る。無効化すると枠線が消える | 準備済み。ユーザー手動 |
-| C2-31 | Dashboard の `表情` を `happy`、`confused`、`alert`、`sleepy` に切り替えて `ペット更新を送信` を押す | Core2 の hatch-pet または fallback pet 上に mood marker / 表情差分が表示され、Dashboard outbound の `pet.updated.pet.mood` と一致する | 準備済み。ユーザー手動 |
+| C2-31 | Dashboard の `表情` を `happy`、`confused`、`alert`、`sleepy` に切り替えて `ペット更新を送信` を押す | local hatch-pet asset では図形 marker ではなく、`happy` は jumping row、`confused` は review row、`alert` / `sleepy` は failed row のキャラクターイラスト差分に切り替わる。fallback pet の場合だけ簡易 marker / 表情差分で近似する。Dashboard outbound の `pet.updated.pet.mood` と一致する | 準備済み。ユーザー手動 |
 | C2-32 | Pet 表示領域を single tap / double tap / long press / swipe up / swipe down / swipe left / swipe right する | Host Bridge inbound に `device.pet_interacted` が追加され、`interaction`、`gesture`、`target`、`screen`、`page`、`mood` が Dashboard event log と preview readout に表示される | 準備済み。ユーザー手動 |
 | C2-33 | Pet 表示領域を long press し、その後 Core2 の A/B/C を押す | Host Bridge が side effect として `prompt.choice_requested` を queue し、Core2 が Choice 画面へ遷移する。A/B/C 押下後、inbound に `device.reply_selected` が出る | 準備済み。ユーザー手動 |
+| C2-34 | `sakenomeuniere` など標準 9 行 atlas の local asset を生成して upload し、Dashboard で `idle`、`thinking`、`listening`、`surprised`、`proud`、`review`、`failed` を順に送る | `idle` は idle、`thinking` は running、`listening` は waiting、`surprised` は waving、`proud` は jumping、`review` は review、`failed` は failed row のイラストに切り替わる。実機と Dashboard preview の row が一致し、local asset 上に追加の図形 marker が重ならない | 準備済み。ユーザー手動 |
 
 ## GRAY 今回対象外
 

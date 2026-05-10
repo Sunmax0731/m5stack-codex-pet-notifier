@@ -52,6 +52,20 @@ const displaySyncFields = [
   'visualProbe'
 ];
 
+const petAnimationRows = [
+  { name: 'idle', index: 0, frames: 6 },
+  { name: 'running-right', index: 1, frames: 8 },
+  { name: 'running-left', index: 2, frames: 8 },
+  { name: 'waving', index: 3, frames: 4 },
+  { name: 'jumping', index: 4, frames: 5 },
+  { name: 'failed', index: 5, frames: 8 },
+  { name: 'waiting', index: 6, frames: 6 },
+  { name: 'running', index: 7, frames: 6 },
+  { name: 'review', index: 8, frames: 6 }
+];
+
+const petAnimationRowByName = new Map(petAnimationRows.map((row) => [row.name, row]));
+
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -1390,6 +1404,7 @@ function renderM5Preview() {
   elements.m5Preview.dataset.device = device;
   elements.m5Preview.dataset.mood = petMood;
   elements.previewPet.dataset.mood = petMood;
+  elements.previewPet.dataset.assetRow = previewPetRow().name;
   elements.m5Preview.style.setProperty('--pet-width', `${petWidth}px`);
   elements.m5Preview.style.setProperty('--pet-height', `${petHeight}px`);
   elements.m5Preview.style.setProperty('--pet-x', `${petOffsetX}px`);
@@ -1458,9 +1473,40 @@ function renderPreviewPetFrame() {
     return;
   }
   const petWidth = Number.parseFloat(getComputedStyle(elements.m5Preview).getPropertyValue('--pet-width')) || 100;
-  const frameCount = Math.max(1, Number(manifest.idleFrames ?? 6));
+  const petHeight = Number.parseFloat(getComputedStyle(elements.m5Preview).getPropertyValue('--pet-height')) || 100;
+  const row = previewPetRow();
+  const frameCount = Math.max(1, Number(row.frames ?? manifest.idleFrames ?? 6));
   const frame = state.previewPetFrame % frameCount;
-  elements.previewPet.style.backgroundPosition = `${-frame * petWidth}px 0px`;
+  elements.previewPet.style.backgroundPosition = `${-frame * petWidth}px ${-row.index * petHeight}px`;
+}
+
+function manifestAnimationRow(name) {
+  const manifestRow = state.petManifest?.animationRows?.find((row) => row.name === name);
+  return manifestRow ?? petAnimationRowByName.get(name) ?? petAnimationRows[0];
+}
+
+function previewPetRow() {
+  const mood = elements.petMood?.value || moodFromState(elements.petState.value);
+  const petState = elements.petState?.value || 'idle';
+  if (petState === 'running' || mood === 'thinking') {
+    return manifestAnimationRow('running');
+  }
+  if (petState === 'waiting' || mood === 'listening') {
+    return manifestAnimationRow('waiting');
+  }
+  if (petState === 'failed' || ['alert', 'worried', 'sleepy'].includes(mood)) {
+    return manifestAnimationRow('failed');
+  }
+  if (petState === 'review' || mood === 'confused') {
+    return manifestAnimationRow('review');
+  }
+  if (petState === 'celebrate' || mood === 'happy' || mood === 'proud') {
+    return manifestAnimationRow('jumping');
+  }
+  if (petState === 'reacting' || mood === 'surprised') {
+    return manifestAnimationRow('waving');
+  }
+  return manifestAnimationRow('idle');
 }
 
 function syncPreviewAnimationTimer() {

@@ -30,6 +30,17 @@ const deviceToHostTypes = new Set([
   'device.pet_interacted',
   'device.heartbeat'
 ]);
+const petAnimationRows = [
+  { name: 'idle', index: 0, frames: 6 },
+  { name: 'running-right', index: 1, frames: 8 },
+  { name: 'running-left', index: 2, frames: 8 },
+  { name: 'waving', index: 3, frames: 4 },
+  { name: 'jumping', index: 4, frames: 5 },
+  { name: 'failed', index: 5, frames: 8 },
+  { name: 'waiting', index: 6, frames: 6 },
+  { name: 'running', index: 7, frames: 6 },
+  { name: 'review', index: 8, frames: 6 }
+];
 
 export class LanHostBridge {
   constructor(options = {}) {
@@ -552,6 +563,10 @@ function buildCurrentPetManifest(selection = {}) {
     columns: 8,
     rows: 9,
     idleFrames: headerInfo.frameCount ?? 6,
+    animationRows: petAnimationRows.map((row, index) => ({
+      ...row,
+      frames: headerInfo.rowFrameCounts?.[index] ?? row.frames
+    })),
     firmwareFrameWidth: headerInfo.frameWidth ?? null,
     firmwareFrameHeight: headerInfo.frameHeight ?? null
   };
@@ -663,11 +678,19 @@ function readLocalPetHeaderInfo() {
   if (!fs.existsSync(headerPath)) {
     return {};
   }
-  const source = fs.readFileSync(headerPath, 'utf8');
+  const fd = fs.openSync(headerPath, 'r');
+  const buffer = Buffer.alloc(64 * 1024);
+  const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, 0);
+  fs.closeSync(fd);
+  const source = buffer.toString('utf8', 0, bytesRead);
   return {
     frameCount: Number(source.match(/PET_ASSET_FRAME_COUNT\s*=\s*(\d+)/)?.[1] ?? 0) || undefined,
     frameWidth: Number(source.match(/PET_ASSET_FRAME_WIDTH\s*=\s*(\d+)/)?.[1] ?? 0) || undefined,
-    frameHeight: Number(source.match(/PET_ASSET_FRAME_HEIGHT\s*=\s*(\d+)/)?.[1] ?? 0) || undefined
+    frameHeight: Number(source.match(/PET_ASSET_FRAME_HEIGHT\s*=\s*(\d+)/)?.[1] ?? 0) || undefined,
+    rowFrameCounts: source.match(/PET_ASSET_ROW_FRAME_COUNTS\[[^\]]+\]\s+PROGMEM\s*=\s*\{\s*([^}]+)\s*\}/)?.[1]
+      ?.split(',')
+      .map((value) => Number(value.trim()))
+      .filter((value) => Number.isFinite(value) && value > 0)
   };
 }
 

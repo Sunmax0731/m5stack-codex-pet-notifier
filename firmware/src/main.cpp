@@ -38,6 +38,18 @@ enum ScreenState {
   SCREEN_ERROR
 };
 
+enum PetAssetRow {
+  PET_ROW_IDLE = 0,
+  PET_ROW_RUNNING_RIGHT = 1,
+  PET_ROW_RUNNING_LEFT = 2,
+  PET_ROW_WAVING = 3,
+  PET_ROW_JUMPING = 4,
+  PET_ROW_FAILED = 5,
+  PET_ROW_WAITING = 6,
+  PET_ROW_RUNNING = 7,
+  PET_ROW_REVIEW = 8
+};
+
 namespace {
 constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t POLL_INTERVAL_MS = 1200;
@@ -513,6 +525,99 @@ int petBaseAssetHeight() {
 #endif
 }
 
+int clampPetAssetRow(int value) {
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  return max(0, min(PET_ASSET_ROW_COUNT - 1, value));
+#else
+  (void)value;
+  return PET_ROW_IDLE;
+#endif
+}
+
+int petAssetRowIndex() {
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  const String mood = renderedPetMood();
+  if (petReactUntil && millis() < petReactUntil) {
+    if (lastInteraction == "swipe-right") {
+      return clampPetAssetRow(PET_ROW_RUNNING_RIGHT);
+    }
+    if (lastInteraction == "swipe-left") {
+      return clampPetAssetRow(PET_ROW_RUNNING_LEFT);
+    }
+    if (lastInteraction == "long-press" || lastInteraction == "button-long-press") {
+      return clampPetAssetRow(PET_ROW_REVIEW);
+    }
+    if (lastInteraction == "double-tap") {
+      return clampPetAssetRow(PET_ROW_JUMPING);
+    }
+    if (lastInteraction == "tap") {
+      return clampPetAssetRow(PET_ROW_WAVING);
+    }
+  }
+  if (petState == "running" || mood == "thinking") {
+    return clampPetAssetRow(PET_ROW_RUNNING);
+  }
+  if (petState == "waiting" || mood == "listening") {
+    return clampPetAssetRow(PET_ROW_WAITING);
+  }
+  if (petState == "failed" || mood == "alert" || mood == "worried" || mood == "sleepy") {
+    return clampPetAssetRow(PET_ROW_FAILED);
+  }
+  if (petState == "review" || mood == "confused") {
+    return clampPetAssetRow(PET_ROW_REVIEW);
+  }
+  if (petState == "celebrate" || mood == "proud" || mood == "happy") {
+    return clampPetAssetRow(PET_ROW_JUMPING);
+  }
+  if (petState == "reacting" || mood == "surprised") {
+    return clampPetAssetRow(PET_ROW_WAVING);
+  }
+#endif
+  return PET_ROW_IDLE;
+}
+
+int petAssetRowFrameCount(int rowIndex) {
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  return max(1, static_cast<int>(pgm_read_byte(&PET_ASSET_ROW_FRAME_COUNTS[clampPetAssetRow(rowIndex)])));
+#elif HAS_LOCAL_PET_ASSET
+  (void)rowIndex;
+  return max(1, PET_ASSET_FRAME_COUNT);
+#else
+  (void)rowIndex;
+  return 1;
+#endif
+}
+
+int petAssetRowFrameOffset(int rowIndex) {
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  return static_cast<int>(pgm_read_word(&PET_ASSET_ROW_OFFSETS[clampPetAssetRow(rowIndex)]));
+#else
+  (void)rowIndex;
+  return 0;
+#endif
+}
+
+int petAssetBaseFrameIndex() {
+#if HAS_LOCAL_PET_ASSET
+  const int rowIndex = petAssetRowIndex();
+  return petAssetRowFrameOffset(rowIndex) + (petFrame % petAssetRowFrameCount(rowIndex));
+#else
+  return 0;
+#endif
+}
+
+int petAssetScaleFrameCount(int rowIndex) {
+#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES) && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  return max(1, static_cast<int>(pgm_read_byte(&PET_ASSET_SCALE_FRAME_COUNTS[clampPetAssetRow(rowIndex)])));
+#elif HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+  (void)rowIndex;
+  return max(1, PET_ASSET_FRAME_COUNT);
+#else
+  (void)rowIndex;
+  return 1;
+#endif
+}
+
 bool hasScaleSpecificPetAsset() {
 #if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
   return PET_ASSET_HAS_SCALE_FRAMES;
@@ -863,10 +968,16 @@ template <typename Target>
 void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y, int scale) {
 #if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
   const int levelIndex = petScaleLevelIndex();
-  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
   const int width = pgm_read_word(&PET_ASSET_SCALE_WIDTHS[levelIndex]);
   const int height = pgm_read_word(&PET_ASSET_SCALE_HEIGHTS[levelIndex]);
+#if defined(PET_ASSET_HAS_ANIMATION_ROWS)
+  const int rowIndex = petAssetRowIndex();
+  const int frameIndex = petFrame % petAssetScaleFrameCount(rowIndex);
+  const uint32_t offset = pgm_read_dword(&PET_ASSET_SCALE_OFFSETS[levelIndex][rowIndex][frameIndex]);
+#else
+  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
   const uint32_t offset = pgm_read_dword(&PET_ASSET_SCALE_OFFSETS[levelIndex][frameIndex]);
+#endif
   for (int row = 0; row < height; ++row) {
     int runStart = -1;
     uint16_t runColor = PET_ASSET_TRANSPARENT;
@@ -922,7 +1033,7 @@ void drawLocalPetAssetTo(Target& target, int x, int y, int scale) {
     drawScaleSpecificLocalPetAssetTo(target, x, y, scale);
     return;
   }
-  const int frameIndex = petFrame % PET_ASSET_FRAME_COUNT;
+  const int frameIndex = petAssetBaseFrameIndex();
   for (int row = 0; row < PET_ASSET_FRAME_HEIGHT; ++row) {
     for (int col = 0; col < PET_ASSET_FRAME_WIDTH; ++col) {
       const uint16_t color = pgm_read_word(&PET_ASSET_FRAMES[frameIndex][row * PET_ASSET_FRAME_WIDTH + col]);
@@ -1057,7 +1168,6 @@ void drawPetAvatarTo(Target& target, int x, int y) {
   const int s = petAssetRenderScale();
   const int inset = (petBoxPadding() / 2) * s;
   drawLocalPetAssetTo(target, x + inset, y + inset + bounce * s, s);
-  drawMoodOverlayTo(target, x, y, petBoxWidth(), petBoxHeight());
 #else
   drawVectorPetAvatarTo(target, x, y);
 #endif
