@@ -9,17 +9,21 @@
 | event routing | pet、display、notification、answer、choice が device session へ届く | `happy-path.validEvents` |
 | reply routing | A/B/C 返信が requestEventId 付きで host へ戻る | `happy-path.replyCount` |
 | scroll model | 長文回答の分割、位置、末尾判定を検証する | `mixed-batch.scrollPages` |
-| device profile | Core2 / GRAY の入力割り当て差分を検証する | `profileCovered` |
+| device profile | Core2 release profile と button reference preview の入力割り当て差分を検証する | `profileCovered` |
 | LAN bridge smoke | HTTP pairing、sample replay、polling、device reply 受信を検証する | `npm run bridge:smoke` |
 | Codex relay smoke | relay CLI と `/codex/answer` から `answer.completed` を queue / poll できることを検証する | `scripts/codex-relay-smoke.mjs` |
 | Codex session smoke | local session JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として queue / poll できることを検証する | `scripts/codex-session-smoke.mjs`、`dist/codex-session-smoke-result.json` |
 | Codex hook relay smoke | hook process 相当の one-shot relay が state file で重複を抑止することを検証する | `scripts/codex-session-smoke.mjs` |
+| Codex app-server adapter smoke | public Codex App Server adapter の `initialize`、`thread/start`、`turn/start`、transport gate を検証する | `scripts/codex-app-server-adapter-smoke.mjs`、`dist/codex-app-server-adapter-smoke-result.json` |
+| adapter review | local session JSONL、hook relay、app-server adapter の役割と private API scraping 禁止を検証する | `tools/adapter-review.mjs`、`docs/adapter-review-result.json` |
 | clipboard UTF-8 relay smoke | 日本語 clipboard 本文を `answer.completed` として壊さず送れることを検証する | `scripts/codex-relay-smoke.mjs` |
 | dashboard smoke | Dashboard asset、`/debug/snapshot`、`/debug/runtime`、`/debug/commands/run`、`/codex/decision`、`/codex/pet`、`/codex/display`、`/pet/current/manifest`、`/codex/session/latest`、`/codex/session/publish`、inbound reply summary、collapse、command modal tabs を検証する | `scripts/dashboard-smoke.mjs`、`dist/dashboard-smoke-result.json` |
 | dashboard browser smoke | Dashboard を desktop / mobile viewport で表示し、非 blank と主要 UI を確認する | `dist/dashboard-smoke.png`、`dist/dashboard-mobile-smoke.png` |
 | firmware 日本語表示 source gate | firmware が日本語フォントと UTF-8 code point 境界のページングを使うことを検証する | `scripts/validate.mjs` |
 | firmware pet animation source gate | firmware が pet avatar animation、runtime render FPS、motion step、`M5Canvas` Sprite buffer、pet box redraw path を含むことを検証する | `scripts/validate.mjs` |
+| long-run source gate | Host Bridge queue/log 上限、stale diagnostics、firmware HTTP timeout、Wi-Fi / poll backoff、連続失敗時の復帰を検証する | `scripts/validate.mjs` |
 | hatch-pet asset source gate | local pet asset generator、firmware compile-time gate、ignored header、標準 9 行 atlas、row-aware frame selection を検証する | `scripts/validate.mjs` |
+| signing readiness | Windows SDK / WiX / 署名用 env の準備状況を JSON へ出す | `npm run installer:signing:check`、`dist/windows-signing-readiness.json` |
 | platform gate | simulator、mock device、sample telemetry、adapter、安全境界を確認する | `docs/platform-runtime-gate.json` |
 
 ## Representative Suite
@@ -36,7 +40,6 @@
 | Test | 内容 | Evidence |
 | --- | --- | --- |
 | Core2 build | PlatformIO Core2 target を build する | `pio run -e m5stack-core2` |
-| GRAY build | PlatformIO GRAY target を build する | `pio run -e m5stack-gray` |
 | Core2 upload | USB 接続された Core2 へ firmware を書き込む | `npm run firmware:upload:core2` |
 | Core2 LAN | 2.4GHz Wi-Fi、pairing、Host Bridge sample poll を serial log で確認する | `docs/hardware-runtime-evidence.json` |
 | Core2 re-pairing | Host Bridge 再起動後に invalid token を検出し、再pairingへ戻る。既存実機が旧 `paired-*` token で poll した場合は、Host Bridge が token を再取り込みして queued display event を配信する | `bridge:smoke`、`docs/hardware-runtime-evidence.json` |
@@ -50,10 +53,10 @@
 | Codex decision request | `codex:decision` または Dashboard Decision tab から三択を送り、Core2 A/B/C 返信を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 hatch-pet animation | `%USERPROFILE%\.codex\pets` 由来の local asset が header に表示され、state / mood / gesture 連動でキャラクターイラストの表情 / 姿勢 row が切り替わることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 display settings | Dashboard から pet display area を `1..32`、text size を `1..8`、render FPS を `4..20`、motion step を `120..800ms`、RGBA、beep を送り、Core2 の固定ヘッダーテキスト削除、pet 超拡大、文字サイズ変化、pose 切替頻度変化、色変更、answer beep を目視する | `docs/gui-tools-manual-check.md` |
-| Dashboard Core2 / GRAY preview | Dashboard の device preview を Core2 / GRAY で切り替え、320x240 layout、text overlay、2カラム配置を確認する | `docs/gui-tools-manual-check.md` |
+| Dashboard Core2 / button reference preview | Dashboard の device preview を Core2 / button reference で切り替え、320x240 layout、text overlay、2カラム配置を確認する | `docs/gui-tools-manual-check.md` |
 | Core2 scale-specific pet asset | `pet:asset` が生成した scale-specific frame を使い、pet display area `1/32`、`8/32`、`16/32`、`32/32` で低解像度 base frame のブロック拡大にならないことと超拡大構図を目視する | `docs/gui-tools-manual-check.md` |
 | Core2 sprite-buffered pet redraw | pet animation 中に画面全体の黒塗りや Answer / Choice / footer text の明滅がなく、ちらつきが抑えられることを目視する | `docs/gui-tools-manual-check.md` |
 | Core2 ABC GUI workflow | Dashboard から Choice を送り、Core2 A/B/C 返信が Dashboard inbound に出ることを確認する | `docs/gui-tools-manual-check.md` |
 | Core2 touch / swipe | footer touch、choice touch、answer swipe を確認する | `docs/manual-test.md` |
 
-GRAY 実機、GRAY IMU、長時間運用、実 Codex App 内部 API 連携の手動テストは Codex では未実施です。手順と対象外範囲は `docs/manual-test.md`、`docs/host-bridge-manual-check.md`、`docs/codex-relay-manual-check.md` に残し、release notes にも明記します。
+GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続の手動テストは Codex では未実施です。手順と対象外範囲は `docs/manual-test.md`、`docs/host-bridge-manual-check.md`、`docs/codex-relay-manual-check.md` に残し、release notes にも明記します。

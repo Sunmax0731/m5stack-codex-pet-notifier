@@ -6,7 +6,7 @@
 - Node.js 24 以上
 - npm 11 以上
 - 実機確認時のみ PlatformIO と M5Unified / M5Stack board packages
-- 対象 device: M5Stack Core2 / M5Stack GRAY
+- 対象 device: M5Stack Core2。GRAY 実機と GRAY IMU は release target 外。
 
 ## 自動検証
 
@@ -19,8 +19,9 @@ cmd.exe /d /s /c npm test
 
 - `platform runtime gate passed for m5stack-codex-pet-notifier`
 - `dashboard smoke passed`
+- `codex app-server adapter smoke passed`
+- `adapter review passed for m5stack-codex-pet-notifier`
 - `validated m5stack-codex-pet-notifier`
-- `release guard passed for m5stack-codex-pet-notifier`
 - `release guard passed for m5stack-codex-pet-notifier`
 - `dist/validation-result.json` と `dist/m5stack-codex-pet-notifier-docs.zip` が生成される。
 
@@ -39,7 +40,10 @@ installer zip を開発環境で再生成する場合:
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run installer:package
+cmd.exe /d /s /c npm run installer:signing:check
 ```
+
+署名付き MSI / MSIX の準備は `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs` に分けています。実署名では `WINDOWS_SIGNING_CERT_THUMBPRINT`、`WINDOWS_SIGNING_PFX_PATH`、`WINDOWS_SIGNING_PFX_PASSWORD` を環境変数で指定し、証明書や password を repository に保存しません。
 
 ## Demo
 
@@ -63,13 +67,12 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
 ```
 
 PlatformIO を追加導入する場合は `C:\` ではなく `E:\DevEnv` 以下へ配置してください。
 
 この環境では PlatformIO を `E:\DevEnv\PlatformIO\venv` に配置します。
-Core2 / GRAY build は同じ `.pio` を使うため、並列ではなく順番に実行します。
+Core2 build のみを release target とします。
 
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
@@ -142,3 +145,15 @@ Windows で長い日本語本文を送る場合、`cmd.exe` の code page に左
 Codex の最近 session を自動送信する場合は `codex:sessions` を起動します。既定では `%USERPROFILE%\.codex\sessions` の最新 JSONL を監視し、最新の user / assistant のやり取りを `answer.completed` として送ります。進行中の短い更新も見たい場合は `--phase any`、完了応答だけにしたい場合は `--phase final` を使います。
 
 Codex Hooks が使える環境では `docs/codex-hooks.example.json` の command を hook に登録します。`codex:hook` は hook から呼ばれるたびに最新 session を確認し、すでに送った message は本文を保存しない state file で抑止します。
+
+## Codex App Server Adapter
+
+実 Codex App 公開 API 連携へ進める前に、adapter smoke と review を実行します。
+
+```powershell
+cd D:\AI\IoT\m5stack-codex-pet-notifier
+cmd.exe /d /s /c npm run codex:app-server:smoke
+cmd.exe /d /s /c npm run adapter:review
+```
+
+この段階では `initialize`、`thread/start`、`turn/start` の message contract と transport safety gate を確認します。実 App Server 接続では `codex app-server` を起動し、stdio transport を既定にします。WebSocket を使う場合は loopback に限定するか、capability token または signed bearer token を必須にします。

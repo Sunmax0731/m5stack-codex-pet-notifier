@@ -6,15 +6,18 @@
 | --- | --- | --- |
 | Host Bridge model | Codex App 側の状態を正規イベントへ変換し LAN 内 device へ配信する contract を検証する | `src/host-adapter/localLanBridge.mjs` |
 | LAN Host Bridge | pairing、token 認証、HTTP polling、device event 受信、sample replay、event log を提供する | `src/host-bridge/server.mjs` |
-| Dashboard GUI | Host Bridge のsidebar状態確認、debug snapshot、event 送信、ABC 返信確認、最近の Codex session 回答表示、Core2 / GRAY preview、表示設定、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
+| Dashboard GUI | Host Bridge のsidebar状態確認、debug snapshot、event 送信、ABC 返信確認、最近の Codex session 回答表示、Core2 / button reference preview、表示設定、導入コマンド参照を提供する | `src/host-bridge/dashboard/` |
 | Codex relay | clipboard / stdin / file の Codex 返答を `answer.completed` へ変換して Host Bridge に送る。PowerShell clipboard は Base64 UTF-8 経由で読む | `src/codex-adapter/relay.mjs` |
 | Codex session watcher | `%USERPROFILE%\.codex\sessions` の最新 session JSONL から user / assistant の最新やり取りを抽出し、`answer.completed` として送る | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex hook relay | Codex Hooks の command hook から one-shot で session watcher を実行し、重複送信を state file で抑止する | `src/codex-adapter/hookRelay.mjs` |
-| Device Profile | Core2 / GRAY の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
+| Codex app-server adapter | Codex App Server public interface の JSON-RPC message builder、transport safety gate、adapter readiness を提供する | `src/codex-adapter/appServerAdapter.mjs` |
+| Adapter review | 実 adapter の fallback / public API / private scraping 禁止をまとめて検証する | `src/codex-adapter/adapterRegistry.mjs`、`tools/adapter-review.mjs` |
+| Device Profile | Core2 release profile と button reference preview の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
 | Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
 | Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
 | Pet asset generator | hatch-pet package の `spritesheet.webp` を firmware 用 RGB565 local header へ変換する | `tools/generate-pet-firmware-asset.py` |
 | Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson、日本語フォント表示による device loop | `firmware/` |
+| Signing readiness | WiX MSI / MSIX template と Windows SDK / WiX / 署名用 env を確認する | `installer/`、`tools/windows-signing-check.mjs` |
 
 ## LAN Host Bridge API
 
@@ -70,12 +73,14 @@
 
 ## 入力割り当て
 
-| Operation | Core2 | GRAY |
+| Operation | Core2 release profile | Button reference preview |
 | --- | --- | --- |
-| 選択 A/B/C | 下部 touch button または画面領域 | 物理 A/B/C |
-| pet 反応 | pet 領域 single tap / double tap / long press / swipe | B click / double click / 長押しまたは IMU tap |
-| 回答スクロール | swipe up/down/left/right | A/C 上下、B 決定 |
-| 戻る | 画面左上 tap または B 長押し | B 長押し |
+| 選択 A/B/C | 下部 touch button または画面領域 | A/B/C 相当の preview 入力 |
+| pet 反応 | pet 領域 single tap / double tap / long press / swipe | click / double click / long press |
+| 回答スクロール | swipe up/down/left/right | 上下 button 相当 |
+| 戻る | 画面左上 tap または B 長押し | B 長押し相当 |
+
+GRAY 実機と GRAY IMU は release target 外です。`gray` profile id は Dashboard preview と古い scenario 互換のために残しますが、`releaseTarget=false` とし firmware build target には戻しません。
 
 ## Codex Relay
 
@@ -86,10 +91,12 @@
 | file | `npm run codex:watch -- --file dist/codex-answer.txt` | 外部ツールが書いた返答ファイルを監視する |
 | session JSONL | `npm run codex:sessions -- --phase any` | 最近の Codex session の最新 user / assistant やり取りを自動送信する |
 | Codex Hooks | `npm run codex:hook -- --bridge http://127.0.0.1:8080` | Codex hook 発火時に最新 session を1回だけ送る |
+| Codex App Server | `npm run codex:app-server:smoke` | public interface adapter の message contract と transport gate を検証する |
 | Decision | `npm run codex:decision -- --question "..." --a "..." --b "..." --c "..."` | Codex 側から M5Stack へ三択判断を求める |
 
 `codex:sessions` は opt-in のローカルファイル監視です。Codex App の非公開 API へ接続せず、ローカル session JSONL だけを読みます。`--phase any` は進行中の commentary も送信し、`--phase final` は完了応答だけを送信します。
 `codex:hook` は hook process ごとに起動されるため、`dist/codex-session-hook-state.json` に本文を含まない署名だけを保存して重複送信を防ぎます。
+`codex-app-server` adapter は `initialize`、`thread/start`、`turn/start` を組み立て、stdio を既定 transport とします。WebSocket は loopback 以外で auth を必須にし、非公開 API scraping は `privateApiScraping=false` の review gate で禁止します。
 
 ## 日本語表示
 
@@ -127,15 +134,14 @@
 - `display.settings_updated.display.textBorderEnabled` は boolean を受け付け、文字パネルと footer の枠線を切り替える。
 - `display.settings_updated.display.beepOnAnswer` は boolean を受け付け、次回 `answer.completed` 到着時の短い beep を切り替える。
 - `pet.updated.pet.mood` は `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` を受け付け、`state` と独立して pet の表情または姿勢に反映する。local hatch-pet asset がある場合は標準 atlas row を選択し、図形 marker は重ねない。未指定時は `state` から安全な fallback mood を導出する。
-- `device.pet_interacted.interaction` は `tap / double-tap / long-press / button-long-press / imu-tap / swipe-up / swipe-down / swipe-left / swipe-right` を扱う。`gesture`、`target`、`screen`、`page`、`mood` は Dashboard 診断と Codex workflow の context として保持する。
+- `device.pet_interacted.interaction` は `tap / double-tap / long-press / button-long-press / swipe-up / swipe-down / swipe-left / swipe-right` を扱う。`gesture`、`target`、`screen`、`page`、`mood` は Dashboard 診断と Codex workflow の context として保持する。
 - Host Bridge は `long-press` または `button-long-press` を受け取った場合、同じ device に `prompt.choice_requested` を queue し、M5Stack から Codex 側の次アクションを A/B/C で返せるようにする。
-- Dashboard は side menu、環境構築コマンド modal、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / GRAY 表示を確認できる。表示パラメータは `変更を自動送信` がonならデバウンス付きで実機へ送信し、offなら `表示設定を送信` button で手動送信する。プレビューは1ペインで全幅表示し、最近の Codex 回答とイベントログは左右ペインで維持する。各項目の説明は `?` icon click で開く help popover とし、theme は既定で OS に追従しつつ light / dark を手動選択できる。label は既定日本語で、English へ切り替えできる。
+- Dashboard は side menu、環境構築コマンド modal、M5Stack 表示プレビューを持ち、送信前に現在の hatch-pet spritesheet、pet 面積、pet X/Y offset、text size、render FPS、motion step、RGBA、text border、Core2 / button reference 表示を確認できる。表示パラメータは `変更を自動送信` がonならデバウンス付きで実機へ送信し、offなら `表示設定を送信` button で手動送信する。プレビューは1ペインで全幅表示し、最近の Codex 回答とイベントログは左右ペインで維持する。各項目の説明は `?` icon click で開く help popover とし、theme は既定で OS に追従しつつ light / dark を手動選択できる。label は既定日本語で、English へ切り替えできる。
 - firmware は互換 fallback として `pet.updated.display` も同じ display 設定として解釈する。
 - firmware は `display.*Rgba` を object、hex string、channel array として受け取り、LCD 全体は screen background、local hatch-pet asset の透明ピクセル部分は pet background、文字パネルと footer は text background と text border を使って描画する。text background は screen background に暗黙同期せず、alpha `0` ではパネル塗りを行わず文字だけを描画する。pet fullscreen layout の Answer / Decision / Notification でも本文パネルを描画して、text panel の塗りを screen background へfallbackしない。
 - firmware は pet avatar を `M5Canvas` の off-screen Sprite に描画し、pet box だけを `pushSprite()` で転送する。pet animation tick では `needsPetRedraw` だけを立て、画面全体や本文を再描画しない。
 - `firmware/include/pet_asset.local.h` がある場合、hatch-pet package から生成した RGB565 frame を優先表示する。header は `PET_ASSET_HAS_ANIMATION_ROWS`、row frame count、row offset を持ち、`idle`、`running-right`、`running-left`、`waving`、`jumping`、`failed`、`waiting`、`running`、`review` を行別に参照できる。
 - 生成 header は base frame に加え、scale `1..8` ごとの Core2 用高解像度 frame set を含む。firmware は `petDisplayScale` と現在の row に対応する frame set を選び、低解像度 base frame の矩形拡大だけに依存しない。flash 制約のため高解像度 set は idle の全 frame と各 row の代表 pose を保持する。
-- GRAY target は flash 余裕を優先し、同じ header が存在しても scale-specific frame は参照せず base frame 拡大へ fallback する。
 - `firmware/include/pet_asset.local.h` がない場合、同じ firmware source は vector fallback avatar を描画する。
 - local asset header は `.gitignore` 対象で、個人 pet sprite を release asset や docs ZIP に含めない。
 - `pet.updated.pet.state` は `idle`、`waiting`、`running`、`failed`、`review`、`reacting`、`celebrate` と mood 互換値を受け付ける。
@@ -146,4 +152,4 @@
 
 - device 保存: `deviceId`、host URL、pairing token、表示設定。
 - device 非保存: 通知本文、回答本文、返信本文、個人 pet sprite。
-- host 保存: beta では event type、eventId、device event summary、display / pet diagnostics のみを release evidence に残す。公開 Codex adapter API を追加する場合は保存期間と削除手順を再定義する。
+- host 保存: beta では event type、eventId、device event summary、display / pet diagnostics、adapter review result、signing readiness result のみを release evidence に残す。公開 Codex App Server の実接続を追加する場合は保存期間と削除手順を再定義する。

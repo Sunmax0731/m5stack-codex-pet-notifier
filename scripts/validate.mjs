@@ -50,16 +50,23 @@ for (const required of [
   'src/codex-adapter/relay.mjs',
   'src/codex-adapter/sessionWatcher.mjs',
   'src/codex-adapter/hookRelay.mjs',
+  'src/codex-adapter/appServerAdapter.mjs',
+  'src/codex-adapter/adapterRegistry.mjs',
   'src/codex-adapter/eventFactory.mjs',
   'src/device-adapter/deviceProfiles.mjs',
   'src/simulator/mockDevice.mjs',
   'scripts/bridge-smoke.mjs',
   'scripts/codex-relay-smoke.mjs',
   'scripts/codex-session-smoke.mjs',
+  'scripts/codex-app-server-adapter-smoke.mjs',
   'scripts/dashboard-smoke.mjs',
+  'tools/adapter-review.mjs',
+  'tools/windows-signing-check.mjs',
   'tools/upload-firmware.ps1',
   'tools/start-bridge-background.mjs',
   'tools/generate-pet-firmware-asset.py',
+  'installer/wix/Product.wxs',
+  'installer/msix/Package.appxmanifest',
   'src/host-bridge/dashboard/index.html',
   'src/host-bridge/dashboard/app.js',
   'src/host-bridge/dashboard/display-utils.js',
@@ -149,6 +156,12 @@ assert(firmwareSource.includes('drawScaleSpecificLocalPetAsset'), 'firmware must
 assert(firmwareSource.includes('PET_ASSET_SCALED_PIXELS'), 'firmware must select high-resolution scale-specific pet frames when available');
 assert(firmwareSource.includes('pet_asset.local.h'), 'firmware must support an ignored local hatch-pet asset header');
 assert(firmwareSource.includes('HAS_LOCAL_PET_ASSET'), 'firmware must gate local hatch-pet assets behind a compile-time flag');
+assert(firmwareSource.includes('HTTP_TIMEOUT_MS'), 'firmware HTTP clients must use a bounded timeout for long-running operation');
+assert(firmwareSource.includes('MAX_POLL_INTERVAL_MS'), 'firmware polling must use a bounded backoff interval');
+assert(firmwareSource.includes('MAX_RECOVERABLE_POLL_FAILURES'), 'firmware must recover from repeated poll failures by returning to pairing');
+assert(firmwareSource.includes('wifiRetryIntervalMs'), 'firmware Wi-Fi reconnects must use backoff instead of fixed-delay loops');
+assert(firmwareSource.includes('currentPollIntervalMs'), 'firmware must track dynamic poll interval for long-running operation');
+assert(!firmwareSource.includes('DEVICE_PROFILE_GRAY'), 'firmware release target must not include the GRAY build profile');
 
 const gitignoreSource = fs.readFileSync('.gitignore', 'utf8');
 assert(gitignoreSource.includes('firmware/include/pet_asset.local.h'), 'local pet asset header must be ignored');
@@ -206,6 +219,23 @@ const hookRelaySource = fs.readFileSync('src/codex-adapter/hookRelay.mjs', 'utf8
 assert(hookRelaySource.includes('runSessionWatcherCli'), 'hook relay must reuse the session watcher path');
 assert(fs.existsSync('docs/codex-hooks.example.json'), 'Codex hooks example must be documented');
 
+const appServerAdapterSource = fs.readFileSync('src/codex-adapter/appServerAdapter.mjs', 'utf8');
+assert(appServerAdapterSource.includes('buildInitializeMessage'), 'Codex app-server adapter must build initialize messages');
+assert(appServerAdapterSource.includes('thread/start'), 'Codex app-server adapter must support thread/start');
+assert(appServerAdapterSource.includes('turn/start'), 'Codex app-server adapter must support turn/start');
+assert(appServerAdapterSource.includes('experimentalApi: false'), 'Codex app-server adapter must keep experimental API disabled by default');
+assert(appServerAdapterSource.includes('privateApiScraping: false'), 'Codex app-server adapter must reject private API scraping');
+assert(appServerAdapterSource.includes('non-loopback-websocket-requires-auth'), 'Codex app-server adapter must reject unauthenticated non-loopback WebSocket transport');
+const adapterRegistrySource = fs.readFileSync('src/codex-adapter/adapterRegistry.mjs', 'utf8');
+assert(adapterRegistrySource.includes('local-session-jsonl'), 'adapter review must keep the local session JSONL adapter registered');
+assert(adapterRegistrySource.includes('codex-app-server'), 'adapter review must register the public Codex app-server adapter');
+const signingCheckSource = fs.readFileSync('tools/windows-signing-check.mjs', 'utf8');
+assert(signingCheckSource.includes('signtool.exe'), 'Windows signing readiness must check signtool.exe');
+assert(signingCheckSource.includes('makeappx.exe'), 'Windows signing readiness must check makeappx.exe');
+assert(signingCheckSource.includes('wix.exe'), 'Windows signing readiness must check wix.exe');
+assert(signingCheckSource.includes('WINDOWS_SIGNING_CERT_THUMBPRINT'), 'Windows signing readiness must document certificate thumbprint env var');
+assert(signingCheckSource.includes('WINDOWS_SIGNING_PFX_PATH'), 'Windows signing readiness must document PFX path env var');
+
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');
 assert(bridgeSource.includes("url.pathname === '/codex/decision'"), 'Host Bridge must expose a decision endpoint for Codex-to-M5Stack choice workflows');
@@ -232,6 +262,11 @@ assert(bridgeSource.includes('handlePetInteraction'), 'Host Bridge must turn lon
 assert(bridgeSource.includes('sourceInteraction'), 'Host Bridge side effects must identify the source pet interaction');
 assert(bridgeSource.includes('EADDRINUSE'), 'Host Bridge must handle occupied ports without an unhandled Node stack trace');
 assert(bridgeSource.includes('readExistingBridgeHealth'), 'Host Bridge occupied-port handling must inspect the existing bridge version');
+assert(bridgeSource.includes('maxDeviceQueueLength'), 'Host Bridge must cap per-device event queues for long-running operation');
+assert(bridgeSource.includes('maxEventLogEntries'), 'Host Bridge must cap event/security logs for long-running operation');
+assert(bridgeSource.includes('deviceStaleAfterMs'), 'Host Bridge must mark stale devices for long-running operation');
+assert(bridgeSource.includes('droppedEvents'), 'Host Bridge must expose dropped event diagnostics');
+assert(bridgeSource.includes('lastHeartbeatSec'), 'Host Bridge must expose heartbeat age diagnostics');
 
 const dashboardIndexSource = fs.readFileSync('src/host-bridge/dashboard/index.html', 'utf8');
 const dashboardAppSource = fs.readFileSync('src/host-bridge/dashboard/app.js', 'utf8');
@@ -266,7 +301,7 @@ assert(dashboardIndexSource.includes('テキスト枠を表示'), 'Dashboard mus
 assert(dashboardIndexSource.includes('Codex回答のビープ通知'), 'Dashboard must expose answer beep controls');
 assert(dashboardIndexSource.includes('languageMode'), 'Dashboard must expose Japanese/English language switching');
 assert(dashboardIndexSource.includes('themeMode'), 'Dashboard must expose theme switching');
-assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and GRAY preview switching');
+assert(dashboardIndexSource.includes('previewDevice'), 'Dashboard must expose Core2 and button-reference preview switching');
 assert(dashboardIndexSource.includes('petPackagePath'), 'Dashboard must expose local pet package path override');
 assert(dashboardIndexSource.includes('preview-settings-dock'), 'Dashboard preview settings must be docked below the screen preview');
 assert(dashboardIndexSource.includes('preview-asset-column'), 'Dashboard preview settings must keep asset controls in a left column');

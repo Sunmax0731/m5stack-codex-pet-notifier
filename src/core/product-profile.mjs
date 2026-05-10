@@ -16,6 +16,10 @@ export const productProfile = {
     'lanHostBridge',
     'dashboardGui',
     'codexRelay',
+    'codexSessionAutoRelay',
+    'codexAppServerAdapter',
+    'longRunBridge',
+    'installerSigningPrepared',
     'securityPrivacy'
   ],
   requiredDocs: [
@@ -43,6 +47,10 @@ export const productProfile = {
     'docs/qcds-regression-baseline.json',
     'docs/qcds-remote-benchmark.md',
     'docs/qcds-strict-gap-analysis.md',
+    'docs/long-run-operations.md',
+    'docs/signed-installer-plan.md',
+    'docs/codex-app-server-api-integration.md',
+    'docs/adapter-review.md',
     'docs/source-idea-pack.json',
     'docs/release-evidence.json',
     'docs/strict-manual-test-addendum.md',

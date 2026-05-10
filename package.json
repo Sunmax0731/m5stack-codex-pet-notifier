@@ -5,7 +5,7 @@
   "type": "module",
   "description": "M5Stack Codex pet notifier beta",
   "scripts": {
-    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/codex-session-smoke.mjs && node scripts/dashboard-smoke.mjs && node scripts/validate.mjs && node tools/release-guard.mjs",
+    "test": "node tools/platform-runtime-gate.mjs && node scripts/bridge-smoke.mjs && node scripts/codex-relay-smoke.mjs && node scripts/codex-session-smoke.mjs && node scripts/codex-app-server-adapter-smoke.mjs && node scripts/dashboard-smoke.mjs && node tools/adapter-review.mjs && node tools/windows-signing-check.mjs && node scripts/validate.mjs && node tools/release-guard.mjs",
     "validate": "node scripts/validate.mjs",
     "bridge:smoke": "node scripts/bridge-smoke.mjs",
     "dashboard:smoke": "node scripts/dashboard-smoke.mjs",
@@ -23,10 +23,13 @@
     "codex:watch": "node src/codex-adapter/relay.mjs watch",
     "codex:sessions": "node src/codex-adapter/sessionWatcher.mjs",
     "codex:hook": "node src/codex-adapter/hookRelay.mjs",
+    "codex:app-server:smoke": "node scripts/codex-app-server-adapter-smoke.mjs",
     "pet:asset": "python tools/generate-pet-firmware-asset.py",
     "firmware:upload:core2": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/upload-firmware.ps1 -Environment m5stack-core2",
     "installer:package": "node tools/package-beta.mjs",
+    "installer:signing:check": "node tools/windows-signing-check.mjs",
     "choice:package": "node tools/package-choice-workflow.mjs",
+    "adapter:review": "node tools/adapter-review.mjs",
     "platform:gate": "node tools/platform-runtime-gate.mjs",
     "release:guard": "node tools/release-guard.mjs",
     "demo": "node src/cli/index.mjs demo"

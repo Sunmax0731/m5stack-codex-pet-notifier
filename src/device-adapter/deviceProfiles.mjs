@@ -2,9 +2,9 @@ export const deviceProfiles = {
   core2: {
     id: 'core2',
     label: 'M5Stack Core2',
+    releaseTarget: true,
     screen: { width: 320, height: 240 },
     touch: true,
-    imuTap: false,
     inputMap: {
       choiceA: 'touch-button-a',
       choiceB: 'touch-button-b',
@@ -17,15 +17,16 @@ export const deviceProfiles = {
   },
   gray: {
     id: 'gray',
-    label: 'M5Stack GRAY',
+    label: 'GRAY reference profile (out of release scope)',
+    releaseTarget: false,
+    scope: 'reference-preview-only',
     screen: { width: 320, height: 240 },
     touch: false,
-    imuTap: true,
     inputMap: {
       choiceA: 'button-a',
       choiceB: 'button-b',
       choiceC: 'button-c',
-      petInteract: 'button-b-long-press-or-imu-tap',
+      petInteract: 'button-b-long-press',
       scrollUp: 'button-a-in-scroll-mode',
       scrollDown: 'button-c-in-scroll-mode',
       back: 'button-b-long-press'
@@ -39,4 +40,8 @@ export function getDeviceProfile(profileId) {
     throw new Error(`unknown device profile: ${profileId}`);
   }
   return profile;
+}
+
+export function releaseDeviceProfiles() {
+  return Object.values(deviceProfiles).filter((profile) => profile.releaseTarget === true);
 }

@@ -30,6 +30,10 @@ const deviceToHostTypes = new Set([
   'device.pet_interacted',
   'device.heartbeat'
 ]);
+const maxDeviceQueueLength = 200;
+const maxEventLogEntries = 500;
+const deviceStaleAfterMs = 30_000;
+const deviceExpireAfterMs = 24 * 60 * 60 * 1000;
 const petAnimationRows = [
   { name: 'idle', index: 0, frames: 6 },
   { name: 'running-right', index: 1, frames: 8 },
@@ -50,6 +54,12 @@ export class LanHostBridge {
     this.outboundLog = [];
     this.inboundLog = [];
     this.securityLog = [];
+    this.limits = {
+      maxDeviceQueueLength: options.maxDeviceQueueLength ?? maxDeviceQueueLength,
+      maxEventLogEntries: options.maxEventLogEntries ?? maxEventLogEntries,
+      deviceStaleAfterMs: options.deviceStaleAfterMs ?? deviceStaleAfterMs,
+      deviceExpireAfterMs: options.deviceExpireAfterMs ?? deviceExpireAfterMs
+    };
   }
 
   pair(deviceId, pairingCode) {
@@ -57,7 +67,7 @@ export class LanHostBridge {
       return { ok: false, reason: 'device-id-required' };
     }
     if (pairingCode !== this.pairingCode) {
-      this.securityLog.push({ kind: 'pairing-rejected', deviceId });
+      this.pushLog(this.securityLog, { kind: 'pairing-rejected', deviceId });
       return { ok: false, reason: 'invalid-pairing-code' };
     }
     const record = this.ensureDevice(deviceId);
@@ -94,7 +104,12 @@ export class LanHostBridge {
         logEntry.details = details;
       }
       target.queue.push(event);
-      this.outboundLog.push(logEntry);
+      target.lastQueuedAt = Date.now();
+      while (target.queue.length > this.limits.maxDeviceQueueLength) {
+        target.queue.shift();
+        target.droppedEvents += 1;
+      }
+      this.pushLog(this.outboundLog, logEntry);
       if (target.socket) {
         sendWebSocketText(target.socket, JSON.stringify(event));
       }
@@ -108,6 +123,8 @@ export class LanHostBridge {
       return auth;
     }
     const record = this.devices.get(deviceId);
+    record.lastPollAt = Date.now();
+    record.lastSeenAt = record.lastPollAt;
     return {
       ok: true,
       event: record.queue.shift() ?? null,
@@ -127,7 +144,14 @@ export class LanHostBridge {
     if (!deviceToHostTypes.has(event.type)) {
       return { ok: false, reason: 'not-device-to-host-event' };
     }
-    this.inboundLog.push({ deviceId, type: event.type, eventId: event.eventId, event });
+    const record = this.devices.get(deviceId);
+    record.lastEventAt = Date.now();
+    record.lastSeenAt = record.lastEventAt;
+    if (event.type === 'device.heartbeat') {
+      record.lastHeartbeatAt = record.lastEventAt;
+      record.lastHeartbeat = summarizeDeviceEvent(event);
+    }
+    this.pushLog(this.inboundLog, { deviceId, type: event.type, eventId: event.eventId, event });
     const sideEffect = event.type === 'device.pet_interacted'
       ? this.handlePetInteraction(deviceId, event)
       : null;
@@ -188,7 +212,7 @@ export class LanHostBridge {
       try {
         this.receive(deviceId, token, JSON.parse(text));
       } catch (error) {
-        this.securityLog.push({ kind: 'websocket-json-error', deviceId, message: error.message });
+        this.pushLog(this.securityLog, { kind: 'websocket-json-error', deviceId, message: error.message });
       }
     });
     socket.on('close', () => {
@@ -200,17 +224,26 @@ export class LanHostBridge {
   }
 
   summary() {
+    this.pruneExpiredDevices();
+    const now = Date.now();
     return {
       product: productProfile.repo,
       version: productProfile.version,
       pairedDevices: [...this.devices.values()].filter((record) => record.paired).map((record) => ({
         deviceId: record.deviceId,
         pending: record.queue.length,
-        websocket: Boolean(record.socket)
+        websocket: Boolean(record.socket),
+        stale: now - (record.lastSeenAt ?? record.createdAt) > this.limits.deviceStaleAfterMs,
+        lastSeenSec: Math.round((now - (record.lastSeenAt ?? record.createdAt)) / 1000),
+        lastPollSec: record.lastPollAt ? Math.round((now - record.lastPollAt) / 1000) : null,
+        lastHeartbeatSec: record.lastHeartbeatAt ? Math.round((now - record.lastHeartbeatAt) / 1000) : null,
+        droppedEvents: record.droppedEvents,
+        lastHeartbeat: record.lastHeartbeat ?? null
       })),
       outboundEvents: this.outboundLog.length,
       inboundEvents: this.inboundLog.length,
-      securityRejections: this.securityLog.length
+      securityRejections: this.securityLog.length,
+      limits: this.limits
     };
   }
 
@@ -230,12 +263,21 @@ export class LanHostBridge {
 
   ensureDevice(deviceId) {
     if (!this.devices.has(deviceId)) {
+      const now = Date.now();
       this.devices.set(deviceId, {
         deviceId,
         token: null,
         paired: false,
         queue: [],
-        socket: null
+        socket: null,
+        createdAt: now,
+        lastSeenAt: now,
+        lastPollAt: null,
+        lastEventAt: null,
+        lastHeartbeatAt: null,
+        lastHeartbeat: null,
+        lastQueuedAt: null,
+        droppedEvents: 0
       });
     }
     return this.devices.get(deviceId);
@@ -248,17 +290,37 @@ export class LanHostBridge {
         const recovered = this.ensureDevice(deviceId);
         recovered.token = token;
         recovered.paired = true;
-        this.securityLog.push({ kind: 'token-rehydrated', deviceId });
+        this.pushLog(this.securityLog, { kind: 'token-rehydrated', deviceId });
         return { ok: true };
       }
-      this.securityLog.push({ kind: 'unpaired-device', deviceId });
+      this.pushLog(this.securityLog, { kind: 'unpaired-device', deviceId });
       return { ok: false, reason: 'device-not-paired' };
     }
     if (record.token !== token) {
-      this.securityLog.push({ kind: 'token-rejected', deviceId });
+      this.pushLog(this.securityLog, { kind: 'token-rejected', deviceId });
       return { ok: false, reason: 'invalid-token' };
     }
+    record.lastSeenAt = Date.now();
     return { ok: true };
+  }
+
+  pushLog(log, entry) {
+    log.push(entry);
+    while (log.length > this.limits.maxEventLogEntries) {
+      log.shift();
+    }
+  }
+
+  pruneExpiredDevices() {
+    const now = Date.now();
+    for (const [deviceId, record] of this.devices) {
+      if (record.paired || record.queue.length || record.socket) {
+        continue;
+      }
+      if (now - (record.lastSeenAt ?? record.createdAt) > this.limits.deviceExpireAfterMs) {
+        this.devices.delete(deviceId);
+      }
+    }
   }
 }
 

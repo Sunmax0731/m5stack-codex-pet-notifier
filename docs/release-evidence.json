@@ -49,7 +49,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10; beta long-run, GRAY hardware, signed MSI/MSIX, and public Codex API adapter checks remain outside this beta confirmation",
+  "manualTest": "user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10; GRAY hardware and GRAY IMU are out of release scope; long-run soak, signed MSI/MSIX, and real Codex App Server connection remain formal-release manual checks",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
@@ -60,15 +60,23 @@
       "result": "passed"
     },
     {
+      "command": "cmd.exe /d /s /c npm run codex:app-server:smoke",
+      "result": "passed"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run adapter:review",
+      "result": "passed"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run installer:signing:check",
+      "result": "readiness-json-generated"
+    },
+    {
       "command": "cmd.exe /d /s /c npm run pet:asset -- --pet-dir C:\\Users\\gkkjh\\.codex\\pets\\sakenomeuniere --output firmware\\include\\pet_asset.local.h",
       "result": "passed-9-rows-57-frames"
     },
     {
       "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-core2 -t upload --upload-port COM4",
-      "result": "passed"
-    },
-    {
-      "command": "E:\\DevEnv\\PlatformIO\\venv\\Scripts\\pio.exe run -d firmware -e m5stack-gray",
       "result": "passed"
     },
     {

@@ -11,14 +11,17 @@
 ## 評価基準
 
 - Codex App 側の変更に追従しやすいこと。
-- Core2 / GRAY の両方に同じ event contract を使えること。
+- Core2 release profile と button reference preview に同じ event contract を使えること。
+- 長時間運用で Host Bridge queue / log、heartbeat、polling、Wi-Fi 再接続が肥大化または固着しないこと。
+- Codex App 連携は public interface を優先し、非公開 API scraping を追加しないこと。
+- 署名付き MSI / MSIX へ移行できる packaging 境界を持つこと。
 - 実機なしで runtime gate を通せること。
 - LAN 内でも pairing token による安全境界を置けること。
 - 将来 MQTT や Home Assistant へ拡張できること。
 
 ## 採用設計
 
-採用設計は Host Bridge 方式です。M5Stack firmware は Codex App の詳細を知らず、`pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` などの正規イベントだけを処理します。beta では Codex relay を使い、clipboard / stdin / file / local session JSONL から実際の返答本文を送れるようにします。
+採用設計は Host Bridge 方式です。M5Stack firmware は Codex App の詳細を知らず、`pet.updated`、`notification.created`、`answer.completed`、`prompt.choice_requested` などの正規イベントだけを処理します。beta では Codex relay を使い、clipboard / stdin / file / local session JSONL から実際の返答本文を送れるようにします。公開 API 連携は Codex App Server の JSON-RPC adapter を準備し、実 App Server 接続前でも message contract と transport safety gate を smoke で検証します。
 
 ## 画面デザイン
 
@@ -41,7 +44,7 @@
 - pet tap は反応イベントであり返信送信とは分ける。
 - single tap は軽い反応、double tap は直近回答の再表示、long press は Codex 側への三択 request、swipe は回答ページ移動と interaction log を兼ねる。
 - long press / button long press から生成される三択 request は Host Bridge の side effect とし、firmware は Codex の作業内容を知らない。
-- GRAY では IMU 閾値とボタン長押しの両方を設定候補にし、誤検知を避ける。
+- GRAY 実機と GRAY IMU は対象外。button reference preview は長押し相当の操作確認だけに使い、firmware target へ戻さない。
 - 通知と選択肢が同時に来た場合、Choice を優先表示し通知は未読として残す。
 
 ## Dashboard GUI
@@ -51,7 +54,7 @@
 - Answer / Decision / Notification は環境構築コマンド modal の `デバッグ送信` tab のcommandとして扱い、重複した直接送信フォームは持たない。Pet と Display は preview の操作領域へ統合する。
 - Dashboard は side menu でプレビュー、Codex 回答、ログへ移動できる。状態確認 section は sidebar 内に常時表示し、状態 navigation button は持たない。paired / outbound / inbound / security を常時確認できる。独立したデバッグ section は持たない。各 section は View / Hide で折りたためる。
 - M5Stack 表示プレビューは 320x240 の simulated display として、Host Bridge が配信する現在の local hatch-pet spritesheet、Answer / Decision / Notification の本文、footer button label の表示密度、render FPS、motion step、RGBA、beep 設定を送信前に確認できるようにする。プレビュー section は1ペイン全幅とし、画面プレビュー、readout、asset、表示設定を同じ面で確認できるようにする。
-- Preview は Core2 / GRAY を切り替えられる。どちらも 320x240 LCD として扱い、Core2 は touch 前提、GRAY は button 前提のreadoutを出す。
+- Preview は Core2 / button reference を切り替えられる。どちらも 320x240 LCD として扱い、Core2 は touch 前提、button reference は IMU なしのボタン前提 readout を出す。
 - M5Stack 表示プレビューは1ペイン全幅、Recent Codex Answer と Event Log は左右2カラムで並べる。
 - 主要 field は `?` help icon のクリックで hint を表示し、設定項目の意味を画面内で確認できるようにする。
 - Decision 返信ワークフローは環境構築コマンド modal に統合し、Decision 送信、M5Stack A/B/C 押下、inbound reply 確認の順で見えるようにする。
@@ -63,12 +66,26 @@
 - Codex App の非公開内部 API には接続しない。
 - `%USERPROFILE%\.codex\sessions` の JSONL を opt-in で監視し、最新 user / assistant の組を `answer.completed` として送る。
 - Codex Hooks が使える場合は、hook command から `codex:hook` を起動して one-shot 送信する。
+- Codex App Server が使える場合は、`codex app-server` の public interface を adapter 境界にし、`initialize`、`thread/start`、`turn/start` の message builder から実接続へ進める。
+- WebSocket transport を使う場合は loopback に限定するか、capability token / signed bearer token を要求する。
 - `--phase any` は進行中の commentary も送り、`--phase final` は完了応答だけに絞る。
 - release evidence と hook state file には session 本文を保存しない。
+
+## Long-Run Strategy
+
+- Host Bridge は device queue と event/security log に上限を持ち、queue overflow は `droppedEvents` として heartbeat diagnostics に出す。
+- Paired device は `lastSeenSec`、`lastPollSec`、`lastHeartbeatSec`、`stale` を Dashboard / debug API に出し、長時間放置時の状態を判断できるようにする。
+- firmware は HTTP timeout、Wi-Fi reconnect backoff、poll interval backoff、連続 poll 失敗時の再 pairing を持ち、通信不良時に busy loop へ落ちない。
+
+## Installer Signing Strategy
+
+- 既存の user-local installer ZIP は beta 配布用に維持する。
+- MSI は WiX v4 template、MSIX は manifest template を `installer/` 配下に保持し、実署名証明書は環境変数で参照する。
+- readiness check は `signtool.exe`、`makeappx.exe`、`makepri.exe`、`wix.exe` と署名用 env を確認し、証明書や password を repository に保存しない。
 
 ## Pet Asset Strategy
 
 - `%USERPROFILE%\.codex\pets` の hatch-pet package は local input とし、firmware には generated header として取り込む。Dashboard は `/pet/packages` で同配下の package を列挙し、`petDir` override で任意の local package を preview する。
 - `firmware/include/pet_asset.local.h` は個人素材を含む可能性があるため commit しない。
-- scale-specific frame は local header 内に生成する。標準 9 行 atlas を row metadata 付きで取り込み、base frame は各 row の全 frame、Core2 用の高解像度 set は idle 全 frame と各 row の代表 pose を保持する。release asset には含めず、Core2 build 時にのみ使用する。GRAY は flash 制約のため local header を取り込まず vector fallback と `huge_app.csv` partition で build gate を通す。
+- scale-specific frame は local header 内に生成する。標準 9 行 atlas を row metadata 付きで取り込み、base frame は各 row の全 frame、Core2 用の高解像度 set は idle 全 frame と各 row の代表 pose を保持する。release asset には含めず、Core2 build 時にのみ使用する。
 - header がない環境でも build が通るように firmware は vector fallback を持つ。

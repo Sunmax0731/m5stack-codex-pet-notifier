@@ -80,6 +80,7 @@ try {
   assert.match(index, /displaySyncCard/);
   assert.match(index, /実機反映/);
   assert.match(index, /previewDevice/);
+  assert.match(index, /Button reference/);
   assert.match(index, /petPackagePath/);
   assert.match(index, /preview-settings-dock/);
   assert.match(index, /preview-asset-column/);
@@ -131,6 +132,7 @@ try {
   assert.match(app, /heartbeats\[0\]/);
   assert.match(app, /display: displaySettingsPayload/);
   assert.match(app, /previewDevice/);
+  assert.match(app, /Button reference \/ 320x240 \/ no IMU/);
   assert.match(app, /\/debug\/commands\/run/);
   assert.match(app, /codexDecision/);
   assert.match(app, /bridgeRestartBackground/);

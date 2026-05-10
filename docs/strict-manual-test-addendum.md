@@ -8,8 +8,11 @@
 - Mock M5Stack simulator
 - LAN Host Bridge smoke
 - Codex relay smoke
+- Codex app-server adapter smoke
+- Adapter review
 - sample telemetry validation
-- Core2 / GRAY PlatformIO build
+- Core2 PlatformIO build
+- Signing readiness check
 - Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll、A button reply
 - docs ZIP generation
 - QCDS grade validation
@@ -26,11 +29,14 @@
 
 ## Codexでは未実施
 
-- GRAY 実機への firmware 書き込み。
-- 長時間 Wi-Fi 再接続。
-- GRAY button / IMU の物理操作。
-- 署名付き MSI / MSIX。
-- 実 Codex App 公開 API 連携。
+- 長時間 soak と Wi-Fi 再接続の実運用証跡。
+- 実署名付き MSI / MSIX。
+- 実 Codex App Server 接続。
+
+## 対象外
+
+- GRAY 実機。
+- GRAY IMU。
 
 ## Release判定
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap">
+  <Identity
+    Name="Sunmax0731.M5StackCodexPetNotifier"
+    Publisher="CN=Sunmax0731"
+    Version="0.2.0.0" />
+  <Properties>
+    <DisplayName>M5Stack Codex Pet Notifier</DisplayName>
+    <PublisherDisplayName>Sunmax0731</PublisherDisplayName>
+    <Description>Local Host Bridge and dashboard for the M5Stack Codex pet notifier.</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Applications>
+    <Application Id="App" Executable="start-dashboard.bat" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="M5Stack Codex Pet Notifier"
+        Description="Start the local M5Stack Codex Pet dashboard."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+    </Application>
+  </Applications>
+</Package>

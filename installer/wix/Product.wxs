@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="M5Stack Codex Pet Notifier"
+    Manufacturer="Sunmax0731"
+    Version="0.2.0.0"
+    UpgradeCode="7d2eeb2d-6b04-4fe2-93b6-8e9bde5c4f27"
+    Scope="perUser">
+    <SummaryInformation Description="M5Stack Codex Pet Notifier per-user MSI package" />
+    <MediaTemplate EmbedCab="yes" />
+    <Feature Id="MainFeature" Title="M5Stack Codex Pet Notifier" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="M5StackCodexPetNotifier" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <!-- Harvest staged files with WiX heat or an equivalent controlled file list before producing a signed MSI. -->
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -4,5 +4,5 @@
   "createdAt": "2026-05-09T00:00:04+09:00",
   "threadId": "thread-local-sample",
   "summary": "実装方針を整理しました。",
-  "body": "Host Bridge方式でCodex App側の変更を吸収し、M5Stack firmwareは安定したLANイベントだけを処理します。Core2ではタッチとスワイプを使い、GRAYではA/B/CボタンとIMU tap代替で同じ操作を実現します。長文回答は固定本文領域で分割表示し、現在位置を保持します。"
+  "body": "Host Bridge方式でCodex App側の変更を吸収し、M5Stack firmwareは安定したLANイベントだけを処理します。Core2ではタッチ、スワイプ、下部ボタンを使って同じ操作を実現します。GRAY実機とGRAY IMUは今回のrelease targetに含めません。長文回答は固定本文領域で分割表示し、現在位置を保持します。"
 }

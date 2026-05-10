@@ -1,14 +1,14 @@
 # m5stack-codex-pet-notifier
 
-M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使うための beta 版プロダクトです。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack firmware は安定した JSON event contract だけを処理します。
+M5Stack Core2 を Codex App の卓上ペット通知端末として使うための beta 版プロダクトです。PC 側の Host Bridge が Codex の状態を LAN 内イベントへ変換し、M5Stack firmware は安定した JSON event contract だけを処理します。GRAY 実機と GRAY IMU は release target から外し、Dashboard の button reference preview だけを互換確認用に残します。
 
 ## Status
 
 - Version: `0.2.0-beta.1`
 - Domain: IoT
 - Idea No: 18
-- Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / Codex relay / device adapter / security boundary
-- Firmware: Core2 / GRAY PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer 表示、日本語フォント表示まで確認対象
+- Runtime gate: simulator / mock device / sample telemetry / host adapter / LAN Host Bridge / long-run diagnostics / Codex relay / Codex app-server adapter smoke / device adapter / installer signing readiness / security boundary
+- Firmware: Core2 PlatformIO build target、Core2 upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer 表示、日本語フォント表示まで確認対象
 - Release channel: GitHub prerelease
 
 ## 搭載機能
@@ -24,7 +24,7 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - `firmware/src/main.cpp` で M5Unified、Wi-Fi、HTTP polling、ArduinoJson による実機 loop を実装する。
 - `firmware/src/main.cpp` で M5GFX の日本語フォントと UTF-8 境界の折り返しを使い、日本語の Codex 返答本文を Core2 へ表示する。
 - `tools/generate-pet-firmware-asset.py` で `%USERPROFILE%\.codex\pets` の hatch-pet package を firmware 用 RGB565 local asset に変換し、標準 9 行 atlas の表情 / 姿勢 row と Core2 向け scale `1..8` の高解像度 frame set を生成する。
-- `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。Core2 は mood / state / touch gesture に応じて `idle`、`running`、`waiting`、`waving`、`jumping`、`failed`、`review` などのイラスト row を切り替え、scale ごとの高解像度 frame を選ぶ。GRAY は flash 余裕を優先して vector fallback と large app partition で build gate を通す。
+- `firmware/src/main.cpp` で hatch-pet asset を優先表示し、未生成時は vector fallback を描画する。Core2 は mood / state / touch gesture に応じて `idle`、`running`、`waiting`、`waving`、`jumping`、`failed`、`review` などのイラスト row を切り替え、scale ごとの高解像度 frame を選ぶ。
 - pet avatar は `M5Canvas` の off-screen Sprite に描画してから pet box だけを `pushSprite()` し、animation tick では画面全体や上部 surface の再転送を避けてちらつきを抑える。
 - M5Stack 画面上部の `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストは描画せず、pet surface を優先表示する。
 - ペット表示面積は Dashboard または `codex:display` から `1..32` の32段階で動的に変更でき、`8` は pet を画面全体に近い面積、`32` は実験用の超拡大表示として扱う。
@@ -32,10 +32,14 @@ M5Stack Core2 / GRAY を Codex App の卓上ペット通知端末として使う
 - pet render FPS は既定 `12fps`、Dashboard または `codex:display` から `4..20fps` の範囲で動的に変更する。キャラの pose / frame 切替は `motionStepMs` で分離し、小刻みな震えを抑える。
 - `display.settings_updated` は画面全体の背景、pet 背景、文字色、文字背景、文字枠、pet X/Y offset を受け取り、Codex answer 到着時の beep 通知も切り替えられる。firmware は object / hex string / channel array の RGBA 入力を扱い、local hatch-pet asset の透明ピクセルから設定背景が見えるように描画する。
 - `pet.updated.pet.mood` で `idle / listening / thinking / happy / surprised / confused / sleepy / worried / alert / proud` の表情を指定できる。local hatch-pet asset では図形 marker を重ねず、素材 atlas の表情 / 姿勢 row で再現する。Core2 の tap / double tap / long press / swipe は `device.pet_interacted` として Host Bridge へ返り、long press は Codex 側の三択 request を自動 queue する。
-- Dashboard は side menu、サイドバー内の状態確認 section、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / GRAY preview の見え方を確認できる。色と透明度は項目ごとの1つの RGBA picker で操作し、現在色の swatch と `#hex / alpha` を同時に表示する。表示パラメータは `変更を自動送信` で実機へデバウンス送信できる。
+- Dashboard は side menu、サイドバー内の状態確認 section、折りたたみ可能な section、クリック式 `?` help、OS追従を既定にした light / dark theme、日本語 / 英語 label 切替、全幅のM5Stack 表示プレビュー、環境構築コマンド modal、Bridge runtime status を持ち、送信前に現在の hatch-pet キャラ、pet 面積、pet X/Y offset、文字サイズ、motion step、RGBA、text border、Core2 / button reference preview の見え方を確認できる。色と透明度は項目ごとの1つの RGBA picker で操作し、現在色の swatch と `#hex / alpha` を同時に表示する。表示パラメータは `変更を自動送信` で実機へデバウンス送信できる。
 - Dashboard は `%USERPROFILE%\.codex\pets` 配下の local hatch-pet package を一覧選択でき、必要に応じて package path override で任意の local asset を確認できる。
-- Core2 touch / swipe / button と GRAY button / IMU fallback を device profile と firmware 条件分岐で扱う。
-- `src/simulator/mockDevice.mjs` で Core2 / GRAY profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
+- Core2 touch / swipe / button を release profile として扱う。`gray` profile は IMU を持たない button reference preview と legacy scenario 互換用に限定し、`releaseTarget=false` として扱う。
+- `src/simulator/mockDevice.mjs` で Core2 と button reference profile の画面遷移、長文回答のページング、返信、pet interaction を再現する。
+- Host Bridge は長時間運用向けに device queue / event log の上限、stale device diagnostics、heartbeat age、dropped event count を公開する。
+- firmware は HTTP timeout、Wi-Fi reconnect backoff、poll backoff、連続失敗時の pairing 復帰を持ち、固定 delay loop で固着しない。
+- `installer/wix/` と `installer/msix/` に署名付き MSI / MSIX 化のテンプレートを配置し、`npm run installer:signing:check` で Windows SDK / WiX / 署名用 env を確認する。
+- `src/codex-adapter/appServerAdapter.mjs` は Codex App Server の public interface を使うための JSON-RPC message builder と安全な transport gate を提供する。非公開 API scraping は adapter review で禁止する。
 - `samples/representative-suite.json` で happy path、必須項目欠落、warning、mixed batch を代表シナリオとして検証する。
 
 ## Commands
@@ -57,8 +61,12 @@ cmd.exe /d /s /c npm run codex:display -- --pet-scale 8 --ui-text-scale 2 --body
 cmd.exe /d /s /c npm run codex:clipboard -- --summary "Codex clipboard answer"
 cmd.exe /d /s /c npm run codex:sessions -- --phase any
 cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-id m5stack-sample-001
+cmd.exe /d /s /c npm run codex:app-server:smoke
+cmd.exe /d /s /c npm run adapter:review
+cmd.exe /d /s /c npm run installer:signing:check
 cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h
 cmd.exe /d /s /c npm run firmware:upload:core2
+cmd.exe /d /s /c npm run installer:package
 cmd.exe /d /s /c npm run choice:package
 ```
 
@@ -83,7 +91,6 @@ cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira -
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier\firmware
 E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-core2
-E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -e m5stack-gray
 cd ..
 cmd.exe /d /s /c npm run firmware:upload:core2
 ```
@@ -115,6 +122,10 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 - [host-bridge-manual-check.md](docs/host-bridge-manual-check.md)
 - [codex-relay-manual-check.md](docs/codex-relay-manual-check.md)
 - [m5stack-choice-workflow.md](docs/m5stack-choice-workflow.md)
+- [long-run-operations.md](docs/long-run-operations.md)
+- [signed-installer-plan.md](docs/signed-installer-plan.md)
+- [codex-app-server-api-integration.md](docs/codex-app-server-api-integration.md)
+- [adapter-review.md](docs/adapter-review.md)
 - [installation-guide.md](docs/installation-guide.md)
 - [user-guide.md](docs/user-guide.md)
 - [security-privacy-checklist.md](docs/security-privacy-checklist.md)
@@ -125,4 +136,4 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 
 ## Beta Boundary
 
-この release は simulator、mock device、LAN Host Bridge smoke、Codex relay smoke、Dashboard smoke、Core2 firmware build を検証対象にした beta prerelease です。Core2 実機の mood / gesture / long press choice workflow、GRAY 実機、長時間運用、署名付き installer、実 Codex App 内部 API 連携は手動確認対象です。
+この release は simulator、mock device、LAN Host Bridge smoke、Codex relay smoke、Codex app-server adapter smoke、adapter review、Dashboard smoke、Core2 firmware build、署名準備チェックを検証対象にした beta prerelease です。GRAY 実機と GRAY IMU は対象外です。長時間運用、署名付き MSI / MSIX、実 Codex App 公開 API 連携は実装準備と smoke / readiness まで進めていますが、実運用・実署名・実 App Server 接続の確認は formal release 前の手動確認対象です。

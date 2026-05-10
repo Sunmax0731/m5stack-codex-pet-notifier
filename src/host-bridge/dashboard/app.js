@@ -1417,7 +1417,7 @@ function renderM5Preview() {
   elements.m5Preview.style.setProperty('--overlay-bg', rgbaOverBlackCss(textBackground));
   elements.m5Preview.style.setProperty('--overlay-border', rgbaCss(textBorder));
   elements.m5Preview.style.setProperty('--overlay-border-width', elements.textBorderEnabled.checked ? '1px' : '0px');
-  elements.previewDeviceReadout.textContent = device === 'gray' ? 'GRAY / 320x240 / buttons' : 'Core2 / 320x240 / touch';
+  elements.previewDeviceReadout.textContent = device === 'gray' ? 'Button reference / 320x240 / no IMU' : 'Core2 / 320x240 / touch';
   elements.previewPetReadout.textContent = `${petScale}/32`;
   elements.previewUiReadout.textContent = `${uiTextScale}/8`;
   elements.previewBodyReadout.textContent = `${bodyTextScale}/8`;

@@ -1,6 +1,6 @@
 # 手動テスト
 
-Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Dashboard smoke の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機、GRAY IMU、長時間運用、Codex App 非公開内部 API 連携は今回対象外です。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Codex app-server adapter smoke / adapter review / Dashboard smoke / signing readiness の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続は formal release 前の手動確認対象です。
 
 ## 共通前提
 
@@ -13,7 +13,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 ## 2026-05-10 手動確認結果
 
-機能ブラッシュアップ時に、ユーザーが Core2 実機、Dashboard、Codex relay、Decision、Display 設定、hatch-pet row illustration、ちらつき抑制、色 / 透明度、位置調整、起動導線を動作確認し、問題なく動作することを確認済みです。以下の Core2 / Dashboard 項目の結果は、このユーザー報告を反映します。GRAY 実機、長時間運用、署名付き MSI / MSIX は beta 残リスクとして別管理します。
+機能ブラッシュアップ時に、ユーザーが Core2 実機、Dashboard、Codex relay、Decision、Display 設定、hatch-pet row illustration、ちらつき抑制、色 / 透明度、位置調整、起動導線を動作確認し、問題なく動作することを確認済みです。以下の Core2 / Dashboard 項目の結果は、このユーザー報告を反映します。GRAY 実機と GRAY IMU は対象外として扱い、長時間 soak、署名付き MSI / MSIX、実 Codex App Server 接続は beta 残リスクとして別管理します。
 
 ## Core2
 
@@ -39,7 +39,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | C2-18 | Dashboard から `Choice` を送り、Core2 の A/B/C を押す | Dashboard inbound に `device.reply_selected` と choiceId / input が表示される | 確認済み（ユーザー報告） |
 | C2-19 | Dashboard の `最近の Codex 回答` から `M5Stackへ送信` を押す | local Codex session の最新 user / assistant やり取りが Core2 の `Answer` 画面へ表示される | 確認済み（ユーザー報告） |
 | C2-20 | Dashboard の `M5Stack 表示プレビュー` で pet display area を `8/32`、`16/32`、`32/32`、UI text size と body text size を任意、render FPS を `12fps`、motion step を `280ms`、pet background / text color / text background を任意の RGBA に変更して送る | Core2 は `Codex Pet`、`state`、`LAN`、`U:0` などの固定ヘッダーテキストを表示せず、pet が画面全体付近から超拡大まで変化する。local hatch-pet asset の透明ピクセルは設定した pet background を見せ、文字背景と文字色もRGBA合成後の色に変わる | 確認済み（ユーザー報告） |
-| C2-21 | Dashboard の `M5Stack 表示プレビュー` で Core2 / GRAY、Pet / Answer / Decision / Notify を切り替え、pet / display slider、RGBA、local hatch-pet asset を変更する | 送信前の simulated display が現在の hatch-pet キャラ、pet 面積、body text、footer text size、render FPS、motion step、色設定を即時反映する。GRAY 切替では button 前提のreadoutになる | 確認済み（dashboard:smoke + ユーザー報告） |
+| C2-21 | Dashboard の `M5Stack 表示プレビュー` で Core2 / button reference、Pet / Answer / Decision / Notify を切り替え、pet / display slider、RGBA、local hatch-pet asset を変更する | 送信前の simulated display が現在の hatch-pet キャラ、pet 面積、body text、footer text size、render FPS、motion step、色設定を即時反映する。button reference 切替では IMU なしの button 前提 readout になる | 確認済み（dashboard:smoke + ユーザー報告） |
 | C2-22 | `pet:asset` 生成後の firmware で Display slider を `1/32`、`8/32`、`16/32`、`32/32` に変えて pet を見る | Core2 の pet は scale ごとの高解像度 frame に切り替わり、`32/32` では画面外にはみ出す超拡大表示になる | 確認済み（ユーザー報告） |
 | C2-23 | Dashboard または `codex:display` で render FPS を `4`、`12`、`20`、motion step を `120`、`280`、`600` の順に送る | render FPS は更新上限、motion step はキャラ frame / bounce の切替頻度として効く。`20fps / 280ms` では小刻みに震えず、Answer / Decision / footer text のちらつきが増えない | 確認済み（ユーザー報告） |
 | C2-24 | Answer または Choice 画面を表示したまま pet animation を 20 秒以上見る | pet avatar はアニメーションするが、画面全体の黒塗り、本文の明滅、footer の明滅は発生しない。ちらつきが見える場合は firmware version と pet box only Sprite 対応 build かを確認する | 確認済み（ユーザー報告） |
@@ -56,7 +56,16 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 ## GRAY 今回対象外
 
-今回の手動テスト対象は Core2 です。GRAY firmware build は自動確認しますが、GRAY 実機 flash / button / IMU は今回対象外です。
+今回の手動テスト対象は Core2 です。GRAY firmware build、GRAY 実機 flash / button / IMU は対象外です。Dashboard の `Button reference` は互換 preview であり、実機 target ではありません。
+
+## 長時間運用 / 署名 / 公開 API 手動確認
+
+| No | 手順 | 期待結果 | 結果 |
+| --- | --- | --- | --- |
+| LR-01 | Host Bridge と Core2 を 8 時間以上稼働し、5分ごとに heartbeat と sample event を流す | `/debug/snapshot` または Dashboard で `stale=false`、`lastHeartbeatSec` が更新され、`droppedEvents` が想定外に増えない | 未実施 |
+| LR-02 | Wi-Fi AP を一時停止し、復帰後に poll を再開する | firmware が backoff 後に再接続し、連続 poll 失敗時は pairing 復帰できる | 未実施 |
+| SIGN-01 | 実署名証明書を用意し、`WINDOWS_SIGNING_CERT_THUMBPRINT` または `WINDOWS_SIGNING_PFX_PATH` を設定して MSI / MSIX を作成する | `signtool verify` が成功し、証明書や password が repo に残らない | 未実施 |
+| API-01 | Codex App Server を起動し、adapter から `initialize`、`thread/start`、`turn/start` を実行する | public interface 経由で thread / turn が作成され、非公開 API scraping を使わない | 未実施 |
 
 ## Dashboard GUI
 
@@ -78,7 +87,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | GUI-13 | 主要 input / slider 横の `?` icon をクリックする | 項目の意味を説明する help popover が表示され、外側 click または Esc で閉じる | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-14 | sidebar の `環境構築コマンド` を押す | `環境構築`、`デバッグ送信` のタブ付き command modal が開き、Bridge background 起動 / 再起動、pet asset、Core2 upload、Codex Answer / Decision / Notification / Display / session、sample replay を任意パラメータで実行できる。重複していた `保守` tab と直接送信フォームは表示されない | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-15 | `local hatch-pet asset` を別packageへ切り替える、または `asset path override` に `%USERPROFILE%\.codex\pets\Mira` を入れる | preview の `current pet` と simulated display が選択した package の spritesheet に切り替わる | `dashboard:smoke` 済み。ユーザー目視 |
-| GUI-16 | `M5Stack 表示プレビュー` の `device` を Core2 / GRAY で切り替える | preview readout が `Core2 / 320x240 / touch` と `GRAY / 320x240 / buttons` で切り替わる。`M5Stack 表示プレビュー` は1ペイン全幅で表示され、`最近の Codex 回答` と `イベントログ` は左右ペインのまま表示される | `dashboard:smoke` 済み。ユーザー目視 |
+| GUI-16 | `M5Stack 表示プレビュー` の `device` を Core2 / Button reference で切り替える | preview readout が `Core2 / 320x240 / touch` と `Button reference / 320x240 / no IMU` で切り替わる。`M5Stack 表示プレビュー` は1ペイン全幅で表示され、`最近の Codex 回答` と `イベントログ` は左右ペインのまま表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-17 | `cmd.exe /d /s /c npm run bridge:start:bg -- --host=0.0.0.0 --port=8080` で起動し、Dashboard sidebar を見る | PowerShell 画面を残さずHost Bridgeが動き、sidebarに `Bridge running / background`、pid、uptimeが表示される | `dashboard:smoke` 済み。ユーザー目視 |
 | GUI-18 | `start-dashboard.bat` をダブルクリックする | background Bridge が起動し、既定ブラウザで `http://127.0.0.1:8080/` が開く。失敗時は batch window にエラーが表示される | 確認済み（ユーザー報告） |
 | GUI-19 | Dashboard preview の Pet 画面で footer を見る | `A poll` が左、`B pet` が中央、`C idle` が右に表示され、実機 footer 位置と一致する | `dashboard:smoke` 済み。ユーザー目視 |
@@ -160,6 +169,9 @@ cmd.exe /d /s /c npm run firmware:upload:core2
 - File watch evidence: `codex:watch --file dist\codex-answer.txt --once` で `Codex file watch answer` を送信し、Core2 の `Answer page 1/1` に summary、本文、`A up / B idle / C down` footer が表示されたことをユーザー提供画像で確認済み。
 - Codex session evidence: `codex:sessions` は `%USERPROFILE%\.codex\sessions` の最新 JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として送信する。自動検証は `scripts/codex-session-smoke.mjs` で実施する。
 - Codex hook evidence: `codex:hook` は Codex Hooks の command hook から呼べる one-shot relay で、本文を含まない state file により重複送信を抑止する。
+- Codex App Server evidence: `codex:app-server:smoke` は public JSON-RPC adapter の message builder と transport gate を確認する。実 App Server 接続は `API-01` の手動確認対象。
+- Signing evidence: `installer:signing:check` は Windows SDK / WiX / 署名用 env の準備状況を `dist/windows-signing-readiness.json` に出力する。実署名は `SIGN-01` の手動確認対象。
+- Long-run evidence: Host Bridge は queue/log 上限、stale diagnostics、heartbeat age、dropped event count を出し、firmware は Wi-Fi / poll backoff を持つ。8時間以上の soak は `LR-01` の手動確認対象。
 - Dashboard evidence: `dashboard:smoke`、desktop / mobile browser screenshot、Core2 firmware upload を実施済み。GUI と実機連携の最終目視は `docs/gui-tools-manual-check.md` に従って実施する。
 - Hatch-pet asset evidence: `%USERPROFILE%\.codex\pets\Mira` から scale-specific frame 付きの `firmware/include/pet_asset.local.h` を生成し、Core2 firmware に組み込む。生成済み header は ignored local file として扱う。
 - PC-side LAN reachability: M5Stack の local IP へ `Test-Connection` が成功。

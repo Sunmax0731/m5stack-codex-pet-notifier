@@ -1,0 +1,92 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.2.0-beta.1",
+  "status": "passed",
+  "ok": true,
+  "publicApiWorkstream": {
+    "ok": true,
+    "adapter": "codex-app-server",
+    "command": "codex",
+    "args": [
+      "app-server"
+    ],
+    "transport": {
+      "ok": true,
+      "transport": "stdio",
+      "authRequired": false
+    },
+    "experimentalApi": false,
+    "publicInterfaceOnly": true,
+    "privateApiScraping": false,
+    "readyForRuntimeProbe": true
+  },
+  "implementedAdapters": [
+    "local-session-jsonl",
+    "codex-hook-relay"
+  ],
+  "preparedAdapters": [
+    "codex-app-server"
+  ],
+  "findings": [
+    "Keep local session JSONL and hook relay as supported fallback adapters.",
+    "Use codex app-server as the first public Codex App integration target.",
+    "Do not add private Codex App scraping paths.",
+    "Require loopback or authenticated WebSocket if app-server WebSocket mode is used."
+  ],
+  "adapters": [
+    {
+      "id": "local-session-jsonl",
+      "label": "Local Codex session JSONL",
+      "status": "implemented",
+      "publicInterfaceOnly": false,
+      "privateApiScraping": false,
+      "source": "%USERPROFILE%\\.codex\\sessions",
+      "bodyPersistence": "session body is read locally and not written to release evidence"
+    },
+    {
+      "id": "codex-hook-relay",
+      "label": "Codex Hooks one-shot relay",
+      "status": "implemented",
+      "publicInterfaceOnly": true,
+      "privateApiScraping": false,
+      "source": "Codex hook command execution",
+      "bodyPersistence": "hook state stores only a body signature"
+    },
+    {
+      "id": "codex-app-server",
+      "label": "Codex App Server public interface",
+      "transport": "stdio-jsonrpc",
+      "defaultCommand": "codex",
+      "defaultArgs": [
+        "app-server"
+      ],
+      "experimentalApi": false,
+      "publicInterfaceOnly": true,
+      "privateApiScraping": false,
+      "messageBodiesPersistedInEvidence": false,
+      "notes": [
+        "Uses the public codex app-server protocol surface instead of scraping private Codex App data.",
+        "Keeps experimentalApi disabled until a concrete feature requires it and is documented.",
+        "WebSocket transport is not used by default; if enabled, it must stay loopback or require auth."
+      ],
+      "status": "prepared",
+      "readiness": {
+        "ok": true,
+        "adapter": "codex-app-server",
+        "command": "codex",
+        "args": [
+          "app-server"
+        ],
+        "transport": {
+          "ok": true,
+          "transport": "stdio",
+          "authRequired": false
+        },
+        "experimentalApi": false,
+        "publicInterfaceOnly": true,
+        "privateApiScraping": false,
+        "readyForRuntimeProbe": true
+      }
+    }
+  ]
+}

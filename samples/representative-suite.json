@@ -28,7 +28,7 @@
     },
     {
       "id": "missing-required",
-      "profile": "gray",
+      "profile": "core2",
       "expectInvalid": true,
       "events": [
         {
@@ -52,7 +52,7 @@
     },
     {
       "id": "warning",
-      "profile": "gray",
+      "profile": "core2",
       "events": [
         {
           "event": {
@@ -68,7 +68,7 @@
           }
         }
       ],
-      "actions": ["pet-interact"],
+      "actions": ["pet-long-press"],
       "expected": {
         "status": "passed",
         "validEvents": 1,

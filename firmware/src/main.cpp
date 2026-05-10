@@ -10,7 +10,7 @@
 #include "wifi_config.example.h"
 #endif
 
-#if !defined(DEVICE_PROFILE_GRAY) && __has_include("pet_asset.local.h")
+#if __has_include("pet_asset.local.h")
 #include "pet_asset.local.h"
 #define HAS_LOCAL_PET_ASSET 1
 #else
@@ -20,14 +20,9 @@
 struct DeviceProfile {
   const char* name;
   bool touch;
-  bool imuTap;
 };
 
-#if defined(DEVICE_PROFILE_GRAY)
-DeviceProfile profile = {"gray", false, true};
-#else
-DeviceProfile profile = {"core2", true, false};
-#endif
+DeviceProfile profile = {"core2", true};
 
 enum ScreenState {
   SCREEN_PAIRING,
@@ -53,8 +48,13 @@ enum PetAssetRow {
 namespace {
 constexpr uint32_t WIFI_TIMEOUT_MS = 20000;
 constexpr uint32_t POLL_INTERVAL_MS = 1200;
+constexpr uint32_t MAX_POLL_INTERVAL_MS = 15000;
 constexpr uint32_t HEARTBEAT_INTERVAL_MS = 10000;
 constexpr uint32_t STATUS_INTERVAL_MS = 5000;
+constexpr uint32_t HTTP_TIMEOUT_MS = 3500;
+constexpr uint32_t WIFI_RETRY_MIN_MS = 5000;
+constexpr uint32_t WIFI_RETRY_MAX_MS = 60000;
+constexpr uint8_t MAX_RECOVERABLE_POLL_FAILURES = 10;
 constexpr int DEFAULT_PET_ANIMATION_FPS = 12;
 constexpr int MIN_PET_ANIMATION_FPS = 4;
 constexpr int MAX_PET_ANIMATION_FPS = 20;
@@ -96,6 +96,10 @@ uint8_t petFrame = 0;
 uint32_t lastPoll = 0;
 uint32_t lastHeartbeat = 0;
 uint32_t lastStatus = 0;
+uint32_t nextWifiRetryAt = 0;
+uint32_t wifiRetryIntervalMs = WIFI_RETRY_MIN_MS;
+uint32_t currentPollIntervalMs = POLL_INTERVAL_MS;
+uint8_t consecutivePollFailures = 0;
 uint32_t lastTouchEvent = 0;
 uint32_t lastPetFrame = 0;
 uint32_t lastPetMotionStep = 0;
@@ -607,9 +611,9 @@ int petAssetBaseFrameIndex() {
 }
 
 int petAssetScaleFrameCount(int rowIndex) {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES) && defined(PET_ASSET_HAS_ANIMATION_ROWS)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES) && defined(PET_ASSET_HAS_ANIMATION_ROWS)
   return max(1, static_cast<int>(pgm_read_byte(&PET_ASSET_SCALE_FRAME_COUNTS[clampPetAssetRow(rowIndex)])));
-#elif HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#elif HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   (void)rowIndex;
   return max(1, PET_ASSET_FRAME_COUNT);
 #else
@@ -619,7 +623,7 @@ int petAssetScaleFrameCount(int rowIndex) {
 }
 
 bool hasScaleSpecificPetAsset() {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   return PET_ASSET_HAS_SCALE_FRAMES;
 #else
   return false;
@@ -627,7 +631,7 @@ bool hasScaleSpecificPetAsset() {
 }
 
 int petScaleLevelIndex() {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   return max(0, min(PET_ASSET_SCALE_LEVELS - 1, petDisplayScale - 1));
 #else
   return 0;
@@ -635,7 +639,7 @@ int petScaleLevelIndex() {
 }
 
 int petScaleSpecificMultiplier() {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   return max(1, (petDisplayScale + PET_ASSET_SCALE_LEVELS - 1) / PET_ASSET_SCALE_LEVELS);
 #else
   return 1;
@@ -643,7 +647,7 @@ int petScaleSpecificMultiplier() {
 }
 
 int petAssetWidth() {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   if (hasScaleSpecificPetAsset()) {
     return pgm_read_word(&PET_ASSET_SCALE_WIDTHS[petScaleLevelIndex()]);
   }
@@ -652,7 +656,7 @@ int petAssetWidth() {
 }
 
 int petAssetHeight() {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   if (hasScaleSpecificPetAsset()) {
     return pgm_read_word(&PET_ASSET_SCALE_HEIGHTS[petScaleLevelIndex()]);
   }
@@ -966,7 +970,7 @@ uint16_t petAccentColor() {
 
 template <typename Target>
 void drawScaleSpecificLocalPetAssetTo(Target& target, int x, int y, int scale) {
-#if HAS_LOCAL_PET_ASSET && !defined(DEVICE_PROFILE_GRAY) && defined(PET_ASSET_HAS_SCALE_FRAMES)
+#if HAS_LOCAL_PET_ASSET && defined(PET_ASSET_HAS_SCALE_FRAMES)
   const int levelIndex = petScaleLevelIndex();
   const int width = pgm_read_word(&PET_ASSET_SCALE_WIDTHS[levelIndex]);
   const int height = pgm_read_word(&PET_ASSET_SCALE_HEIGHTS[levelIndex]);
@@ -1404,6 +1408,7 @@ bool httpPostJson(const String& path, const String& payload, String& response) {
     lastError = "http begin failed";
     return false;
   }
+  http.setTimeout(HTTP_TIMEOUT_MS);
   http.addHeader("Content-Type", "application/json");
   const int code = http.POST(payload);
   response = http.getString();
@@ -1423,6 +1428,7 @@ bool httpGetJson(const String& path, String& response) {
     lastError = "http begin failed";
     return false;
   }
+  http.setTimeout(HTTP_TIMEOUT_MS);
   const int code = http.GET();
   response = http.getString();
   http.end();
@@ -1453,6 +1459,8 @@ bool pairDevice() {
     return false;
   }
   authToken = String(reply["token"] | "");
+  consecutivePollFailures = 0;
+  currentPollIntervalMs = POLL_INTERVAL_MS;
   screenState = SCREEN_IDLE;
   petMood = "idle";
   markDraw();
@@ -1470,12 +1478,22 @@ void setError(const String& message) {
 }
 
 void setRecoverablePollError(const String& message) {
+  consecutivePollFailures = min<uint8_t>(consecutivePollFailures + 1, MAX_RECOVERABLE_POLL_FAILURES);
+  currentPollIntervalMs = min<uint32_t>(
+    MAX_POLL_INTERVAL_MS,
+    POLL_INTERVAL_MS * (1UL << min<uint8_t>(consecutivePollFailures, 4))
+  );
   lastErrorRecoverable = true;
   lastError = message;
   screenState = SCREEN_ERROR;
   petMood = "worried";
   markDraw();
   Serial.printf("device_poll_recoverable_error %s\n", message.c_str());
+}
+
+void resetPollBackoff() {
+  consecutivePollFailures = 0;
+  currentPollIntervalMs = POLL_INTERVAL_MS;
 }
 
 void sendDeviceEvent(JsonDocument& doc) {
@@ -1699,6 +1717,13 @@ void pollHost() {
   String response;
   if (!httpGetJson(queryPath("/device/poll"), response)) {
     setRecoverablePollError(lastError);
+    if (consecutivePollFailures >= MAX_RECOVERABLE_POLL_FAILURES) {
+      Serial.println("pairing_token_reset reason=poll-failure-threshold");
+      authToken = "";
+      screenState = SCREEN_PAIRING;
+      petMood = "listening";
+      markDraw();
+    }
     return;
   }
   JsonDocument doc;
@@ -1719,6 +1744,7 @@ void pollHost() {
     setRecoverablePollError(String("poll failed: ") + reason);
     return;
   }
+  resetPollBackoff();
   if (!doc["event"].isNull()) {
     handleHostEvent(doc["event"]);
   } else if (screenState == SCREEN_ERROR && lastErrorRecoverable) {
@@ -1783,6 +1809,8 @@ void connectWifi() {
 
   if (WiFi.status() == WL_CONNECTED) {
     petMood = "idle";
+    wifiRetryIntervalMs = WIFI_RETRY_MIN_MS;
+    nextWifiRetryAt = 0;
     Serial.printf("wifi_connected ip=%s rssi=%d host=%s:%u\n", WiFi.localIP().toString().c_str(), WiFi.RSSI(), HOST_BRIDGE_HOST, HOST_BRIDGE_PORT);
   } else {
     petMood = "worried";
@@ -1834,7 +1862,7 @@ void handleButtons() {
   }
 
   if (screenState != SCREEN_CHOICE && screenState != SCREEN_ANSWER && M5.BtnB.wasHold()) {
-    sendPetInteraction(profile.touch ? "long-press" : "button-long-press", "long-press", "button");
+    sendPetInteraction("long-press", "long-press", "button");
   }
 }
 
@@ -1952,13 +1980,18 @@ void loop() {
   }
 
   if (WiFi.status() != WL_CONNECTED) {
-    WiFi.reconnect();
-    delay(1000);
-    markDraw();
+    const uint32_t now = millis();
+    if (now >= nextWifiRetryAt) {
+      WiFi.reconnect();
+      nextWifiRetryAt = now + wifiRetryIntervalMs;
+      wifiRetryIntervalMs = min<uint32_t>(WIFI_RETRY_MAX_MS, wifiRetryIntervalMs * 2);
+      Serial.printf("wifi_reconnect_scheduled next_ms=%lu interval_ms=%lu\n", static_cast<unsigned long>(nextWifiRetryAt), static_cast<unsigned long>(wifiRetryIntervalMs));
+      markDraw();
+    }
   } else if (!authToken.length()) {
     pairDevice();
   } else {
-    if (millis() - lastPoll > POLL_INTERVAL_MS) {
+    if (millis() - lastPoll > currentPollIntervalMs) {
       lastPoll = millis();
       pollHost();
     }

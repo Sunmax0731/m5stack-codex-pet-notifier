@@ -17,7 +17,6 @@
         "double-tap",
         "long-press",
         "button-long-press",
-        "imu-tap",
         "swipe-up",
         "swipe-down",
         "swipe-left",
@@ -32,7 +31,6 @@
         "double-tap",
         "long-press",
         "button-long-press",
-        "imu-tap",
         "swipe-up",
         "swipe-down",
         "swipe-left",
@@ -41,7 +39,7 @@
     },
     "target": {
       "type": "string",
-      "enum": ["screen", "pet", "footer", "answer", "choice", "button", "imu"]
+      "enum": ["screen", "pet", "footer", "answer", "choice", "button"]
     },
     "screen": { "type": "string", "minLength": 1 },
     "page": { "type": "integer", "minimum": 0 },

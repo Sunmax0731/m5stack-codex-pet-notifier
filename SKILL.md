@@ -19,14 +19,18 @@ cmd.exe /d /s /c npm test
 
 - 実機なし: sample payload replay、schema validation、host bridge auth、simulator、sample telemetry、security/privacy boundary。
 - Core2 実機: touch、swipe、A/B/C 相当入力、Wi-Fi 再接続、画面更新。
-- GRAY 実機: A/B/C ボタン、IMU tap 代替、ボタン式スクロール、Wi-Fi 再接続。
+- GRAY 実機と GRAY IMU は release target 外。Dashboard の button reference preview は互換確認用であり、firmware build / flash 対象に戻さない。
 - repo root から PlatformIO を実行する場合は `pio.exe run -d firmware ...` の順にする。`pio.exe -d firmware run ...` はこの環境では `No such option: -d` になる。
-- 日本語表示を変更した場合は Core2 / GRAY 両方の firmware build と `scripts/validate.mjs` の日本語フォント / UTF-8 境界 gate を通す。
+- 日本語表示を変更した場合は Core2 firmware build と `scripts/validate.mjs` の日本語フォント / UTF-8 境界 gate を通す。
 - Codex session 自動送信を変更した場合は `node scripts/codex-session-smoke.mjs` と `cmd.exe /d /s /c npm test` を通し、session 本文を release evidence に保存しない。
+- Codex App Server public interface を変更した場合は `cmd.exe /d /s /c npm run codex:app-server:smoke` と `cmd.exe /d /s /c npm run adapter:review` を通す。
+- 署名付き MSI / MSIX の準備を変更した場合は `cmd.exe /d /s /c npm run installer:signing:check` を通し、証明書 thumbprint / PFX path / PFX password は環境変数だけで扱う。
+- 長時間運用の queue、heartbeat、Wi-Fi / poll backoff を変更した場合は `cmd.exe /d /s /c npm test` に加えて Core2 firmware build を実行する。
 - M5Stack Choice Gate の配布ルールを変更した場合は `distribution/m5stack-choice-workflow/AGENTS.md`、`distribution/m5stack-choice-workflow/SKILL.md`、`docs/m5stack-choice-workflow.md` を同時に更新し、`cmd.exe /d /s /c npm run choice:package` を実行する。
 - hatch-pet の素材を firmware に反映する場合は、先に `cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h` を実行する。生成される `pet_asset.local.h` は ignored local file であり commit しない。
 - Dashboard の command modal 経由で npm script を実行する実装を変更した場合は、Windows の `spawn('npm.cmd', ...)` を避け、`cmd.exe /d /s /c npm ...` 経由にする。GUIで `spawn EINVAL` が出た場合はこの経路を最初に確認する。
-- PlatformIO build は `.pio` の cleanup が競合しないように Core2、GRAY の順に個別実行する。
+- PlatformIO build は Core2 target のみを対象にし、repo root からは `E:\DevEnv\PlatformIO\venv\Scripts\pio.exe run -d firmware -e m5stack-core2` を使う。
+- PowerShell では `&&` を前提にせず、`git add` と `git commit` などの段階コマンドは個別に実行する。
 
 ## Release
 

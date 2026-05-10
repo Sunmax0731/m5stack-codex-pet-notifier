@@ -111,4 +111,4 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 
 ## 今回対象外
 
-GRAY 実機、GRAY IMU、長時間運用、実 Codex App 内部 API 連携の手動テストはCodexでは未実施です。結果は `docs/manual-test.md` の該当行へ追記します。
+GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続の手動テストはCodexでは未実施です。結果は `docs/manual-test.md` の該当行へ追記します。
