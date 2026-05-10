@@ -35,7 +35,7 @@ const gate = {
   platformType: productProfile.platformType,
   pass: true,
   method: 'node-simulator-runtime-gate',
-  manualTest: 'partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-dashboard-gui',
+  manualTest: 'user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10',
   signals,
   scenarioIds: result.scenarios.map((scenario) => scenario.id)
 };

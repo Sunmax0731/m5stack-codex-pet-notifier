@@ -62,15 +62,15 @@
 - [x] `dist/validation-result.json` を生成する。
 - [x] Core2 実機で build / upload / Wi-Fi / pairing / Codex relay answer を確認する。
 - [x] Core2 実機 firmware に hatch-pet local asset を含めて upload する。
-- [ ] Core2 実機で日本語 glyph を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Dashboard Choice / hatch-pet animation を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Codex session auto relay を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Codex hook relay を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更を目視確認した。ユーザー手動。
-- [ ] Core2 実機で Sprite buffer により pet animation 中の画面全体、本文、footer のちらつきが抑えられていることを目視確認した。ユーザー手動。
-- [ ] Core2 実機で pet mood、single tap、double tap、long press、swipe、long press Choice request を目視確認した。ユーザー手動。
-- [ ] Windows 実環境で installer shortcut と hidden dashboard launcher を確認した。ユーザー手動。
+- [x] Core2 実機で日本語 glyph を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Dashboard Choice / hatch-pet animation を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Codex session auto relay を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Codex hook relay を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Dashboard 最新 Codex 回答送信を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更を目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で Sprite buffer により pet animation 中の画面全体、本文、footer のちらつきが抑えられていることを目視確認した。ユーザー報告で確認済み。
+- [x] Core2 実機で pet mood、single tap、double tap、long press、swipe、long press Choice request を目視確認した。ユーザー報告で確認済み。
+- [x] Windows 実環境で installer shortcut と hidden dashboard launcher を確認した。ユーザー報告で確認済み。
 - [ ] GRAY 実機で主要フローを確認した。今回対象外。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 

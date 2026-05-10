@@ -47,7 +47,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "partial-pass-core2-upload-wifi-pairing-codex-relay-answer-button-reply-display-sync-hatch-pet-row-sync; beta long-run, GRAY hardware, and signed installer checks prepared but not executed by Codex",
+  "manualTest": "user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10; beta long-run, GRAY hardware, signed MSI/MSIX, and public Codex API adapter checks remain outside this beta confirmation",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",

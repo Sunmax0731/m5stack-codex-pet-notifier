@@ -28,6 +28,7 @@
 - Core2 scale-specific pet asset frame selection。
 - Core2 Sprite buffer による pet surface redraw と本文 overlay の安定表示。
 - Dashboard side menu、状態確認sidebar、全幅M5Stack 表示プレビュー、最近の回答 / イベントログの左右ペイン。
+- Core2 / Dashboard の機能ブラッシュアップ手動確認。日本語表示、Display 設定、pet 位置 / scale / RGBA、hatch-pet row illustration、gesture、Decision、最新 Codex 回答送信、installer shortcut、background launcher はユーザー確認済み。
 - Runtime gate。
 - Security/privacy checklist。
 - QCDS metrics。
@@ -37,20 +38,11 @@
 
 - GRAY 実機 firmware flash。
 - 長時間 Wi-Fi 再接続。
-- Core2 日本語 glyph のユーザー目視確認。
-- Dashboard からの Choice / hatch-pet animation 実機目視確認。
-- Codex session auto relay の Core2 実機目視確認。
-- Codex hook relay の Core2 実機目視確認。
-- Dashboard 最新 Codex 回答送信の Core2 実機目視確認。
-- Display 設定による固定ヘッダーテキスト削除、pet `32/32` 超拡大表示、text size 変更、render FPS / motion step 変更の Core2 実機目視確認。
-- hatch-pet row illustration 切替、tap / double tap / long press / swipe の Core2 実機 UX。
-- Long press からの Codex decision request queue の実機目視確認。
-- Current pet preview と実機 layout の一致、文字 overlay、tooltip、section collapse、command modal のユーザー目視確認。
-- Sprite buffer による pet animation ちらつき抑制の Core2 実機目視確認。
 - GRAY button / IMU の物理 UX。
-- Windows installer と double click launcher のユーザー環境実行。
-- 実 Codex App 内部 API 連携。
+- 署名付き MSI / MSIX installer。
+- 複数 M5Stack 同時接続。
+- 実 Codex App 公開 API 連携。
 
 ## Decision
 
-`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。alpha より広い機能面を実装済みですが、上記の物理 UX と運用確認が残るため stable には上げません。
+`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。Core2 / Dashboard の主要 UX はユーザー確認済みですが、GRAY 実機、長時間運用、複数端末、署名付き installer、実 Codex 公開 API の運用確認が残るため stable には上げません。

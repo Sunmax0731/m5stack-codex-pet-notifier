@@ -2,7 +2,7 @@
   "product": "m5stack-codex-pet-notifier",
   "version": "0.2.0-beta.1",
   "hardwareCheck": "core2-target-upload-wifi-pairing-codex-relay-answer-dashboard-pet-animation",
-  "status": "partial-pass",
+  "status": "core2-user-confirmed-pass",
   "device": {
     "serialPort": "COM4",
     "usbDescription": "Silicon Labs CP210x USB to UART Bridge",
@@ -238,8 +238,8 @@
     "core2BuildWithLocalAssetPassed": true,
     "grayBuildWithLocalAssetPassed": true,
     "core2UploadWithLocalAssetPassed": true,
-    "manualVisualConfirmation": "pending-user-check",
-    "evidence": "Core2 firmware with a local hatch-pet asset header generated from sakenomeuniere was built and uploaded to COM4 (Silicon Labs CP210x USB to UART Bridge). PlatformIO upload succeeded after generating a 9-row / 57-frame local header. A pet.updated event with name=酒飲ムニエル, state=celebrate, mood=happy was queued and later device heartbeat returned the same pet name/state/mood. The ignored local header includes row metadata, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, row-aware local asset drawing, and display setting controls. Final visual row-by-row confirmation is listed in docs/gui-tools-manual-check.md."
+    "manualVisualConfirmation": "user-confirmed-pass-2026-05-10",
+    "evidence": "Core2 firmware with a local hatch-pet asset header generated from sakenomeuniere was built and uploaded to COM4 (Silicon Labs CP210x USB to UART Bridge). PlatformIO upload succeeded after generating a 9-row / 57-frame local header. A pet.updated event with name=酒飲ムニエル, state=celebrate, mood=happy was queued and later device heartbeat returned the same pet name/state/mood. The ignored local header includes row metadata, scale-specific Core2 frames, and is not a release asset. Firmware source gates verify M5Canvas sprite-buffered pet rendering, text overlay redraw without full-screen black fill, row-aware local asset drawing, and display setting controls. The user confirmed during feature polish that Core2 display, Dashboard controls, Codex relay, Decision workflow, display settings, hatch-pet row illustrations, flicker reduction, color/alpha, pet offset, and launcher flows work without issues."
   },
   "serialEvidence": {
     "logRetention": "redacted local logs were used during verification and are not release assets",

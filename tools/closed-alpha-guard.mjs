@@ -16,7 +16,8 @@ const runtimeGate = JSON.parse(fs.readFileSync('docs/platform-runtime-gate.json'
 enforceManualTestCap(metrics);
 assert(JSON.stringify(metrics.gradingScale ?? metrics.gradeScale).includes(allowedGrades[0]), 'grading scale is missing');
 assert(runtimeGate.pass === true, 'platform runtime gate must pass');
-assert(releaseNotes.includes('手動テストはCodexでは未実施'), 'release notes must state manual tests are not run by Codex');
+assert(releaseNotes.includes('ユーザーが動作を確認'), 'release notes must include the user manual confirmation result');
+assert(releaseNotes.includes('GRAY 実機') && releaseNotes.includes('長時間運用'), 'release notes must state remaining beta manual-test risks');
 
 if (releaseEvidence.releaseStatus === 'created') {
   assert(releaseEvidence.prerelease === true, 'release evidence must confirm prerelease=true');
