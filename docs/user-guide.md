@@ -70,10 +70,11 @@ cmd.exe /d /s /c npm run codex:hook -- --bridge http://127.0.0.1:8080 --device-i
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:app-server:smoke
+cmd.exe /d /s /c npm run codex:app-server:probe -- --include-turn
 cmd.exe /d /s /c npm run adapter:review
 ```
 
-この adapter は `codex app-server` の public interface を対象にし、`initialize`、`thread/start`、`turn/start` の message を組み立てます。既定は stdio transport です。WebSocket を使う場合は loopback または認証付き transport に限定します。
+この adapter は `codex app-server` の public interface を対象にし、`initialize`、`thread/start`、`turn/start` の message を組み立てます。runtime probe は実 `codex app-server` を起動し、本文を保存せず thread / turn 作成を確認します。既定は stdio transport です。WebSocket を使う場合は loopback または認証付き transport に限定します。
 
 ## 署名付き Installer 準備
 
@@ -82,9 +83,10 @@ cmd.exe /d /s /c npm run adapter:review
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run installer:signing:check
+cmd.exe /d /s /c npm run installer:signed:pipeline
 ```
 
-MSI template は `installer/wix/Product.wxs`、MSIX template は `installer/msix/Package.appxmanifest` にあります。証明書 thumbprint、PFX path、PFX password は環境変数で渡し、repository や release docs へ保存しません。
+MSI template は `installer/wix/Product.wxs`、MSIX template は `installer/msix/Package.appxmanifest` にあります。pipeline は WiX source と MSIX payload を生成し、release 環境では署名と verify まで進めます。証明書 thumbprint、PFX path、PFX password は環境変数で渡し、repository や release docs へ保存しません。
 
 ## M5Stack Choice Gate の配布
 
@@ -143,7 +145,7 @@ Dashboard preview だけを切り替える場合は、Host Bridge 起動後に `
 
 ## 制約
 
-- beta では Codex relay、`/codex/event`、`/codex/replay-samples`、session watcher、hook relay を既定 adapter とし、Codex App Server public interface adapter を準備済み経路として扱います。非公開 API scraping は対象外です。
+- beta では Codex relay、`/codex/event`、`/codex/replay-samples`、session watcher、hook relay を既定 adapter とし、Codex App Server public interface adapter は runtime probe 済みの追加経路として扱います。非公開 API scraping は対象外です。
 - Core2 の upload、Wi-Fi、pairing、sample event poll は Codex 実行環境で確認対象です。
-- GRAY 実機と GRAY IMU は対象外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続はユーザー手動確認項目です。
+- GRAY 実機と GRAY IMU は対象外です。長時間 soak、実署名 MSI / MSIX は release 環境での formal gate です。複数 M5Stack 同時接続は今後のアップデート対象です。
 - LAN 外公開は対象外です。

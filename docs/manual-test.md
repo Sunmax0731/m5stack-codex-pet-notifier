@@ -1,6 +1,6 @@
 # 手動テスト
 
-Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Codex app-server adapter smoke / adapter review / Dashboard smoke / signing readiness の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続は formal release 前の手動確認対象です。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Codex app-server adapter smoke / adapter review / Dashboard smoke / signing readiness の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続は formal release 前の gate です。署名 MSI / MSIX と実 Codex App Server 接続は `docs/manual-test-automation.md` の手順で自動 evidence 化します。
 
 ## 共通前提
 
@@ -64,8 +64,8 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 | --- | --- | --- | --- |
 | LR-01 | Host Bridge と Core2 を 8 時間以上稼働し、5分ごとに heartbeat と sample event を流す | `/debug/snapshot` または Dashboard で `stale=false`、`lastHeartbeatSec` が更新され、`droppedEvents` が想定外に増えない | 未実施 |
 | LR-02 | Wi-Fi AP を一時停止し、復帰後に poll を再開する | firmware が backoff 後に再接続し、連続 poll 失敗時は pairing 復帰できる | 未実施 |
-| SIGN-01 | 実署名証明書を用意し、`WINDOWS_SIGNING_CERT_THUMBPRINT` または `WINDOWS_SIGNING_PFX_PATH` を設定して MSI / MSIX を作成する | `signtool verify` が成功し、証明書や password が repo に残らない | 未実施 |
-| API-01 | Codex App Server を起動し、adapter から `initialize`、`thread/start`、`turn/start` を実行する | public interface 経由で thread / turn が作成され、非公開 API scraping を使わない | 未実施 |
+| SIGN-01 | 実署名証明書を用意し、`WINDOWS_SIGNING_CERT_THUMBPRINT` を設定して MSI / MSIX を作成する | `signtool verify` が成功し、証明書や password が repo に残らない | 自動化済み。現環境では WiX / Windows SDK / 署名証明書未導入のため `prepared` |
+| API-01 | Codex App Server を起動し、adapter から `initialize`、`thread/start`、`turn/start` を実行する | public interface 経由で thread / turn が作成され、非公開 API scraping を使わない | 実施済み。`docs/codex-app-server-runtime-probe-result.json` で `passed` |
 
 ## Dashboard GUI
 
@@ -169,8 +169,8 @@ cmd.exe /d /s /c npm run firmware:upload:core2
 - File watch evidence: `codex:watch --file dist\codex-answer.txt --once` で `Codex file watch answer` を送信し、Core2 の `Answer page 1/1` に summary、本文、`A up / B idle / C down` footer が表示されたことをユーザー提供画像で確認済み。
 - Codex session evidence: `codex:sessions` は `%USERPROFILE%\.codex\sessions` の最新 JSONL から最新 user / assistant やり取りを抽出し、`answer.completed` として送信する。自動検証は `scripts/codex-session-smoke.mjs` で実施する。
 - Codex hook evidence: `codex:hook` は Codex Hooks の command hook から呼べる one-shot relay で、本文を含まない state file により重複送信を抑止する。
-- Codex App Server evidence: `codex:app-server:smoke` は public JSON-RPC adapter の message builder と transport gate を確認する。実 App Server 接続は `API-01` の手動確認対象。
-- Signing evidence: `installer:signing:check` は Windows SDK / WiX / 署名用 env の準備状況を `dist/windows-signing-readiness.json` に出力する。実署名は `SIGN-01` の手動確認対象。
+- Codex App Server evidence: `codex:app-server:smoke` は public JSON-RPC adapter の message builder と transport gate を確認する。`codex:app-server:probe -- --include-turn` は実 `codex app-server` で `initialize`、`thread/start`、`turn/start` を確認し、本文を保存しない JSON evidence を出力する。
+- Signing evidence: `installer:signing:check` は Windows SDK / WiX / 署名用 env の準備状況を `dist/windows-signing-readiness.json` に出力する。`installer:signed:pipeline` は WiX source / MSIX payload、環境がそろっている場合は package 作成、署名、verify まで進める。
 - Long-run evidence: Host Bridge は queue/log 上限、stale diagnostics、heartbeat age、dropped event count を出し、firmware は Wi-Fi / poll backoff を持つ。8時間以上の soak は `LR-01` の手動確認対象。
 - Dashboard evidence: `dashboard:smoke`、desktop / mobile browser screenshot、Core2 firmware upload を実施済み。GUI と実機連携の最終目視は `docs/gui-tools-manual-check.md` に従って実施する。
 - Hatch-pet asset evidence: `%USERPROFILE%\.codex\pets\Mira` から scale-specific frame 付きの `firmware/include/pet_asset.local.h` を生成し、Core2 firmware に組み込む。生成済み header は ignored local file として扱う。

@@ -6,6 +6,7 @@ import {
   buildInitializedNotification,
   buildThreadStartMessage,
   buildTurnStartMessage,
+  extractThreadId,
   validateAppServerTransport
 } from '../src/codex-adapter/appServerAdapter.mjs';
 import { summarizeAdapterReview } from '../src/codex-adapter/adapterRegistry.mjs';
@@ -20,10 +21,20 @@ assert.deepEqual(buildInitializedNotification(), { method: 'initialized', params
 const threadStart = buildThreadStartMessage({ model: 'gpt-5.4' });
 assert.equal(threadStart.method, 'thread/start');
 assert.equal(threadStart.params.model, 'gpt-5.4');
+const safeThreadStart = buildThreadStartMessage({
+  cwd: process.cwd(),
+  ephemeral: true,
+  approvalPolicy: 'never',
+  sandbox: 'read-only'
+});
+assert.equal(safeThreadStart.params.ephemeral, true);
+assert.equal(safeThreadStart.params.approvalPolicy, 'never');
+assert.equal(safeThreadStart.params.sandbox, 'read-only');
 
 const turnStart = buildTurnStartMessage({ threadId: 'thr_123', text: 'Summarize status.' });
 assert.equal(turnStart.method, 'turn/start');
 assert.equal(turnStart.params.input[0].text, 'Summarize status.');
+assert.equal(extractThreadId({ result: { thread: { id: 'thr_123' } } }), 'thr_123');
 
 assert.equal(validateAppServerTransport({ listen: 'stdio://' }).ok, true);
 assert.equal(validateAppServerTransport({ listen: 'ws://127.0.0.1:4500' }).ok, true);
@@ -49,6 +60,7 @@ fs.writeFileSync('dist/codex-app-server-adapter-smoke-result.json', `${JSON.stri
     initializeMessage: true,
     threadStartMessage: true,
     turnStartMessage: true,
+    timeoutGuard: true,
     safeTransportGate: true,
     adapterRegistry: true,
     privateApiScraping: false

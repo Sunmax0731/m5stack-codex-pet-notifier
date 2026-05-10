@@ -8,6 +8,7 @@ export const appServerAdapterProfile = {
   transport: 'stdio-jsonrpc',
   defaultCommand: 'codex',
   defaultArgs: ['app-server'],
+  defaultRequestTimeoutMs: 15000,
   experimentalApi: false,
   publicInterfaceOnly: true,
   privateApiScraping: false,
@@ -40,12 +41,33 @@ export function buildInitializedNotification() {
 }
 
 export function buildThreadStartMessage(options = {}) {
+  const params = {
+    model: options.model ?? 'gpt-5.4'
+  };
+  for (const key of [
+    'approvalPolicy',
+    'approvalsReviewer',
+    'baseInstructions',
+    'config',
+    'cwd',
+    'developerInstructions',
+    'ephemeral',
+    'personality',
+    'sandbox',
+    'serviceName',
+    'sessionStartSource',
+    'modelProvider',
+    'permissionProfile',
+    'serviceTier'
+  ]) {
+    if (options[key] !== undefined) {
+      params[key] = options[key];
+    }
+  }
   return {
     method: 'thread/start',
     id: options.id ?? 1,
-    params: {
-      model: options.model ?? 'gpt-5.4'
-    }
+    params
   };
 }
 
@@ -62,9 +84,26 @@ export function buildTurnStartMessage(options = {}) {
     id: options.id ?? 2,
     params: {
       threadId: options.threadId,
-      input: [{ type: 'text', text }]
+      input: [{ type: 'text', text }],
+      ...(options.model !== undefined ? { model: options.model } : {}),
+      ...(options.cwd !== undefined ? { cwd: options.cwd } : {}),
+      ...(options.approvalPolicy !== undefined ? { approvalPolicy: options.approvalPolicy } : {}),
+      ...(options.approvalsReviewer !== undefined ? { approvalsReviewer: options.approvalsReviewer } : {}),
+      ...(options.effort !== undefined ? { effort: options.effort } : {}),
+      ...(options.permissionProfile !== undefined ? { permissionProfile: options.permissionProfile } : {}),
+      ...(options.personality !== undefined ? { personality: options.personality } : {}),
+      ...(options.sandboxPolicy !== undefined ? { sandboxPolicy: options.sandboxPolicy } : {}),
+      ...(options.serviceTier !== undefined ? { serviceTier: options.serviceTier } : {})
     }
   };
+}
+
+export function extractThreadId(response) {
+  return response?.result?.thread?.id
+    ?? response?.thread?.id
+    ?? response?.result?.threadId
+    ?? response?.threadId
+    ?? null;
 }
 
 export function validateAppServerTransport(options = {}) {
@@ -116,9 +155,11 @@ export function createAppServerSession(options = {}) {
   if (!readiness.ok) {
     throw new Error(`unsafe app-server transport: ${readiness.transport.reason}`);
   }
+  const requestTimeoutMs = Number(options.requestTimeoutMs ?? appServerAdapterProfile.defaultRequestTimeoutMs);
+  const stderrMode = options.onStderr ? 'pipe' : 'inherit';
   const child = spawn(readiness.command, readiness.args, {
     cwd: options.cwd ?? process.cwd(),
-    stdio: ['pipe', 'pipe', 'inherit'],
+    stdio: ['pipe', 'pipe', stderrMode],
     windowsHide: true,
     env: { ...process.env, ...(options.env ?? {}) }
   });
@@ -134,21 +175,56 @@ export function createAppServerSession(options = {}) {
       return;
     }
     if (message.id !== undefined && pending.has(message.id)) {
-      pending.get(message.id)(message);
+      const request = pending.get(message.id);
       pending.delete(message.id);
+      clearTimeout(request.timer);
+      request.resolve(message);
       return;
     }
     options.onNotification?.(message);
   });
+
+  child.on('error', (error) => {
+    rejectPending(error);
+    options.onExit?.({ error });
+  });
+
+  child.on('exit', (code, signal) => {
+    rejectPending(new Error(`codex app-server exited before response: code=${code ?? 'null'} signal=${signal ?? 'null'}`));
+    options.onExit?.({ code, signal });
+  });
+
+  if (child.stderr) {
+    child.stderr.on('data', (chunk) => {
+      options.onStderr?.(chunk.toString('utf8'));
+    });
+  }
 
   function send(message) {
     child.stdin.write(`${JSON.stringify(message)}\n`);
     if (message.id === undefined) {
       return Promise.resolve(null);
     }
-    return new Promise((resolve) => {
-      pending.set(message.id, resolve);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pending.delete(message.id);
+        reject(new Error(`codex app-server request timed out: ${message.method}`));
+      }, requestTimeoutMs);
+      pending.set(message.id, {
+        method: message.method,
+        resolve,
+        reject,
+        timer
+      });
     });
+  }
+
+  function rejectPending(error) {
+    for (const [, request] of pending) {
+      clearTimeout(request.timer);
+      request.reject(error);
+    }
+    pending.clear();
   }
 
   return {
@@ -161,7 +237,10 @@ export function createAppServerSession(options = {}) {
     },
     close: () => {
       rl.close();
-      child.kill();
+      rejectPending(new Error('codex app-server session closed'));
+      if (!child.killed) {
+        child.kill();
+      }
     }
   };
 }

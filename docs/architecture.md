@@ -22,7 +22,7 @@ flowchart LR
 | Codex relay | clipboard / stdin / file の返答本文を event 化する | `src/codex-adapter/relay.mjs` |
 | Codex session watcher | local session JSONL の最新 user / assistant やり取りを event 化する | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex hook relay | Codex Hooks から one-shot relay を実行する | `src/codex-adapter/hookRelay.mjs` |
-| Codex app-server adapter | Codex App Server public interface の JSON-RPC message builder と transport gate | `src/codex-adapter/appServerAdapter.mjs` |
+| Codex app-server adapter | Codex App Server public interface の JSON-RPC message builder、transport gate、runtime probe | `src/codex-adapter/appServerAdapter.mjs`、`tools/codex-app-server-runtime-probe.mjs` |
 | Adapter review | fallback adapter、public API workstream、private scraping 禁止を検証する | `src/codex-adapter/adapterRegistry.mjs` |
 | Codex adapter model | Codex 側の未確定差分を隔離する mock | `src/host-adapter/mockCodexAdapter.mjs` |
 | Protocol | schema load、型検査、warning | `src/protocol/validator.mjs` |

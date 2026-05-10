@@ -23,7 +23,11 @@ const includeEntries = [
   'docs/installation-guide.md',
   'docs/user-guide.md',
   'docs/manual-test.md',
+  'docs/manual-test-automation.md',
   'docs/gui-tools-manual-check.md',
+  'docs/formal-release-platform.md',
+  'docs/signed-installer-plan.md',
+  'docs/codex-app-server-api-integration.md',
   'docs/security-privacy-checklist.md'
 ];
 const skippedNames = new Set(['.git', 'node_modules', 'dist', 'tmp', '.pio']);

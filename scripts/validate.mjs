@@ -62,6 +62,9 @@ for (const required of [
   'scripts/dashboard-smoke.mjs',
   'tools/adapter-review.mjs',
   'tools/windows-signing-check.mjs',
+  'tools/signed-installer-pipeline.mjs',
+  'tools/codex-app-server-runtime-probe.mjs',
+  'tools/formal-release-automation.mjs',
   'tools/upload-firmware.ps1',
   'tools/start-bridge-background.mjs',
   'tools/generate-pet-firmware-asset.py',
@@ -223,6 +226,8 @@ const appServerAdapterSource = fs.readFileSync('src/codex-adapter/appServerAdapt
 assert(appServerAdapterSource.includes('buildInitializeMessage'), 'Codex app-server adapter must build initialize messages');
 assert(appServerAdapterSource.includes('thread/start'), 'Codex app-server adapter must support thread/start');
 assert(appServerAdapterSource.includes('turn/start'), 'Codex app-server adapter must support turn/start');
+assert(appServerAdapterSource.includes('requestTimeoutMs'), 'Codex app-server adapter must guard runtime requests with a timeout');
+assert(appServerAdapterSource.includes('extractThreadId'), 'Codex app-server adapter must expose a ThreadStartResponse thread id extractor');
 assert(appServerAdapterSource.includes('experimentalApi: false'), 'Codex app-server adapter must keep experimental API disabled by default');
 assert(appServerAdapterSource.includes('privateApiScraping: false'), 'Codex app-server adapter must reject private API scraping');
 assert(appServerAdapterSource.includes('non-loopback-websocket-requires-auth'), 'Codex app-server adapter must reject unauthenticated non-loopback WebSocket transport');
@@ -235,6 +240,14 @@ assert(signingCheckSource.includes('makeappx.exe'), 'Windows signing readiness m
 assert(signingCheckSource.includes('wix.exe'), 'Windows signing readiness must check wix.exe');
 assert(signingCheckSource.includes('WINDOWS_SIGNING_CERT_THUMBPRINT'), 'Windows signing readiness must document certificate thumbprint env var');
 assert(signingCheckSource.includes('WINDOWS_SIGNING_PFX_PATH'), 'Windows signing readiness must document PFX path env var');
+const signedInstallerPipelineSource = fs.readFileSync('tools/signed-installer-pipeline.mjs', 'utf8');
+assert(signedInstallerPipelineSource.includes('WINDOWS_SIGNING_ENABLE'), 'signed installer pipeline must require explicit signing enablement');
+assert(signedInstallerPipelineSource.includes('signtool') && signedInstallerPipelineSource.includes('verify'), 'signed installer pipeline must sign and verify artifacts when tools are available');
+assert(signedInstallerPipelineSource.includes('pfx-password-command-line-disabled'), 'signed installer pipeline must block PFX password command-line use by default');
+const appServerRuntimeProbeSource = fs.readFileSync('tools/codex-app-server-runtime-probe.mjs', 'utf8');
+assert(appServerRuntimeProbeSource.includes('generate-json-schema'), 'Codex app-server runtime probe must pin generated schemas');
+assert(appServerRuntimeProbeSource.includes('--include-turn'), 'Codex app-server runtime probe must support the API-01 turn/start gate');
+assert(appServerRuntimeProbeSource.includes('messageBodiesPersistedInEvidence: false'), 'Codex app-server runtime probe must not persist prompt or response bodies in evidence');
 
 const bridgeSource = fs.readFileSync('src/host-bridge/server.mjs', 'utf8');
 assert(bridgeSource.includes("url.pathname === '/codex/choice'"), 'Host Bridge must expose a choice endpoint for ABC reply workflows');

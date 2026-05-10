@@ -13,6 +13,7 @@
 - [x] Codex session 自動送信の opt-in 手順と privacy 境界がある。
 - [x] Codex Hooks 連携の command 例と重複抑止方針がある。
 - [x] Codex App Server public interface adapter、transport gate、adapter review の手順がある。
+- [x] 手動 gate の自動化方針と `formal:automation` の手順がある。
 - [x] Dashboard で最新 Codex session 回答を表示し M5Stack へ送る手順がある。
 - [x] Dashboard の M5Stack 表示プレビューから pet 表示倍率、text size、render FPS、motion step を変更する手順がある。
 - [x] 正式リリースへ向けた Codex decision request、`codex:decision:wait`、A/B/C 返信 workflow の手順がある。
@@ -28,6 +29,7 @@
 - [x] Codex session watcher が local JSONL から最近の user / assistant やり取りを `answer.completed` として送信できる。
 - [x] Codex hook relay が hook command から one-shot session relay を実行できる。
 - [x] Codex app-server adapter が `initialize`、`thread/start`、`turn/start` の public JSON-RPC message を組み立てられる。
+- [x] Codex app-server runtime probe が実 `codex app-server` で `initialize`、`thread/start`、`turn/start` を確認できる。
 - [x] adapter review が private API scraping を禁止し、fallback adapter と public API workstream を区別できる。
 - [x] Dashboard と CLI が `/codex/decision`、`/codex/choice`、`/codex/pet` を送信でき、CLI は `device.reply_selected` を待てる。
 - [x] Dashboard が `/codex/session/latest` と `/codex/session/publish` で最新 Codex 回答を表示/送信できる。
@@ -55,6 +57,7 @@
 - [x] Host Bridge が long press / button long press から `prompt.choice_requested` を同一 device に queue できる。
 - [x] `start-dashboard.bat` が hidden PowerShell launcher 経由で background Bridge と browser open を実行できる。
 - [x] Windows user-local installer が Desktop / Start Menu shortcut と install manifest を作成できる。
+- [x] signed installer pipeline が WiX source / MSIX payload を生成し、release 環境では署名と verify まで進められる。
 - [x] M5Stack Choice Gate 配布 ZIP 生成 script がある。
 
 ## Verification
@@ -65,8 +68,10 @@
 - [x] `scripts/codex-session-smoke.mjs` で Codex session auto relay を検証する。
 - [x] hook relay の state file 重複抑止を `scripts/codex-session-smoke.mjs` で検証する。
 - [x] `scripts/codex-app-server-adapter-smoke.mjs` で Codex App Server adapter を検証する。
+- [x] `codex:app-server:probe -- --include-turn` で実 Codex App Server 接続を検証する。
 - [x] `tools/adapter-review.mjs` で実 adapter 見直しを検証する。
 - [x] `tools/windows-signing-check.mjs` で署名 readiness を JSON 化する。
+- [x] `tools/signed-installer-pipeline.mjs` で WiX source / MSIX payload generation を検証する。
 - [x] `scripts/dashboard-smoke.mjs` で Dashboard、Decision / Pet / Display endpoint、current pet preview、section collapse、tooltip、command modal tabs、runtime status、allowlist command execution、最新 Codex 回答表示/送信 endpoint を検証する。
 - [x] `docs/platform-runtime-gate.json` を生成する。
 - [x] `dist/validation-result.json` を生成する。
@@ -82,7 +87,7 @@
 - [x] Core2 実機で pet mood、single tap、double tap、long press、swipe、long press Choice request を目視確認した。ユーザー報告で確認済み。
 - [x] Windows 実環境で installer shortcut と hidden dashboard launcher を確認した。ユーザー報告で確認済み。
 - [x] GRAY 実機と GRAY IMU を release target 外として扱う。
-- [ ] 長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続を formal release 前に確認する。
+- [ ] 長時間 soak、実署名 MSI / MSIX を formal release 前に確認する。実 Codex App Server 接続は確認済み。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
 ## Distribution

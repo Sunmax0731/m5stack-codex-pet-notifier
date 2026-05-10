@@ -119,7 +119,7 @@
   },
   "notes": [
     "Core2 実機、Dashboard、Codex relay、Decision、Display 設定、hatch-pet row illustration、ちらつき抑制、色 / 透明度、位置調整、起動導線はユーザーが機能ブラッシュアップ時に確認済み。",
-    "GRAY実機とGRAY IMUはrelease target外。長時間soak、実署名MSI/MSIX、実Codex App Server接続は未確認のためS+は付けない。",
+    "GRAY実機とGRAY IMUはrelease target外。実Codex App Server接続はruntime probeでthread/startとturn/startまで確認済み。長時間soak、実署名MSI/MSIXは未確認のためS+は付けない。",
     "Core2 file watch はユーザー提供画像で Answer page 1/1、summary、本文、footer 表示を確認済み。",
     "Codex session auto relay は local session JSONL の最新 user / assistant やり取りを answer.completed として送る smoke とユーザー確認で検証済み。",
     "Dashboard の最近の Codex 回答 panel は local session JSONL の最新 assistant 回答を表示し、M5Stackへ送信できる smoke とユーザー確認で検証済み。",

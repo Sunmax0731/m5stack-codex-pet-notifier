@@ -18,9 +18,10 @@
 | Pet mood / gesture workflow | 実装済み | `pet.updated.pet.mood`、Core2 touch gesture、`device.pet_interacted`、long press -> `prompt.choice_requested` |
 | Windows installer / launcher | 実装済み | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` |
 | Long-run diagnostics | 実装済み | Host Bridge queue/log 上限、stale diagnostics、heartbeat age、firmware HTTP timeout / Wi-Fi / poll backoff |
-| Codex App Server adapter preparation | 実装済み | `src/codex-adapter/appServerAdapter.mjs`、`scripts/codex-app-server-adapter-smoke.mjs` |
+| Codex App Server runtime probe | 実装済み | `src/codex-adapter/appServerAdapter.mjs`、`scripts/codex-app-server-adapter-smoke.mjs`、`tools/codex-app-server-runtime-probe.mjs`、`docs/codex-app-server-runtime-probe-result.json` |
 | Adapter review | 実装済み | `tools/adapter-review.mjs`、private API scraping 禁止 |
-| Signed MSI / MSIX preparation | 実装済み | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs` |
+| Signed MSI / MSIX pipeline | 準備済み | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs`、`docs/signed-installer-pipeline-result.json` |
+| Manual gate automation | 準備済み | `tools/formal-release-automation.mjs`、`docs/manual-test-automation.md`、`docs/formal-release-automation-result.json` |
 
 ## Release Candidate Workstreams
 
@@ -31,7 +32,7 @@
 2. Codex workflow
    - `codex:decision:wait` を Codex Hooks または session workflow から呼べる運用例として固定する。
    - A/B/C 返信結果を次の Codex prompt に渡す adapter を追加候補にする。
-   - Codex App Server の実 process に接続し、`initialize`、`thread/start`、`turn/start` の end-to-end を確認する。
+   - Codex App Server の実 process に接続し、`initialize`、`thread/start`、`turn/start` の end-to-end を確認済み。次は turn notification から M5Stack event への mapper を追加する。
 
 3. Dashboard productization
    - Preview と実機 layout の差分を継続的に smoke で検出する。
@@ -48,11 +49,11 @@
 | --- | --- | --- |
 | reply-to-Codex prompt adapter | `codex:decision:wait` の結果を次の Codex prompt へ自動投入する | High |
 | device reconnect dashboard | 最終 heartbeat、RSSI、pending event、last poll を GUI で見る | High |
-| signed MSI/MSIX pipeline | WiX / MSIX package を署名し、release asset として検証する | High |
-| Codex App Server e2e adapter | public App Server で thread / turn を作成し、回答イベントへの変換を固定する | High |
+| signed MSI/MSIX release environment | WiX / Windows SDK / 署名証明書を用意し、pipeline で署名済み release asset を検証する | High |
+| Codex App Server event mapper | public App Server の turn notification を `answer.completed` / `prompt.choice_requested` へ変換する | High |
 | firmware settings persistence | `petScale`、text size、motion step を再起動後も維持する | Medium |
 | OTA update | USB 接続なしで firmware 更新する | Medium |
-| MQTT adapter | 複数端末や Home Assistant と接続する | Low |
+| multiple M5Stack / MQTT adapter | 複数端末や Home Assistant と接続する。今回対象外、今後アップデート | Low |
 
 ## Manual Gate
 

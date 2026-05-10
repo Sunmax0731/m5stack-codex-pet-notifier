@@ -10,14 +10,14 @@
 | Codex relay | clipboard / stdin / file の Codex 返答を `answer.completed` へ変換して Host Bridge に送る。PowerShell clipboard は Base64 UTF-8 経由で読む | `src/codex-adapter/relay.mjs` |
 | Codex session watcher | `%USERPROFILE%\.codex\sessions` の最新 session JSONL から user / assistant の最新やり取りを抽出し、`answer.completed` として送る | `src/codex-adapter/sessionWatcher.mjs` |
 | Codex hook relay | Codex Hooks の command hook から one-shot で session watcher を実行し、重複送信を state file で抑止する | `src/codex-adapter/hookRelay.mjs` |
-| Codex app-server adapter | Codex App Server public interface の JSON-RPC message builder、transport safety gate、adapter readiness を提供する | `src/codex-adapter/appServerAdapter.mjs` |
+| Codex app-server adapter | Codex App Server public interface の JSON-RPC message builder、transport safety gate、timeout 付き stdio session、runtime probe を提供する | `src/codex-adapter/appServerAdapter.mjs`、`tools/codex-app-server-runtime-probe.mjs` |
 | Adapter review | 実 adapter の fallback / public API / private scraping 禁止をまとめて検証する | `src/codex-adapter/adapterRegistry.mjs`、`tools/adapter-review.mjs` |
 | Device Profile | Core2 release profile と button reference preview の入力差分を吸収する | `src/device-adapter/deviceProfiles.mjs` |
 | Simulator | 実機なしで通知、回答、選択肢、pet 更新を再生する | `src/simulator/mockDevice.mjs` |
 | Protocol | Event schema、validation、warning を管理する | `schemas/events/*.json`、`src/protocol/validator.mjs` |
 | Pet asset generator | hatch-pet package の `spritesheet.webp` を firmware 用 RGB565 local header へ変換する | `tools/generate-pet-firmware-asset.py` |
 | Firmware | M5Unified、Wi-Fi、HTTP polling、ArduinoJson、日本語フォント表示による device loop | `firmware/` |
-| Signing readiness | WiX MSI / MSIX template と Windows SDK / WiX / 署名用 env を確認する | `installer/`、`tools/windows-signing-check.mjs` |
+| Signing readiness / pipeline | WiX MSI / MSIX template と Windows SDK / WiX / 署名用 env を確認し、WiX source / MSIX payload、release 環境では署名と verify まで進める | `installer/`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs` |
 
 ## LAN Host Bridge API
 
@@ -91,12 +91,12 @@ GRAY 実機と GRAY IMU は release target 外です。`gray` profile id は Das
 | file | `npm run codex:watch -- --file dist/codex-answer.txt` | 外部ツールが書いた返答ファイルを監視する |
 | session JSONL | `npm run codex:sessions -- --phase any` | 最近の Codex session の最新 user / assistant やり取りを自動送信する |
 | Codex Hooks | `npm run codex:hook -- --bridge http://127.0.0.1:8080` | Codex hook 発火時に最新 session を1回だけ送る |
-| Codex App Server | `npm run codex:app-server:smoke` | public interface adapter の message contract と transport gate を検証する |
+| Codex App Server | `npm run codex:app-server:smoke`、`npm run codex:app-server:probe -- --include-turn` | public interface adapter の message contract、transport gate、実 `codex app-server` の thread / turn 作成を検証する |
 | Decision | `npm run codex:decision -- --question "..." --a "..." --b "..." --c "..."` | Codex 側から M5Stack へ三択判断を求める |
 
 `codex:sessions` は opt-in のローカルファイル監視です。Codex App の非公開 API へ接続せず、ローカル session JSONL だけを読みます。`--phase any` は進行中の commentary も送信し、`--phase final` は完了応答だけを送信します。
 `codex:hook` は hook process ごとに起動されるため、`dist/codex-session-hook-state.json` に本文を含まない署名だけを保存して重複送信を防ぎます。
-`codex-app-server` adapter は `initialize`、`thread/start`、`turn/start` を組み立て、stdio を既定 transport とします。WebSocket は loopback 以外で auth を必須にし、非公開 API scraping は `privateApiScraping=false` の review gate で禁止します。
+`codex-app-server` adapter は `initialize`、`thread/start`、`turn/start` を組み立て、stdio を既定 transport とします。runtime probe は schema 生成と実 process での thread / turn 作成を確認し、本文は evidence に保存しません。WebSocket は loopback 以外で auth を必須にし、非公開 API scraping は `privateApiScraping=false` の review gate で禁止します。
 
 ## 日本語表示
 
@@ -152,4 +152,4 @@ GRAY 実機と GRAY IMU は release target 外です。`gray` profile id は Das
 
 - device 保存: `deviceId`、host URL、pairing token、表示設定。
 - device 非保存: 通知本文、回答本文、返信本文、個人 pet sprite。
-- host 保存: beta では event type、eventId、device event summary、display / pet diagnostics、adapter review result、signing readiness result のみを release evidence に残す。公開 Codex App Server の実接続を追加する場合は保存期間と削除手順を再定義する。
+- host 保存: beta では event type、eventId、device event summary、display / pet diagnostics、adapter review result、signing readiness result、signed installer pipeline result、Codex App Server runtime probe result のみを release evidence に残す。Codex App Server probe では回答本文や prompt 本文を保存しない。

@@ -11,7 +11,7 @@
 | Codex decision request | `npm run codex:decision`、`/codex/decision`、Dashboard Decision tab | `scripts/codex-relay-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`docs/formal-release-platform.md` |
 | M5Stack Choice Gate 配布 | `distribution/m5stack-choice-workflow/AGENTS.md`、`distribution/m5stack-choice-workflow/SKILL.md`、`docs/m5stack-choice-workflow.md`、`npm run choice:package` | `scripts/validate.mjs`、`dist/m5stack-choice-workflow-kit.zip` |
 | Codex Hooks 連携 | `src/codex-adapter/hookRelay.mjs`、`docs/codex-hooks.example.json` | `scripts/codex-session-smoke.mjs`、`docs/codex-relay-manual-check.md` |
-| Codex App Server public interface | `src/codex-adapter/appServerAdapter.mjs`、`src/codex-adapter/adapterRegistry.mjs` | `npm run codex:app-server:smoke`、`npm run adapter:review` |
+| Codex App Server public interface | `src/codex-adapter/appServerAdapter.mjs`、`src/codex-adapter/adapterRegistry.mjs`、`tools/codex-app-server-runtime-probe.mjs` | `npm run codex:app-server:smoke`、`npm run codex:app-server:probe -- --include-turn`、`npm run adapter:review` |
 | 日本語返答表示 | `firmware/src/main.cpp` の `fonts::efontJA_12`、UTF-8 code point paging | `scripts/validate.mjs`、`docs/codex-relay-manual-check.md` |
 | clipboard 日本語返答表示 | `readClipboard()` の Base64 UTF-8 復元 | `scripts/codex-relay-smoke.mjs`、`docs/codex-relay-manual-check.md` |
 | 実機 event polling | `firmware/src/main.cpp` | `docs/hardware-runtime-evidence.json` |
@@ -29,7 +29,7 @@
 | pet mood / expression | `src/core/pet-mood.mjs`、`pet.updated.pet.mood`、`firmware/src/main.cpp` の hatch-pet row mapping、Dashboard preview row mapping | `scripts/bridge-smoke.mjs`、`scripts/dashboard-smoke.mjs`、`scripts/validate.mjs`、browser smoke |
 | pet interaction / gesture | `device.pet_interacted`、Core2 touch gesture、long press side effect | `happy-path.interactionCount=2`、`warning.interactionCount=1`、`npm run bridge:smoke` |
 | Windows installer / background launcher | `installer/install-windows.ps1`、`installer/M5StackCodexPetNotifier-Setup.bat`、`start-dashboard.bat`、`tools/start-dashboard-hidden.ps1` | `npm run installer:package`、`scripts/validate.mjs`、`docs/manual-test.md` |
-| 署名付き MSI / MSIX 準備 | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs` | `npm run installer:signing:check` |
+| 署名付き MSI / MSIX 準備 | `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs` | `npm run installer:signing:check`、`npm run installer:signed:pipeline` |
 | 長時間運用 diagnostics | `src/host-bridge/server.mjs`、`firmware/src/main.cpp` | `scripts/validate.mjs`、`docs/long-run-operations.md` |
 | Core2 / button reference profile | `src/device-adapter/deviceProfiles.mjs` | `profileCovered=true` |
 | sample telemetry | `samples/sample-telemetry.json` | `docs/platform-runtime-gate.json` |

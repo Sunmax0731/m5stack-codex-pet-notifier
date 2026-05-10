@@ -295,7 +295,7 @@
     "GRAY target and GRAY IMU are out of release scope",
     "long-run soak is not yet executed",
     "signed MSI/MSIX is prepared but not signed with a real certificate",
-    "real Codex App Server connection is not yet executed; relay uses clipboard/stdin/file/local-session-jsonl/hook fallback input and app-server adapter smoke",
+    "real Codex App Server connection is executed by runtime probe for initialize/thread-start/turn-start; relay still keeps clipboard/stdin/file/local-session-jsonl/hook fallback input until event mapper is added",
     "local 8080 bridge should be kept on the current v0.2.0-beta.1 process before final manual confirmation, or the Dashboard should show that it auto-detected the latest Bridge API on 18081"
   ]
 }

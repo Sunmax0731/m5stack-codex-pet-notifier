@@ -9,10 +9,12 @@
 - LAN Host Bridge smoke
 - Codex relay smoke
 - Codex app-server adapter smoke
+- Codex app-server runtime probe
 - Adapter review
 - sample telemetry validation
 - Core2 PlatformIO build
 - Signing readiness check
+- Signed installer pipeline preparation
 - Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll、A button reply
 - docs ZIP generation
 - QCDS grade validation
@@ -31,12 +33,12 @@
 
 - 長時間 soak と Wi-Fi 再接続の実運用証跡。
 - 実署名付き MSI / MSIX。
-- 実 Codex App Server 接続。
 
 ## 対象外
 
 - GRAY 実機。
 - GRAY IMU。
+- 複数 M5Stack 同時接続。今後のアップデート対象。
 
 ## Release判定
 

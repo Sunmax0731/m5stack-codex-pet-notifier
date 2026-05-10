@@ -32,7 +32,9 @@
 - Dashboard side menu、状態確認sidebar、全幅M5Stack 表示プレビュー、最近の回答 / イベントログの左右ペイン。
 - Core2 / Dashboard の機能ブラッシュアップ手動確認。日本語表示、Display 設定、pet 位置 / scale / RGBA、hatch-pet row illustration、gesture、Decision、最新 Codex 回答送信、installer shortcut、background launcher はユーザー確認済み。
 - Host Bridge long-run diagnostics と firmware Wi-Fi / poll backoff。
-- 署名付き MSI / MSIX template と signing readiness check。
+- 署名付き MSI / MSIX template、signing readiness check、signed installer pipeline。
+- 実 Codex App Server runtime probe。`initialize`、`thread/start`、`turn/start` は public interface で確認済み。
+- 手動 gate 自動化 runner。
 - Runtime gate。
 - Security/privacy checklist。
 - QCDS metrics。
@@ -42,9 +44,11 @@
 
 - 長時間 soak test。
 - 実署名付き MSI / MSIX installer。
+
+## Future Update Scope
+
 - 複数 M5Stack 同時接続。
-- 実 Codex App Server 接続。
 
 ## Decision
 
-`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。Core2 / Dashboard の主要 UX はユーザー確認済みです。GRAY 実機と GRAY IMU は release target 外です。長時間 soak、複数端末、実署名 installer、実 Codex App Server 接続の運用確認が残るため stable には上げません。
+`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。Core2 / Dashboard の主要 UX はユーザー確認済みです。GRAY 実機と GRAY IMU は release target 外です。実 Codex App Server 接続は確認済みですが、長時間 soak と実署名 installer の release 環境検証が残るため stable には上げません。複数端末は今回の正式化作業から外し、今後のアップデートで扱います。

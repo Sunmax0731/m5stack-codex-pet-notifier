@@ -23,8 +23,9 @@ cmd.exe /d /s /c npm test
 - repo root から PlatformIO を実行する場合は `pio.exe run -d firmware ...` の順にする。`pio.exe -d firmware run ...` はこの環境では `No such option: -d` になる。
 - 日本語表示を変更した場合は Core2 firmware build と `scripts/validate.mjs` の日本語フォント / UTF-8 境界 gate を通す。
 - Codex session 自動送信を変更した場合は `node scripts/codex-session-smoke.mjs` と `cmd.exe /d /s /c npm test` を通し、session 本文を release evidence に保存しない。
-- Codex App Server public interface を変更した場合は `cmd.exe /d /s /c npm run codex:app-server:smoke` と `cmd.exe /d /s /c npm run adapter:review` を通す。
-- 署名付き MSI / MSIX の準備を変更した場合は `cmd.exe /d /s /c npm run installer:signing:check` を通し、証明書 thumbprint / PFX path / PFX password は環境変数だけで扱う。
+- Codex App Server public interface を変更した場合は `cmd.exe /d /s /c npm run codex:app-server:smoke`、`cmd.exe /d /s /c npm run codex:app-server:probe -- --include-turn`、`cmd.exe /d /s /c npm run adapter:review` を通す。
+- 署名付き MSI / MSIX の準備を変更した場合は `cmd.exe /d /s /c npm run installer:signing:check` と `cmd.exe /d /s /c npm run installer:signed:pipeline` を通し、証明書 thumbprint / PFX path / PFX password は環境変数だけで扱う。
+- formal gate の手動項目を自動化する場合は `cmd.exe /d /s /c npm run formal:automation -- --include-turn` を使い、Core2 実機、Wi-Fi AP、署名証明書など外部前提は結果 JSON の gate として分ける。
 - 長時間運用の queue、heartbeat、Wi-Fi / poll backoff を変更した場合は `cmd.exe /d /s /c npm test` に加えて Core2 firmware build を実行する。
 - M5Stack Choice Gate の配布ルールを変更した場合は `distribution/m5stack-choice-workflow/AGENTS.md`、`distribution/m5stack-choice-workflow/SKILL.md`、`docs/m5stack-choice-workflow.md` を同時に更新し、`cmd.exe /d /s /c npm run choice:package` を実行する。
 - hatch-pet の素材を firmware に反映する場合は、先に `cmd.exe /d /s /c npm run pet:asset -- --pet-dir %USERPROFILE%\.codex\pets\Mira --output firmware\include\pet_asset.local.h` を実行する。生成される `pet_asset.local.h` は ignored local file であり commit しない。

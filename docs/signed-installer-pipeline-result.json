@@ -1,0 +1,73 @@
+{
+  "product": "m5stack-codex-pet-notifier",
+  "version": "0.2.0-beta.1",
+  "generatedAt": "2026-05-10T16:53:47.495Z",
+  "status": "prepared",
+  "formats": [
+    "msi",
+    "msix"
+  ],
+  "signEnabled": false,
+  "signing": {
+    "timestampUrlConfigured": false,
+    "thumbprintConfigured": false,
+    "pfxPathConfigured": false,
+    "pfxPasswordConfigured": false,
+    "pfxPasswordArgAllowed": false,
+    "secretsPersisted": false
+  },
+  "tools": {
+    "signtool": {
+      "available": false,
+      "command": "signtool.exe",
+      "paths": []
+    },
+    "wix": {
+      "available": false,
+      "command": "wix.exe",
+      "paths": []
+    },
+    "makeappx": {
+      "available": false,
+      "command": "makeappx.exe",
+      "paths": []
+    },
+    "makepri": {
+      "available": false,
+      "command": "makepri.exe",
+      "paths": []
+    }
+  },
+  "packageStage": {
+    "ok": true,
+    "stageDir": "dist/m5stack-codex-pet-notifier-windows-installer",
+    "durationMs": 7264,
+    "error": null
+  },
+  "artifacts": {
+    "msi": {
+      "format": "MSI",
+      "sourcePath": "dist/signed-installer-work/msi/Product.generated.wxs",
+      "unsignedPath": null,
+      "tool": "wix.exe",
+      "build": {
+        "status": "skipped",
+        "reason": "wix.exe-not-found"
+      }
+    },
+    "msix": {
+      "format": "MSIX",
+      "payloadDir": "dist/signed-installer-work/msix/payload",
+      "unsignedPath": null,
+      "tool": "makeappx.exe",
+      "build": {
+        "status": "skipped",
+        "reason": "makeappx.exe-not-found"
+      }
+    }
+  },
+  "nextActions": [
+    "Install WiX Toolset under E:\\DevEnv, or expose an existing wix.exe on PATH.",
+    "Install or expose Windows SDK makeappx.exe before producing MSIX."
+  ]
+}

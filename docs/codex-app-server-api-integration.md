@@ -13,9 +13,20 @@
 ## 実装済みの準備
 
 - `src/codex-adapter/appServerAdapter.mjs` に app-server 用 JSON-RPC message builder、transport safety gate、stdio session helper を追加した。
+- stdio session helper は request timeout、child process exit / error 時の pending request 解放、stderr sample の redaction を持つ。
 - `src/codex-adapter/adapterRegistry.mjs` で `local-session-jsonl`、`codex-hook-relay`、`codex-app-server` を catalog 化した。
 - `scripts/codex-app-server-adapter-smoke.mjs` で `initialize`、`thread/start`、`turn/start`、transport gate、adapter registry を検証する。
+- `tools/codex-app-server-runtime-probe.mjs` で実 `codex app-server` を起動し、schema 生成、`initialize`、`thread/start`、必要に応じて `turn/start` を実行する。
 - `tools/adapter-review.mjs` で adapter 状態を `dist/adapter-review-result.json` と `docs/adapter-review-result.json` に出力する。
+- `schemas/codex-app-server/` に `codex app-server generate-json-schema --out schemas/codex-app-server` の結果を固定した。
+
+## 2026-05-11 実接続 evidence
+
+```powershell
+cmd.exe /d /s /c npm run codex:app-server:probe -- --include-turn
+```
+
+結果は `docs/codex-app-server-runtime-probe-result.json` に保存しています。現環境では `codex-cli 0.130.0-alpha.5` で `initialize`、`thread/start`、`turn/start` が成功し、thread id と turn id を受信しました。probe は本文を evidence に保存しません。
 
 ## 安全境界
 
@@ -26,7 +37,5 @@
 
 ## 次の実装タスク
 
-- 実機確認時に `codex app-server generate-json-schema --out schemas/codex-app-server` を実行し、使用する method schema を version 固定する。
-- `codex app-server` の stdio process を起動して `initialize`、`thread/start`、`turn/start`、`turn/*` notification 受信を smoke へ拡張する。
 - app-server の turn notification から `answer.completed` と `prompt.choice_requested` へ変換する mapper を追加する。
 - mapper 追加後も local-session / hook relay を fallback adapter として維持する。

@@ -19,7 +19,7 @@
 ## Codex Adapter
 
 - `local-session-jsonl` と `codex-hook-relay` は実装済み fallback として維持する。
-- `codex-app-server` は公開 interface 連携の準備済み adapter として追加した。
+- `codex-app-server` は公開 interface 連携の runtime probe 済み adapter として追加した。`initialize`、`thread/start`、`turn/start` の実接続は `docs/codex-app-server-runtime-probe-result.json` に残す。
 - adapter review は次で再生成する。
 
 ```powershell
@@ -30,5 +30,5 @@ cmd.exe /d /s /c npm run adapter:review
 ## 完了条件
 
 - `cmd.exe /d /s /c npm test` が通る。
-- `dist/adapter-review-result.json` に `privateApiScraping=false` と `codex-app-server` prepared が出る。
+- `dist/adapter-review-result.json` に `privateApiScraping=false` と `codex-app-server` prepared が出る。実接続可否は `codex:app-server:probe -- --include-turn` で別 evidence 化する。
 - README、manual test、release notes が GRAY 実機 / GRAY IMU を対象外として扱う。

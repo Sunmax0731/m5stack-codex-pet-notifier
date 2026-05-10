@@ -60,6 +60,7 @@
       "defaultArgs": [
         "app-server"
       ],
+      "defaultRequestTimeoutMs": 15000,
       "experimentalApi": false,
       "publicInterfaceOnly": true,
       "privateApiScraping": false,

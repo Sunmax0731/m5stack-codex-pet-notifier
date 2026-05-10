@@ -20,6 +20,7 @@ cmd.exe /d /s /c npm test
 - `platform runtime gate passed for m5stack-codex-pet-notifier`
 - `dashboard smoke passed`
 - `codex app-server adapter smoke passed`
+- `codex app-server runtime probe passed`
 - `adapter review passed for m5stack-codex-pet-notifier`
 - `validated m5stack-codex-pet-notifier`
 - `release guard passed for m5stack-codex-pet-notifier`
@@ -41,9 +42,10 @@ installer zip を開発環境で再生成する場合:
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run installer:package
 cmd.exe /d /s /c npm run installer:signing:check
+cmd.exe /d /s /c npm run installer:signed:pipeline
 ```
 
-署名付き MSI / MSIX の準備は `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs` に分けています。実署名では `WINDOWS_SIGNING_CERT_THUMBPRINT`、`WINDOWS_SIGNING_PFX_PATH`、`WINDOWS_SIGNING_PFX_PASSWORD` を環境変数で指定し、証明書や password を repository に保存しません。
+署名付き MSI / MSIX の準備は `installer/wix/Product.wxs`、`installer/msix/Package.appxmanifest`、`tools/windows-signing-check.mjs`、`tools/signed-installer-pipeline.mjs` に分けています。実署名では `WINDOWS_SIGNING_CERT_THUMBPRINT` を優先し、証明書や password を repository に保存しません。
 
 ## Demo
 
@@ -153,7 +155,8 @@ Codex Hooks が使える環境では `docs/codex-hooks.example.json` の command
 ```powershell
 cd D:\AI\IoT\m5stack-codex-pet-notifier
 cmd.exe /d /s /c npm run codex:app-server:smoke
+cmd.exe /d /s /c npm run codex:app-server:probe -- --include-turn
 cmd.exe /d /s /c npm run adapter:review
 ```
 
-この段階では `initialize`、`thread/start`、`turn/start` の message contract と transport safety gate を確認します。実 App Server 接続では `codex app-server` を起動し、stdio transport を既定にします。WebSocket を使う場合は loopback に限定するか、capability token または signed bearer token を必須にします。
+`codex:app-server:smoke` は message contract と transport safety gate を確認します。`codex:app-server:probe -- --include-turn` は実 `codex app-server` を起動し、`initialize`、`thread/start`、`turn/start` を public interface で確認します。stdio transport を既定にし、WebSocket を使う場合は loopback に限定するか、capability token または signed bearer token を必須にします。
