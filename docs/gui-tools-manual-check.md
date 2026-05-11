@@ -233,7 +233,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8080/device/poll?deviceId=m5stack-sampl
 
 ## 未実施として残す範囲
 
-- 長時間 soak。
 - 実署名 MSI / MSIX。
 - 複数 M5Stack 同時接続。今回対象外で今後のアップデート対象。
+- Wi-Fi AP停止 / 復帰。今回の 8時間 soak には含めない。
 - 実 Codex App Server 接続は `codex:app-server:probe -- --include-turn` で確認済み。beta では clipboard / stdin / file relay、Codex session watcher、Codex hook relay、Dashboard 操作、Codex App Server runtime probe を実 adapter 境界として扱う。

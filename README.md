@@ -142,4 +142,4 @@ cmd.exe /d /s /c npm run firmware:upload:core2 -- -UploadPort COM3
 
 ## Beta Boundary
 
-この release は simulator、mock device、LAN Host Bridge smoke、Core2 soak runner、Codex relay smoke、Codex app-server adapter smoke / runtime probe、adapter review、Dashboard smoke、Core2 firmware build、署名 pipeline readiness を検証対象にした beta prerelease です。GRAY 実機と GRAY IMU は対象外です。実 Codex App Server 接続は `turn/start` まで確認済みです。長時間運用は Core2 常時接続の heartbeat / stale / droppedEvents を evidence 化し、Wi-Fi AP停止 / 復帰は明示指示がある回だけ別 gate として扱います。実署名付き MSI / MSIX は release 環境での formal gate として残します。複数 M5Stack 同時接続は今回対象外で、今後のアップデート対象です。
+この release は simulator、mock device、LAN Host Bridge smoke、Core2 soak runner、Codex relay smoke、Codex app-server adapter smoke / runtime probe、adapter review、Dashboard smoke、Core2 firmware build、署名 pipeline readiness を検証対象にした beta prerelease です。GRAY 実機と GRAY IMU は対象外です。実 Codex App Server 接続は `turn/start` まで確認済みです。Core2 8時間 soak は Wi-Fi AP停止 / 復帰を含めない条件で合格済みです。Wi-Fi AP停止 / 復帰は明示指示がある回だけ別 gate として扱います。実署名付き MSI / MSIX は release 環境での formal gate として残します。複数 M5Stack 同時接続は今回対象外で、今後のアップデート対象です。

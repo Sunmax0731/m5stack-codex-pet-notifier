@@ -49,7 +49,7 @@
     "Delivery": "A+",
     "Satisfaction": "S-"
   },
-  "manualTest": "user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10; GRAY hardware and GRAY IMU are out of release scope; long-run soak, signed MSI/MSIX, and real Codex App Server connection remain formal-release manual checks",
+  "manualTest": "user-confirmed-core2-dashboard-feature-polish-pass-2026-05-10; GRAY hardware and GRAY IMU are out of release scope; Core2 8-hour soak passed without Wi-Fi AP interruption on 2026-05-11; signed MSI/MSIX remains a formal-release manual check",
   "automatedTests": [
     {
       "command": "cmd.exe /d /s /c npm test",
@@ -70,6 +70,14 @@
     {
       "command": "cmd.exe /d /s /c npm run installer:signing:check",
       "result": "readiness-json-generated"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run core2:soak -- --duration-min=480 --skip-wifi-interruption",
+      "result": "passed-snapshots-961-heartbeats-961-replay-96-bridgeFailures-0-stale-0-droppedEvents-0"
+    },
+    {
+      "command": "cmd.exe /d /s /c npm run formal:automation -- --skip-npm-test --include-turn --skip-wifi-interruption",
+      "result": "partial-longRun-and-codexAppServer-passed-signedInstaller-environment-required"
     },
     {
       "command": "cmd.exe /d /s /c npm run pet:asset -- --pet-dir C:\\Users\\gkkjh\\.codex\\pets\\sakenomeuniere --output firmware\\include\\pet_asset.local.h",

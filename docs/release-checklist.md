@@ -87,7 +87,8 @@
 - [x] Core2 実機で pet mood、single tap、double tap、long press、swipe、long press Choice request を目視確認した。ユーザー報告で確認済み。
 - [x] Windows 実環境で installer shortcut と hidden dashboard launcher を確認した。ユーザー報告で確認済み。
 - [x] GRAY 実機と GRAY IMU を release target 外として扱う。
-- [ ] 長時間 soak、実署名 MSI / MSIX を formal release 前に確認する。実 Codex App Server 接続は確認済み。
+- [x] Core2 8時間 soak を formal release 前に確認する。Wi-Fi AP停止 / 復帰は今回対象外。
+- [ ] 実署名 MSI / MSIX を formal release 前に確認する。実 Codex App Server 接続は確認済み。
 - [x] 実機未実施項目が manual test と release notes に残っている。
 
 ## Distribution

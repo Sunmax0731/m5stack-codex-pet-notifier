@@ -1,7 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
   "version": "0.2.0-beta.1",
-  "generatedAt": "2026-05-10T17:24:32.750Z",
+  "generatedAt": "2026-05-11T02:37:23.737Z",
   "status": "prepared",
   "formats": [
     "msi",
@@ -41,7 +41,7 @@
   "packageStage": {
     "ok": true,
     "stageDir": "dist/m5stack-codex-pet-notifier-windows-installer",
-    "durationMs": 7197,
+    "durationMs": 7662,
     "error": null
   },
   "artifacts": {

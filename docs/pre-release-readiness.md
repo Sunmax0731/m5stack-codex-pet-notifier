@@ -33,6 +33,7 @@
 - Core2 / Dashboard の機能ブラッシュアップ手動確認。日本語表示、Display 設定、pet 位置 / scale / RGBA、hatch-pet row illustration、gesture、Decision、最新 Codex 回答送信、installer shortcut、background launcher はユーザー確認済み。
 - Host Bridge long-run diagnostics と firmware Wi-Fi / poll backoff。
 - Core2 soak runner。
+- Core2 8時間 soak。Wi-Fi AP停止 / 復帰は今回対象外。
 - 署名付き MSI / MSIX template、signing readiness check、signed installer pipeline。
 - 実 Codex App Server runtime probe。`initialize`、`thread/start`、`turn/start` は public interface で確認済み。
 - 手動 gate 自動化 runner。
@@ -43,7 +44,6 @@
 
 ## Not Ready for Stable
 
-- 長時間 soak test。
 - 実署名付き MSI / MSIX installer。
 
 ## Future Update Scope
@@ -52,4 +52,4 @@
 
 ## Decision
 
-`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。Core2 / Dashboard の主要 UX はユーザー確認済みです。GRAY 実機と GRAY IMU は release target 外です。実 Codex App Server 接続は確認済みですが、長時間 soak と実署名 installer の release 環境検証が残るため stable には上げません。複数端末は今回の正式化作業から外し、今後のアップデートで扱います。
+`v0.2.0-beta.1` は beta prerelease として公開し、stable release にはしません。Core2 / Dashboard の主要 UX はユーザー確認済みです。GRAY 実機と GRAY IMU は release target 外です。実 Codex App Server 接続と Core2 8時間 soak は確認済みですが、実署名 installer の release 環境検証が残るため stable には上げません。複数端末は今回の正式化作業から外し、今後のアップデートで扱います。

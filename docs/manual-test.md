@@ -1,6 +1,6 @@
 # 手動テスト
 
-Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Codex app-server adapter smoke / adapter review / Dashboard smoke / signing readiness の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機と GRAY IMU は release target 外です。長時間 soak、実署名 MSI / MSIX、実 Codex App Server 接続は formal release 前の gate です。署名 MSI / MSIX と実 Codex App Server 接続は `docs/manual-test-automation.md` の手順で自動 evidence 化します。
+Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Codex relay answer、sample event polling は Codex で確認対象にします。beta では simulator / mock device / LAN Host Bridge smoke / Codex relay smoke / Codex app-server adapter smoke / adapter review / Dashboard smoke / signing readiness の自動検証に加え、USB 接続された M5Stack への firmware 書き込みと LAN 接続ログを証跡化します。GRAY 実機と GRAY IMU は release target 外です。Core2 8時間 soak と実 Codex App Server 接続は formal gate として確認済みです。Wi-Fi AP停止 / 復帰は今回の soak に含めません。実署名 MSI / MSIX は formal release 前の gate です。署名 MSI / MSIX と実 Codex App Server 接続は `docs/manual-test-automation.md` の手順で自動 evidence 化します。
 
 ## 共通前提
 
@@ -13,7 +13,7 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 ## 2026-05-10 手動確認結果
 
-機能ブラッシュアップ時に、ユーザーが Core2 実機、Dashboard、Codex relay、Decision、Display 設定、hatch-pet row illustration、ちらつき抑制、色 / 透明度、位置調整、起動導線を動作確認し、問題なく動作することを確認済みです。以下の Core2 / Dashboard 項目の結果は、このユーザー報告を反映します。GRAY 実機と GRAY IMU は対象外として扱い、長時間 soak、署名付き MSI / MSIX、実 Codex App Server 接続は beta 残リスクとして別管理します。
+機能ブラッシュアップ時に、ユーザーが Core2 実機、Dashboard、Codex relay、Decision、Display 設定、hatch-pet row illustration、ちらつき抑制、色 / 透明度、位置調整、起動導線を動作確認し、問題なく動作することを確認済みです。以下の Core2 / Dashboard 項目の結果は、このユーザー報告を反映します。GRAY 実機と GRAY IMU は対象外として扱います。Core2 8時間 soak と実 Codex App Server 接続は確認済みで、署名付き MSI / MSIX は beta 残リスクとして別管理します。
 
 ## Core2
 
@@ -62,8 +62,8 @@ Core2 target の build、upload、2.4GHz Wi-Fi 接続、Host Bridge pairing、Co
 
 | No | 手順 | 期待結果 | 結果 |
 | --- | --- | --- | --- |
-| LR-01 | Host Bridge と Core2 を 8 時間以上稼働し、5分ごとに heartbeat と sample event を流す | `/debug/snapshot` または Dashboard で `stale=false`、`lastHeartbeatSec` が更新され、`droppedEvents` が想定外に増えない | 未実施 |
-| LR-02 | Wi-Fi AP を一時停止し、復帰後に poll を再開する | firmware が backoff 後に再接続し、連続 poll 失敗時は pairing 復帰できる | 未実施 |
+| LR-01 | Host Bridge と Core2 を 8 時間以上稼働し、5分ごとに heartbeat と sample event を流す | `/debug/snapshot` または Dashboard で `stale=false`、`lastHeartbeatSec` が更新され、`droppedEvents` が想定外に増えない | 実施済み。`docs/core2-soak-result.json` で 8時間、snapshots 961、heartbeat 961、replay 96回、bridgeFailures 0、stale 0、droppedEvents 0 |
+| LR-02 | Wi-Fi AP を一時停止し、復帰後に poll を再開する | firmware が backoff 後に再接続し、連続 poll 失敗時は pairing 復帰できる | 今回対象外。実施タイミングを指定した回だけ別 gate として扱う |
 | SIGN-01 | 実署名証明書を用意し、`WINDOWS_SIGNING_CERT_THUMBPRINT` を設定して MSI / MSIX を作成する | `signtool verify` が成功し、証明書や password が repo に残らない | 自動化済み。現環境では WiX / Windows SDK / 署名証明書未導入のため `prepared` |
 | API-01 | Codex App Server を起動し、adapter から `initialize`、`thread/start`、`turn/start` を実行する | public interface 経由で thread / turn が作成され、非公開 API scraping を使わない | 実施済み。`docs/codex-app-server-runtime-probe-result.json` で `passed` |
 

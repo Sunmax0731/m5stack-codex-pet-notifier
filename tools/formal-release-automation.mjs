@@ -65,10 +65,10 @@ try {
     }
     const longRun = runNpm(soakArgs, { timeout: (longRunMinutes * 60_000) + 120_000 });
     result.steps.push(step('core2:soak', longRun));
-    result.evidence.longRun = readJson(path.join(repoRoot, 'dist', 'core2-soak-result.json'));
+    result.evidence.longRun = summarizeLongRunEvidence(readJson(path.join(repoRoot, 'dist', 'core2-soak-result.json')));
   } else {
     result.steps.push({ name: 'core2:soak', status: 'evidence-read' });
-    result.evidence.longRun = readJson(path.join(repoRoot, 'docs', 'core2-soak-result.json'));
+    result.evidence.longRun = summarizeLongRunEvidence(readJson(path.join(repoRoot, 'docs', 'core2-soak-result.json')));
   }
   result.gates.longRun = longRunGate(result.evidence.longRun);
 
@@ -131,6 +131,37 @@ function longRunGate(evidence) {
     return 'failed';
   }
   return 'passed';
+}
+
+function summarizeLongRunEvidence(evidence) {
+  if (!evidence) {
+    return null;
+  }
+  return {
+    product: evidence.product,
+    version: evidence.version,
+    generatedAt: evidence.generatedAt,
+    status: evidence.status,
+    scope: evidence.scope,
+    config: evidence.config,
+    startedAt: evidence.startedAt,
+    endedAt: evidence.endedAt,
+    checks: evidence.checks,
+    counters: evidence.counters,
+    devices: evidence.devices,
+    replaySummary: {
+      attempts: evidence.counters?.replayAttempts ?? null,
+      failures: evidence.counters?.replayFailures ?? null,
+      retainedEntries: Array.isArray(evidence.replayResults) ? evidence.replayResults.length : 0
+    },
+    sampleSummary: {
+      retainedEntries: Array.isArray(evidence.samples) ? evidence.samples.length : 0,
+      firstElapsedMs: Array.isArray(evidence.samples) ? evidence.samples[0]?.elapsedMs ?? null : null,
+      lastElapsedMs: Array.isArray(evidence.samples) ? evidence.samples.at(-1)?.elapsedMs ?? null : null
+    },
+    errors: evidence.errors,
+    nextActions: evidence.nextActions
+  };
 }
 
 function codexAppServerGate(evidence, turnRequired) {

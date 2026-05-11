@@ -49,6 +49,7 @@ export const productProfile = {
     'docs/qcds-remote-benchmark.md',
     'docs/qcds-strict-gap-analysis.md',
     'docs/long-run-operations.md',
+    'docs/core2-soak-result.json',
     'docs/signed-installer-plan.md',
     'docs/codex-app-server-api-integration.md',
     'docs/signed-installer-pipeline-result.json',

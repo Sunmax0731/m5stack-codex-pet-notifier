@@ -1,7 +1,7 @@
 {
   "product": "m5stack-codex-pet-notifier",
   "version": "0.2.0-beta.1",
-  "generatedAt": "2026-05-10T17:24:32.315Z",
+  "generatedAt": "2026-05-11T02:37:23.312Z",
   "status": "partial",
   "scope": {
     "releaseTarget": "Core2",
@@ -23,7 +23,7 @@
       "status": "passed",
       "exitCode": 0,
       "signal": null,
-      "durationMs": 8403,
+      "durationMs": 8992,
       "stderr": "",
       "error": null
     },
@@ -32,7 +32,7 @@
       "status": "passed",
       "exitCode": 0,
       "signal": null,
-      "durationMs": 2424,
+      "durationMs": 2919,
       "stderr": "",
       "error": null
     }
@@ -47,7 +47,7 @@
     "longRun": {
       "product": "m5stack-codex-pet-notifier",
       "version": "0.2.0-beta.1",
-      "generatedAt": "2026-05-10T17:22:24.390Z",
+      "generatedAt": "2026-05-10T17:25:38.686Z",
       "status": "passed",
       "scope": {
         "releaseTarget": "Core2",
@@ -58,16 +58,16 @@
       },
       "config": {
         "bridge": "loopback",
-        "durationMs": 90000,
-        "intervalMs": 15000,
-        "replayIntervalMs": 60000,
-        "pairingTimeoutMs": 60000,
+        "durationMs": 28800000,
+        "intervalMs": 30000,
+        "replayIntervalMs": 300000,
+        "pairingTimeoutMs": 600000,
         "maxHeartbeatAgeSec": 45,
         "maxDroppedEvents": 0,
         "requireDevice": true
       },
-      "startedAt": "2026-05-10T17:22:24.391Z",
-      "endedAt": "2026-05-10T17:23:54.437Z",
+      "startedAt": "2026-05-10T17:25:38.687Z",
+      "endedAt": "2026-05-11T01:25:38.733Z",
       "checks": {
         "bridgeReachable": true,
         "pairedDeviceObserved": true,
@@ -78,13 +78,13 @@
         "wifiInterruptionSkipped": true
       },
       "counters": {
-        "snapshots": 7,
-        "replayAttempts": 2,
+        "snapshots": 961,
+        "replayAttempts": 96,
         "replayFailures": 0,
         "bridgeFailures": 0,
         "observedDeviceCount": 1,
-        "observedHeartbeatCount": 7,
-        "maxHeartbeatAgeSec": 7,
+        "observedHeartbeatCount": 961,
+        "maxHeartbeatAgeSec": 10,
         "maxDroppedEvents": 0,
         "staleSampleCount": 0
       },
@@ -94,13 +94,13 @@
           "pending": 0,
           "websocket": false,
           "stale": false,
-          "lastSeenSec": 0,
-          "lastPollSec": 0,
-          "lastHeartbeatSec": 2,
+          "lastSeenSec": 1,
+          "lastPollSec": 1,
+          "lastHeartbeatSec": 8,
           "droppedEvents": 0,
           "lastHeartbeat": {
             "battery": 100,
-            "wifiRssi": -43,
+            "wifiRssi": -45,
             "screen": "Choice",
             "lastError": null,
             "errorRecoverable": null,
@@ -110,336 +110,36 @@
               "bodyTextScale": 1,
               "animationFps": 12,
               "motionStepMs": 280,
-              "applyCount": 2,
+              "applyCount": 98,
               "lastEventId": "evt-display-001",
               "visualProbe": false,
               "beepOnAnswer": true
             },
             "pet": {
               "mood": "confused",
-              "lastInteraction": "none",
-              "interactionCount": 0
+              "lastInteraction": "long-press",
+              "interactionCount": 2
             }
           }
         }
       ],
-      "samples": [
-        {
-          "elapsedMs": 43,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 0,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 1,
-              "lastPollSec": 1,
-              "lastHeartbeatSec": 7,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -42,
-                "screen": "Idle",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 0,
-                  "lastEventId": null,
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "idle",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 0,
-          "inboundEvents": 13,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 53,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 5,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 1,
-              "lastPollSec": 1,
-              "lastHeartbeatSec": 7,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -42,
-                "screen": "Idle",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 0,
-                  "lastEventId": null,
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "idle",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 5,
-          "inboundEvents": 13,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 15059,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 0,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 0,
-              "lastPollSec": 0,
-              "lastHeartbeatSec": 2,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -43,
-                "screen": "Choice",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 1,
-                  "lastEventId": "evt-display-001",
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "confused",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 5,
-          "inboundEvents": 15,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 30063,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 0,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 1,
-              "lastPollSec": 1,
-              "lastHeartbeatSec": 7,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -45,
-                "screen": "Choice",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 1,
-                  "lastEventId": "evt-display-001",
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "confused",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 5,
-          "inboundEvents": 16,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 45067,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 0,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 0,
-              "lastPollSec": 0,
-              "lastHeartbeatSec": 2,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -43,
-                "screen": "Choice",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 1,
-                  "lastEventId": "evt-display-001",
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "confused",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 5,
-          "inboundEvents": 18,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 60076,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 5,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 1,
-              "lastPollSec": 1,
-              "lastHeartbeatSec": 7,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -43,
-                "screen": "Choice",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 1,
-                  "lastEventId": "evt-display-001",
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "confused",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 10,
-          "inboundEvents": 19,
-          "securityRejections": 1
-        },
-        {
-          "elapsedMs": 75079,
-          "ok": true,
-          "pairedDevices": [
-            {
-              "deviceId": "m5stack-sample-001",
-              "pending": 0,
-              "websocket": false,
-              "stale": false,
-              "lastSeenSec": 0,
-              "lastPollSec": 0,
-              "lastHeartbeatSec": 2,
-              "droppedEvents": 0,
-              "lastHeartbeat": {
-                "battery": 100,
-                "wifiRssi": -43,
-                "screen": "Choice",
-                "lastError": null,
-                "errorRecoverable": null,
-                "display": {
-                  "petScale": 2,
-                  "uiTextScale": 1,
-                  "bodyTextScale": 1,
-                  "animationFps": 12,
-                  "motionStepMs": 280,
-                  "applyCount": 2,
-                  "lastEventId": "evt-display-001",
-                  "visualProbe": false,
-                  "beepOnAnswer": true
-                },
-                "pet": {
-                  "mood": "confused",
-                  "lastInteraction": "none",
-                  "interactionCount": 0
-                }
-              }
-            }
-          ],
-          "outboundEvents": 10,
-          "inboundEvents": 21,
-          "securityRejections": 1
-        }
-      ],
-      "replayResults": [
-        {
-          "elapsedMs": 50,
-          "ok": true,
-          "resultCount": 5,
-          "failures": []
-        },
-        {
-          "elapsedMs": 60073,
-          "ok": true,
-          "resultCount": 5,
-          "failures": []
-        }
-      ],
+      "replaySummary": {
+        "attempts": 96,
+        "failures": 0,
+        "retainedEntries": 96
+      },
+      "sampleSummary": {
+        "retainedEntries": 720,
+        "firstElapsedMs": 7202530,
+        "lastElapsedMs": 28785337
+      },
       "errors": [],
       "nextActions": []
     },
     "signedInstaller": {
       "product": "m5stack-codex-pet-notifier",
       "version": "0.2.0-beta.1",
-      "generatedAt": "2026-05-10T17:24:32.750Z",
+      "generatedAt": "2026-05-11T02:37:23.737Z",
       "status": "prepared",
       "formats": [
         "msi",
@@ -479,7 +179,7 @@
       "packageStage": {
         "ok": true,
         "stageDir": "dist/m5stack-codex-pet-notifier-windows-installer",
-        "durationMs": 7197,
+        "durationMs": 7662,
         "error": null
       },
       "artifacts": {
@@ -512,7 +212,7 @@
     "codexAppServer": {
       "product": "m5stack-codex-pet-notifier",
       "version": "0.2.0-beta.1",
-      "generatedAt": "2026-05-10T17:24:41.127Z",
+      "generatedAt": "2026-05-11T02:37:32.802Z",
       "status": "passed",
       "officialDocs": "https://developers.openai.com/codex/app-server",
       "publicInterfaceOnly": true,
@@ -609,11 +309,11 @@
         "malformedLineCount": 0,
         "stderrLineCount": 9,
         "stderrSample": [
-          "{\"timestamp\":\"2026-05-10T17:24:42.199404Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to warm featured plugin ids cache\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/featured failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2rem;height:100%;justify-con",
-          "{\"timestamp\":\"2026-05-10T17:24:42.199436Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"startup remote plugin sync failed; will retry on next app-server start\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/list failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2r",
-          "{\"timestamp\":\"2026-05-10T17:24:42.579789Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to load plugin: missing or invalid plugin.json\",\"plugin\":\"chrome@openai-bundled\",\"path\":\"%USERPROFILE%\\\\.codex\\\\plugins\\\\cache\\\\openai-bundled\\\\chrome\\\\0.1.7\"},\"target\":\"codex_core_plugins::loader\"}",
-          "{\"timestamp\":\"2026-05-10T17:24:42.693625Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: prompt must be at most 128 characters\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\build-ios-apps\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}",
-          "{\"timestamp\":\"2026-05-10T17:24:42.695644Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: maximum of 3 prompts is supported\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\plugin-eval\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}"
+          "{\"timestamp\":\"2026-05-11T02:37:34.196798Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to warm featured plugin ids cache\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/featured failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2rem;height:100%;justify-con",
+          "{\"timestamp\":\"2026-05-11T02:37:34.197551Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"startup remote plugin sync failed; will retry on next app-server start\",\"error\":\"remote plugin sync request to https://chatgpt.com/backend-api/plugins/list failed with status 403 Forbidden: <html>\\n  <head>\\n    <meta name=\\\"viewport\\\" content=\\\"width=device-width, initial-scale=1\\\" />\\n    <style global>body{font-family:Arial,Helvetica,sans-serif}.container{align-items:center;display:flex;flex-direction:column;gap:2r",
+          "{\"timestamp\":\"2026-05-11T02:37:34.591037Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"failed to load plugin: missing or invalid plugin.json\",\"plugin\":\"chrome@openai-bundled\",\"path\":\"%USERPROFILE%\\\\.codex\\\\plugins\\\\cache\\\\openai-bundled\\\\chrome\\\\0.1.7\"},\"target\":\"codex_core_plugins::loader\"}",
+          "{\"timestamp\":\"2026-05-11T02:37:34.702597Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: prompt must be at most 128 characters\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\build-ios-apps\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}",
+          "{\"timestamp\":\"2026-05-11T02:37:34.704644Z\",\"level\":\"WARN\",\"fields\":{\"message\":\"ignoring interface.defaultPrompt: maximum of 3 prompts is supported\",\"path\":\"%USERPROFILE%\\\\.codex\\\\.tmp\\\\plugins\\\\plugins\\\\plugin-eval\\\\.codex-plugin/plugin.json\"},\"target\":\"codex_core_plugins::manifest\"}"
         ],
         "threadIdReceived": true,
         "turnIdReceived": true

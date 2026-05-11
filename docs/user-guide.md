@@ -147,5 +147,5 @@ Dashboard preview だけを切り替える場合は、Host Bridge 起動後に `
 
 - beta では Codex relay、`/codex/event`、`/codex/replay-samples`、session watcher、hook relay を既定 adapter とし、Codex App Server public interface adapter は runtime probe 済みの追加経路として扱います。非公開 API scraping は対象外です。
 - Core2 の upload、Wi-Fi、pairing、sample event poll は Codex 実行環境で確認対象です。
-- GRAY 実機と GRAY IMU は対象外です。長時間 soak、実署名 MSI / MSIX は release 環境での formal gate です。複数 M5Stack 同時接続は今後のアップデート対象です。
+- GRAY 実機と GRAY IMU は対象外です。Core2 8時間 soak は Wi-Fi AP停止 / 復帰を含めない条件で確認済みです。実署名 MSI / MSIX は release 環境での formal gate です。複数 M5Stack 同時接続は今後のアップデート対象です。
 - LAN 外公開は対象外です。

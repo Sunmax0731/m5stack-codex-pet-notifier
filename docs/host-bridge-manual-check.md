@@ -111,4 +111,4 @@ Invoke-RestMethod -Uri http://127.0.0.1:8080/events
 
 ## 今回対象外
 
-GRAY 実機と GRAY IMU は release target 外です。長時間 soak と実署名 MSI / MSIX は release 環境での formal gate として残します。実 Codex App Server 接続は `codex:app-server:probe -- --include-turn` で確認済みです。複数 M5Stack 同時接続は今後のアップデート対象です。
+GRAY 実機と GRAY IMU は release target 外です。Core2 8時間 soak と実 Codex App Server 接続は確認済みです。Wi-Fi AP停止 / 復帰は今回の soak に含めません。実署名 MSI / MSIX は release 環境での formal gate として残します。複数 M5Stack 同時接続は今後のアップデート対象です。

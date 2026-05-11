@@ -16,6 +16,7 @@
 - Signing readiness check
 - Signed installer pipeline preparation
 - Core2 firmware upload、2.4GHz Wi-Fi、pairing、sample event poll、A button reply
+- Core2 8時間 soak。Wi-Fi AP停止 / 復帰は今回対象外
 - docs ZIP generation
 - QCDS grade validation
 
@@ -31,7 +32,7 @@
 
 ## Codexでは未実施
 
-- 長時間 soak と Wi-Fi 再接続の実運用証跡。
+- Wi-Fi AP停止 / 復帰の実運用証跡。
 - 実署名付き MSI / MSIX。
 
 ## 対象外
@@ -42,4 +43,4 @@
 
 ## Release判定
 
-beta prerelease としては許容します。stable release や `S+` 評価には、上記の未実施項目を実機証跡で埋める必要があります。
+beta prerelease としては許容します。stable release や `S+` 評価には、実署名付き MSI / MSIX の証跡が必要です。Wi-Fi AP停止 / 復帰は今回対象外で、実施指示がある回だけ別 gate として扱います。

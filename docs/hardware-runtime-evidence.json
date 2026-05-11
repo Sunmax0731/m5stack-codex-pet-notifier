@@ -90,6 +90,22 @@
     "inboundEventsAtCheck": 11,
     "securityRejections": 0
   },
+  "longRunSoak": {
+    "status": "passed",
+    "command": "cmd.exe /d /s /c npm run core2:soak -- --duration-min=480 --skip-wifi-interruption",
+    "startedAt": "2026-05-10T17:25:38.687Z",
+    "endedAt": "2026-05-11T01:25:38.733Z",
+    "wifiInterruption": "excluded-by-request",
+    "snapshots": 961,
+    "heartbeats": 961,
+    "replayAttempts": 96,
+    "replayFailures": 0,
+    "bridgeFailures": 0,
+    "maxHeartbeatAgeSec": 10,
+    "staleSampleCount": 0,
+    "maxDroppedEvents": 0,
+    "evidence": "docs/core2-soak-result.json"
+  },
   "rePairing": {
     "invalidTokenRecoveryImplemented": true,
     "reasonCodes": [
@@ -293,7 +309,6 @@
     "Dashboard Display settings heartbeat sync for petScale=32, pet drag offset values, and transparent text background alpha=0 is passed; final visual confirmation for fixed header removal, text-only alpha=0 rendering, render FPS, motion step, and text-over-pet layout still requires user manual check",
     "Dashboard current pet preview and physical Core2 layout match are prepared but still require user manual check",
     "GRAY target and GRAY IMU are out of release scope",
-    "long-run soak is not yet executed",
     "signed MSI/MSIX is prepared but not signed with a real certificate",
     "real Codex App Server connection is executed by runtime probe for initialize/thread-start/turn-start; relay still keeps clipboard/stdin/file/local-session-jsonl/hook fallback input until event mapper is added",
     "local 8080 bridge should be kept on the current v0.2.0-beta.1 process before final manual confirmation, or the Dashboard should show that it auto-detected the latest Bridge API on 18081"

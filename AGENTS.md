@@ -27,4 +27,4 @@
 
 ## Release Boundary
 
-`v0.2.0-beta.1` は Host Bridge、Dashboard、Codex relay、Codex app-server adapter runtime probe、M5Stack Core2 firmware、pet mood / gesture interaction、Windows user-local installer、署名付き MSI / MSIX pipeline 準備を含む beta prerelease です。GRAY 実機と GRAY IMU は対象外です。stable release ではないため、長時間運用、実署名、ユーザー環境での signed installer 実行確認は手動テストへ残します。複数 M5Stack 同時接続は今回対象外で今後のアップデート対象です。
+`v0.2.0-beta.1` は Host Bridge、Dashboard、Codex relay、Codex app-server adapter runtime probe、M5Stack Core2 firmware、pet mood / gesture interaction、Windows user-local installer、署名付き MSI / MSIX pipeline 準備を含む beta prerelease です。GRAY 実機と GRAY IMU は対象外です。Core2 の 8時間 soak は Wi-Fi AP停止 / 復帰を含めない条件で合格済みです。stable release ではないため、実署名とユーザー環境での signed installer 実行確認は手動テストへ残します。複数 M5Stack 同時接続は今回対象外で今後のアップデート対象です。

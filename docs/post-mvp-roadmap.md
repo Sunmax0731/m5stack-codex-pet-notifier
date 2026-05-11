@@ -4,7 +4,7 @@
 
 - Codex App Server public interface の実接続確認を行う。
 - Host Bridge を HTTP / WebSocket server として起動できるようにする。
-- Core2 実機 build / flash / long-run soak の証跡を追加する。
+- Core2 実機 build / flash / 8時間 soak の証跡を追加した。Wi-Fi AP停止 / 復帰は別 gate として残す。
 - 署名付き MSI / MSIX の実署名と installer 起動証跡を追加する。
 
 ## Beta
